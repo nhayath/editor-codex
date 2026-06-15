@@ -13,7 +13,7 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <div class="grid gap-6 rounded-lg bg-[var(--color-surface)] p-6 ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)] md:grid-cols-[1fr_1fr]">
+  <div class="@container grid gap-6 rounded-lg bg-[var(--color-surface)] p-6 ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)] @xl:grid-cols-[1fr_1fr]">
     <div>
       <p class="text-sm font-semibold text-[var(--color-primary)]">
         Contact

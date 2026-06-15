@@ -14,8 +14,8 @@ withDefaults(defineProps<{
 
 <template>
   <div
-    class="grid items-center gap-8 lg:grid-cols-2"
-    :class="imagePosition === 'left' ? 'lg:[&>*:first-child]:order-2' : ''"
+    class="@container grid items-center gap-8 @xl:grid-cols-2"
+    :class="imagePosition === 'left' ? '@xl:[&>*:first-child]:order-2' : ''"
   >
     <div>
       <p class="text-sm font-semibold text-[var(--color-primary)]">

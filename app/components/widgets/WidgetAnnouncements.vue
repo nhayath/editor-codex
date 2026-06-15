@@ -22,7 +22,7 @@ const items = computed(() => {
 </script>
 
 <template>
-  <div class="grid gap-6">
+  <div class="@container grid gap-6">
     <div class="flex items-center justify-between gap-4">
       <div>
         <p class="text-sm font-semibold text-[var(--color-primary)]">
@@ -35,7 +35,7 @@ const items = computed(() => {
       <UIcon name="i-lucide-megaphone" class="size-8 text-[var(--color-secondary)]" />
     </div>
 
-    <div :class="variant === 'list' ? 'grid gap-3' : 'grid gap-4 md:grid-cols-3'">
+    <div :class="variant === 'list' ? 'grid gap-3' : 'grid gap-4 @xl:grid-cols-3'">
       <article
         v-for="item in items"
         :key="item.id"

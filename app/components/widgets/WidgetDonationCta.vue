@@ -18,10 +18,10 @@ const featured = computed(() => campaigns.value.find((item: any) => item.isFeatu
 </script>
 
 <template>
-  <div class="rounded-lg bg-[var(--color-primary)] p-6 text-white">
+  <div class="@container rounded-lg bg-[var(--color-primary)] p-6 text-white">
     <div
       v-if="variant === 'banner'"
-      class="grid gap-6 md:grid-cols-[1fr_auto]"
+      class="grid gap-6 @xl:grid-cols-[1fr_auto]"
     >
       <div>
         <p class="text-sm font-medium text-white/75">
@@ -53,7 +53,7 @@ const featured = computed(() => campaigns.value.find((item: any) => item.isFeatu
 
     <div
       v-else
-      class="grid gap-4 md:grid-cols-2"
+      class="grid gap-4 @xl:grid-cols-2"
     >
       <article
         v-for="campaign in campaigns"

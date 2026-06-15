@@ -18,7 +18,7 @@ const images = computed(() => {
 </script>
 
 <template>
-  <div class="grid gap-6">
+  <div class="@container grid gap-6">
     <div>
       <p class="text-sm font-semibold text-[var(--color-primary)]">
         Moments
@@ -28,7 +28,7 @@ const images = computed(() => {
       </h2>
     </div>
 
-    <div :class="variant === 'masonry' ? 'columns-1 gap-4 md:columns-3' : 'grid gap-4 md:grid-cols-3'">
+    <div :class="variant === 'masonry' ? 'columns-1 gap-4 @xl:columns-3' : 'grid gap-4 @xl:grid-cols-3'">
       <img
         v-for="(image, index) in images"
         :key="image"

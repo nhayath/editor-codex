@@ -77,6 +77,24 @@ Browser checks performed against `http://localhost:3000`:
   - Desktop preview pane scrolls independently while the editor shell/body stays fixed.
   - Editor Mobile preview mode scrolls independently while the editor shell/body stays fixed.
   - No relevant browser console errors or warnings were observed during the scroll QA pass.
+- Mobile hero preview fix verified in the in-app Chrome/browser QA loop:
+  - The hero uses container-aware Nuxt UI `UPageHero` overrides so the embedded editor preview responds to preview width instead of the full browser viewport.
+  - In editor Mobile preview mode, the hero title stays inside the card, the image stacks below the title, and no hero horizontal overflow was observed.
+- Mobile grouped-section preview fix verified in the in-app Chrome/browser QA loop:
+  - `GroupRenderer` uses container queries for row layouts so embedded editor Mobile preview stacks grouped widgets instead of using the full browser viewport breakpoint.
+  - The Prayer & Jumu'ah group stacks its countdown and Jumu'ah cards vertically in Mobile preview, with no horizontal overflow observed.
+- Mobile announcements preview fix verified in the in-app Chrome/browser QA loop:
+  - `WidgetAnnouncements` uses container queries so announcement cards stack vertically in embedded editor Mobile preview.
+  - The announcements section showed full-width cards, no horizontal overflow, and no relevant console errors.
+- Mobile events preview fix verified in the in-app Chrome/browser QA loop:
+  - `WidgetEvents` uses container queries so event cards stack vertically in embedded editor Mobile preview.
+  - The events section showed full-width cards, no horizontal overflow, and no relevant console errors.
+- Mobile tenant header/menu fix verified in the in-app Chrome/browser QA loop:
+  - `TenantHeader` uses container queries so the embedded editor Mobile preview hides desktop nav/CTA controls and shows a compact menu button.
+  - Opening the mobile menu shows the tenant navigation links in a stacked menu with no horizontal overflow and no relevant console errors.
+- Mobile responsive sweep verified in the in-app Chrome/browser QA loop:
+  - Donation, about, contact, footer, prayer times, services, gallery, carousel, location map, and related remaining public widgets use container-aware breakpoints where they appear inside the embedded editor preview.
+  - Classic and modern seeded tenants were checked in editor Mobile preview; key cards/columns stack at 390px with no horizontal overflow and no relevant console errors.
 
 ## QA Workflow Note
 

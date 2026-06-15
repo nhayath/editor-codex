@@ -27,7 +27,7 @@ const items = computed(() => {
 </script>
 
 <template>
-  <div class="grid gap-6">
+  <div class="@container grid gap-6">
     <div class="max-w-2xl">
       <p class="text-sm font-semibold text-[var(--color-primary)]">
         Featured
@@ -45,7 +45,7 @@ const items = computed(() => {
       arrows
       dots
       :autoplay="autoplay ? { delay: 5000 } : false"
-      :ui="{ item: variant === 'multi-slide' ? 'basis-full md:basis-1/2' : 'basis-full' }"
+      :ui="{ item: variant === 'multi-slide' ? 'basis-full @xl:basis-1/2' : 'basis-full' }"
       class="overflow-hidden rounded-lg"
     >
       <template #default="{ item }">

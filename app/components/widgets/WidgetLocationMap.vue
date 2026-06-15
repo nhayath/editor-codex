@@ -23,7 +23,7 @@ const directionsUrl = computed(() => `https://www.google.com/maps/search/?api=1&
 </script>
 
 <template>
-  <div class="grid gap-6 md:grid-cols-[0.8fr_1.2fr]">
+  <div class="@container grid gap-6 @xl:grid-cols-[0.8fr_1.2fr]">
     <div>
       <p class="text-sm font-semibold text-[var(--color-primary)]">
         Location

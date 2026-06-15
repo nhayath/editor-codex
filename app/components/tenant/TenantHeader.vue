@@ -1,13 +1,17 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   tenant?: Record<string, any> | null
 }>()
+
+const menuOpen = ref(false)
+
+const navItems = computed(() => props.tenant?.navItems ?? [])
 </script>
 
 <template>
   <header
     id="top"
-    class="sticky top-0 z-30 border-b border-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_92%,transparent)] backdrop-blur"
+    class="@container sticky top-0 z-30 border-b border-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_92%,transparent)] backdrop-blur"
   >
     <div class="tenant-container flex h-16 items-center justify-between gap-4">
       <NuxtLink
@@ -22,9 +26,9 @@ defineProps<{
         </span>
       </NuxtLink>
 
-      <nav class="hidden items-center gap-1 md:flex">
+      <nav class="hidden items-center gap-1 @md:flex">
         <UButton
-          v-for="item in tenant?.navItems ?? []"
+          v-for="item in navItems"
           :key="item.id"
           :to="item.href"
           color="neutral"
@@ -34,13 +38,43 @@ defineProps<{
         />
       </nav>
 
+      <div class="hidden @md:block">
+        <UButton
+          to="#contact"
+          color="primary"
+          icon="i-lucide-mail"
+          label="Contact"
+          size="sm"
+        />
+      </div>
+
       <UButton
-        to="#contact"
-        color="primary"
-        icon="i-lucide-mail"
-        label="Contact"
+        color="neutral"
+        variant="ghost"
+        icon="i-lucide-menu"
         size="sm"
+        :aria-label="menuOpen ? 'Close menu' : 'Open menu'"
+        class="@md:hidden"
+        @click="menuOpen = !menuOpen"
       />
     </div>
+
+    <nav
+      v-if="menuOpen"
+      class="tenant-container grid gap-2 border-t border-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)] py-3 @md:hidden"
+      aria-label="Mobile navigation"
+    >
+      <UButton
+        v-for="item in navItems"
+        :key="item.id"
+        :to="item.href"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        class="justify-start"
+        :label="item.label"
+        @click="menuOpen = false"
+      />
+    </nav>
   </header>
 </template>

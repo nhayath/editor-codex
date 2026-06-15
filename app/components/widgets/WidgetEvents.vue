@@ -20,7 +20,7 @@ function formatDate(value?: string) {
 </script>
 
 <template>
-  <div class="grid gap-6">
+  <div class="@container grid gap-6">
     <div>
       <p class="text-sm font-semibold text-[var(--color-primary)]">
         Programmes
@@ -30,7 +30,7 @@ function formatDate(value?: string) {
       </h2>
     </div>
 
-    <div :class="variant === 'list' ? 'grid gap-3' : 'grid gap-4 md:grid-cols-3'">
+    <div :class="variant === 'list' ? 'grid gap-3' : 'grid gap-4 @xl:grid-cols-3'">
       <article
         v-for="event in items"
         :key="event.id"

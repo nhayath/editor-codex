@@ -15,7 +15,7 @@ const services = computed(() => parsePipeRows(props.items, 3).map(([title, descr
 </script>
 
 <template>
-  <div class="grid gap-6">
+  <div class="@container grid gap-6">
     <div>
       <p class="text-sm font-semibold text-[var(--color-primary)]">
         What we offer
@@ -25,7 +25,7 @@ const services = computed(() => parsePipeRows(props.items, 3).map(([title, descr
       </h2>
     </div>
 
-    <div :class="variant === 'list' ? 'grid gap-3' : 'grid gap-4 md:grid-cols-3'">
+    <div :class="variant === 'list' ? 'grid gap-3' : 'grid gap-4 @xl:grid-cols-3'">
       <article
         v-for="service in services"
         :key="service.title"

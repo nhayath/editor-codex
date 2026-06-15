@@ -7,8 +7,8 @@ const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="border-t border-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)] bg-[var(--color-surface)] py-10">
-    <div class="tenant-container grid gap-8 md:grid-cols-[1fr_auto]">
+  <footer class="@container border-t border-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)] bg-[var(--color-surface)] py-10">
+    <div class="tenant-container grid gap-8 @xl:grid-cols-[1fr_auto]">
       <div>
         <div class="flex items-center gap-3">
           <div class="grid size-10 place-items-center rounded-md bg-[var(--color-primary)] text-white">

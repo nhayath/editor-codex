@@ -30,7 +30,7 @@ const rows = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg bg-[var(--color-surface)] p-6 ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]">
+  <div class="@container rounded-lg bg-[var(--color-surface)] p-6 ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]">
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
         <p class="text-sm font-semibold text-[var(--color-primary)]">
@@ -47,7 +47,7 @@ const rows = computed(() => {
 
     <div
       v-if="variant === 'cards'"
-      class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+      class="grid gap-3 @sm:grid-cols-2 @lg:grid-cols-3"
     >
       <div
         v-for="[name, time, iqamah] in rows"
