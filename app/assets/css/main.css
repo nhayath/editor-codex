@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+:root {
+  --ui-radius: 0.375rem;
+  --color-primary: #1B6B4A;
+  --color-secondary: #D4AF37;
+  --color-accent: #2E8B6E;
+  --color-bg: #FAFDF9;
+  --color-surface: #FFFFFF;
+  --color-text: #1A1A2E;
+  --color-text-muted: #64748B;
+  --font-heading: "Amiri", serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+html,
+body,
+#__nuxt {
+  min-height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.tenant-site {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.tenant-heading {
+  font-family: var(--font-heading);
+}
+
+.tenant-section {
+  padding: 4rem 0;
+}
+
+.tenant-container {
+  width: min(1120px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.rich-content :where(h1, h2, h3) {
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-block: 1rem 0.5rem;
+}
+
+.rich-content :where(p, li) {
+  color: var(--color-text-muted);
+  line-height: 1.75;
+}
+
+.rich-content :where(ul, ol) {
+  padding-left: 1.25rem;
+  margin-block: 0.75rem;
+}
+
+.rich-content :where(a) {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}

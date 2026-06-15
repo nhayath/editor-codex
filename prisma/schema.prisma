@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String             @id @default(cuid())
+  email        String             @unique
+  name         String?
+  passwordHash String?
+  role         String             @default("USER")
+  memberships  TenantMembership[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@map("users")
+}
+
+model Tenant {
+  id             String               @id @default(cuid())
+  name           String
+  slug           String               @unique
+  domain         String?              @unique
+  status         String               @default("ACTIVE")
+  memberships    TenantMembership[]
+  settings       TenantSettings?
+  homepageConfig HomepageConfig?
+  prayerTimes    PrayerTime[]
+  jummahTimes    JummahTime[]
+  events         Event[]
+  announcements  Announcement[]
+  donations      DonationCampaign[]
+  mediaAssets    MediaAsset[]
+  navItems       NavItem[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@map("tenants")
+}
+
+model TenantMembership {
+  id       String @id @default(cuid())
+  userId   String
+  tenantId String
+  role     String @default("EDITOR")
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@map("tenant_memberships")
+}
+
+model TenantSettings {
+  id             String  @id @default(cuid())
+  tenantId       String  @unique
+  tenant         Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  address        String?
+  city           String?
+  postcode       String?
+  country        String? @default("GB")
+  phone          String?
+  email          String?
+  logoUrl        String?
+  faviconUrl     String?
+  primaryColor   String? @default("#1B6B4A")
+  secondaryColor String? @default("#D4AF37")
+  aboutText      String?
+  facebook       String?
+  instagram      String?
+  youtube        String?
+  timezone       String? @default("Europe/London")
+
+  @@map("tenant_settings")
+}
+
+model HomepageConfig {
+  id               String   @id @default(cuid())
+  tenantId         String   @unique
+  tenant           Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  templateId       String   @default("classic")
+  paletteId        String   @default("emerald")
+  fontPairId       String   @default("inter-amiri")
+  customColors     String?
+  sectionOverrides String   @default("{}")
+  sectionOrder     String   @default("[]")
+  sectionsEnabled  String   @default("{}")
+  heroImageUrl     String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("homepage_configs")
+}
+
+model PrayerTime {
+  id            String @id @default(cuid())
+  tenantId      String
+  tenant        Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  date          String
+  fajr          String?
+  sunrise       String?
+  dhuhr         String?
+  asr           String?
+  maghrib       String?
+  isha          String?
+  fajrIqamah    String?
+  dhuhrIqamah   String?
+  asrIqamah     String?
+  maghribIqamah String?
+  ishaIqamah    String?
+
+  @@unique([tenantId, date])
+  @@map("prayer_times")
+}
+
+model JummahTime {
+  id       String  @id @default(cuid())
+  tenantId String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  label    String?
+  time     String
+  location String?
+
+  @@map("jummah_times")
+}
+
+model Event {
+  id          String  @id @default(cuid())
+  tenantId    String
+  tenant      Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  date        String
+  endDate     String?
+  location    String?
+  imageUrl    String?
+  category    String?
+  status      String  @default("PUBLISHED")
+
+  @@map("events")
+}
+
+model Announcement {
+  id       String  @id @default(cuid())
+  tenantId String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  title    String
+  content  String?
+  priority String  @default("NORMAL")
+  isPinned Boolean @default(false)
+  status   String  @default("PUBLISHED")
+
+  @@map("announcements")
+}
+
+model DonationCampaign {
+  id          String  @id @default(cuid())
+  tenantId    String
+  tenant      Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  goal        Float?
+  raised      Float   @default(0)
+  imageUrl    String?
+  paymentUrl  String?
+  status      String  @default("ACTIVE")
+  isFeatured  Boolean @default(false)
+
+  @@map("donation_campaigns")
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  filename  String
+  url       String
+  mimeType  String?
+  size      Int?
+  alt       String?
+  createdAt DateTime @default(now())
+
+  @@map("media_assets")
+}
+
+model NavItem {
+  id       String  @id @default(cuid())
+  tenantId String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  label    String
+  href     String
+  order    Int     @default(0)
+  isActive Boolean @default(true)
+
+  @@map("nav_items")
+}
