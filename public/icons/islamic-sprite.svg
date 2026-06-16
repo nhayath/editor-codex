@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="islamic-mosque" viewBox="0 0 24 24">
+    <path d="M4 20h16"/>
+    <path d="M5 20v-7.5L12 7l7 5.5V20"/>
+    <path d="M9 20v-5a3 3 0 0 1 6 0v5"/>
+    <path d="M12 4.5V2"/>
+    <path d="M10 4.5a2 2 0 0 0 4 0"/>
+    <path d="M3 12.5a3 3 0 0 1 3-3"/>
+    <path d="M18 9.5a3 3 0 0 1 3 3"/>
+  </symbol>
+  <symbol id="islamic-prayer-times" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="8"/>
+    <path d="M12 8v4l3 2"/>
+    <path d="M5.8 4.8 4 3"/>
+    <path d="m18.2 4.8 1.8-1.8"/>
+    <path d="M9.5 20.5h5"/>
+  </symbol>
+  <symbol id="islamic-fajr" viewBox="0 0 24 24">
+    <path d="M4 18h16"/>
+    <path d="M7 18a5 5 0 0 1 10 0"/>
+    <path d="M12 4v3"/>
+    <path d="m5.6 8 2.1 2.1"/>
+    <path d="m18.4 8-2.1 2.1"/>
+    <path d="M3 13h3"/>
+    <path d="M18 13h3"/>
+  </symbol>
+  <symbol id="islamic-dhuhr" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2v3"/>
+    <path d="M12 19v3"/>
+    <path d="M2 12h3"/>
+    <path d="M19 12h3"/>
+    <path d="m4.9 4.9 2.1 2.1"/>
+    <path d="m17 17 2.1 2.1"/>
+    <path d="m19.1 4.9-2.1 2.1"/>
+    <path d="m7 17-2.1 2.1"/>
+  </symbol>
+  <symbol id="islamic-asr" viewBox="0 0 24 24">
+    <path d="M4 18h16"/>
+    <path d="M6 18a6 6 0 0 1 12 0"/>
+    <path d="M8 15h8"/>
+    <path d="m5 9 3 2"/>
+    <path d="m19 9-3 2"/>
+    <path d="M12 4v4"/>
+  </symbol>
+  <symbol id="islamic-maghrib" viewBox="0 0 24 24">
+    <path d="M4 18h16"/>
+    <path d="M7 18a5 5 0 0 1 10 0"/>
+    <path d="M8 15h8"/>
+    <path d="M19 6.5a4.5 4.5 0 0 1-6.5 5.5 5.5 5.5 0 0 0 5.7-7.6c.3.4.6 1.2.8 2.1Z"/>
+  </symbol>
+  <symbol id="islamic-isha" viewBox="0 0 24 24">
+    <path d="M19 4.5a7.5 7.5 0 1 1-9.5 10 8 8 0 0 0 9.5-10Z"/>
+    <path d="m6 5 .7 1.3L8 7l-1.3.7L6 9l-.7-1.3L4 7l1.3-.7L6 5Z"/>
+    <path d="m17 14 .5 1 1 .5-1 .5-.5 1-.5-1-1-.5 1-.5.5-1Z"/>
+  </symbol>
+  <symbol id="islamic-jummah" viewBox="0 0 24 24">
+    <rect x="4" y="5" width="16" height="15" rx="2"/>
+    <path d="M8 3v4"/>
+    <path d="M16 3v4"/>
+    <path d="M4 10h16"/>
+    <path d="M9 16h6"/>
+    <path d="M12 13v6"/>
+  </symbol>
+  <symbol id="islamic-donation" viewBox="0 0 24 24">
+    <path d="M12 20s-7-4.4-9-9a4.1 4.1 0 0 1 6.7-4.6L12 8.7l2.3-2.3A4.1 4.1 0 0 1 21 11c-2 4.6-9 9-9 9Z"/>
+    <path d="M12 13v4"/>
+    <path d="M10.5 14.5h3"/>
+  </symbol>
+  <symbol id="islamic-zakat" viewBox="0 0 24 24">
+    <path d="M5 12.5c3.5-6 10.5-6 14 0"/>
+    <path d="M5 12.5c3.5 6 10.5 6 14 0"/>
+    <path d="M12 6v12"/>
+    <path d="M8.8 9.2h6.4"/>
+    <path d="M8.8 14.8h6.4"/>
+  </symbol>
+  <symbol id="islamic-quran" viewBox="0 0 24 24">
+    <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H20v16H7.5A2.5 2.5 0 0 0 5 21V5.5Z"/>
+    <path d="M5 5.5A2.5 2.5 0 0 0 2.5 3H2v16h.5A2.5 2.5 0 0 1 5 21"/>
+    <path d="M9 7h7"/>
+    <path d="M9 11h7"/>
+    <path d="M12 15h4"/>
+  </symbol>
+  <symbol id="islamic-community" viewBox="0 0 24 24">
+    <circle cx="12" cy="7" r="3"/>
+    <circle cx="5" cy="10" r="2.4"/>
+    <circle cx="19" cy="10" r="2.4"/>
+    <path d="M7 20a5 5 0 0 1 10 0"/>
+    <path d="M2.5 19a4 4 0 0 1 5.4-3.8"/>
+    <path d="M16.1 15.2a4 4 0 0 1 5.4 3.8"/>
+  </symbol>
+  <symbol id="islamic-calendar" viewBox="0 0 24 24">
+    <rect x="4" y="5" width="16" height="15" rx="2"/>
+    <path d="M8 3v4"/>
+    <path d="M16 3v4"/>
+    <path d="M4 10h16"/>
+    <path d="M9 14h2"/>
+    <path d="M13 14h2"/>
+    <path d="M9 17h2"/>
+  </symbol>
+  <symbol id="islamic-announcement" viewBox="0 0 24 24">
+    <path d="M4 14h3l8 4V6l-8 4H4v4Z"/>
+    <path d="M7 14v5"/>
+    <path d="M18 9.5a4 4 0 0 1 0 5"/>
+    <path d="M20 7a7 7 0 0 1 0 10"/>
+  </symbol>
+  <symbol id="islamic-location" viewBox="0 0 24 24">
+    <path d="M12 21s7-5.4 7-12A7 7 0 0 0 5 9c0 6.6 7 12 7 12Z"/>
+    <path d="M9 10.5 12 8l3 2.5V15H9v-4.5Z"/>
+    <path d="M11 15v-2a1 1 0 0 1 2 0v2"/>
+  </symbol>
+  <symbol id="islamic-classes" viewBox="0 0 24 24">
+    <path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2Z"/>
+    <path d="M8 7h6"/>
+    <path d="M8 11h8"/>
+    <path d="M8 15h5"/>
+    <path d="M17 3v16"/>
+  </symbol>
+</svg>

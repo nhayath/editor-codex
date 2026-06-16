@@ -32,7 +32,7 @@ const services = computed(() => parsePipeRows(props.items, 3).map(([title, descr
         class="rounded-lg bg-[var(--color-surface)] p-5 ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]"
       >
         <div class="grid size-10 place-items-center rounded-md bg-[color:color-mix(in_srgb,var(--color-primary)_12%,white)] text-[var(--color-primary)]">
-          <UIcon :name="service.icon" class="size-5" />
+          <IconGlyph :name="service.icon" class="size-5" />
         </div>
         <h3 class="mt-4 font-semibold text-[var(--color-text)]">
           {{ service.title }}

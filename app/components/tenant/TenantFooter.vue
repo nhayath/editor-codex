@@ -12,7 +12,7 @@ const year = new Date().getFullYear()
       <div>
         <div class="flex items-center gap-3">
           <div class="grid size-10 place-items-center rounded-md bg-[var(--color-primary)] text-white">
-            <UIcon name="i-lucide-moon-star" class="size-5" />
+            <IconGlyph name="islamic-mosque" class="size-5" />
           </div>
           <p class="tenant-heading text-xl font-bold text-[var(--color-text)]">
             {{ tenant?.name }}

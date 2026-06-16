@@ -6,15 +6,16 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
+        '@tiptap/extension-image',
+        '@tiptap/starter-kit',
+        '@tiptap/vue-3',
         '@vue/devtools-core',
         '@vue/devtools-kit',
-        '@tiptap/vue-3',
-        '@tiptap/starter-kit',
-        '@tiptap/extension-image',
         'prosemirror-model',
         'prosemirror-state',
-        'prosemirror-view',
         'prosemirror-transform',
+        'prosemirror-view',
+        'vuedraggable', // CJS
       ]
     }
   },

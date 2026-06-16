@@ -31,7 +31,10 @@ useHead(() => ({
 </script>
 
 <template>
-  <div class="tenant-site min-h-screen">
+  <div
+    class="tenant-site min-h-screen"
+    :data-template="data?.config.templateId"
+  >
     <UContainer
       v-if="pending"
       class="py-12"

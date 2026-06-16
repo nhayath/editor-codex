@@ -15,6 +15,7 @@ import WidgetLocationMap from '~/components/widgets/WidgetLocationMap.vue'
 import WidgetText from '~/components/widgets/WidgetText.vue'
 import WidgetRichText from '~/components/widgets/WidgetRichText.vue'
 import WidgetImage from '~/components/widgets/WidgetImage.vue'
+import WidgetQuickLinks from '~/components/widgets/WidgetQuickLinks.vue'
 
 export const widgetComponents: Record<string, Component> = {
   hero: WidgetHero,
@@ -32,5 +33,6 @@ export const widgetComponents: Record<string, Component> = {
   'location-map': WidgetLocationMap,
   text: WidgetText,
   'rich-text': WidgetRichText,
-  image: WidgetImage
+  image: WidgetImage,
+  'quick-links': WidgetQuickLinks
 }

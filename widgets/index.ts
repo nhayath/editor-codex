@@ -15,6 +15,7 @@ import { locationMapWidget } from './location-map'
 import { textWidget } from './text'
 import { richTextWidget } from './rich-text'
 import { imageWidget } from './image'
+import { quickLinksWidget } from './quick-links'
 
 export const widgets: WidgetDefinition[] = [
   heroWidget,
@@ -32,7 +33,8 @@ export const widgets: WidgetDefinition[] = [
   locationMapWidget,
   textWidget,
   richTextWidget,
-  imageWidget
+  imageWidget,
+  quickLinksWidget
 ]
 
 export const widgetMap = Object.fromEntries(widgets.map(widget => [widget.id, widget])) as Record<string, WidgetDefinition>

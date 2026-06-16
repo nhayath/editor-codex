@@ -28,6 +28,7 @@ const style = computed(() => {
       <div
         v-if="editor.tenant.value && editor.draft.value"
         class="tenant-site min-h-full"
+        :data-template="editor.draft.value.templateId"
         :style="style"
       >
         <TenantHeader :tenant="editor.tenant.value" />

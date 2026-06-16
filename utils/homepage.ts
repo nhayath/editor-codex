@@ -52,8 +52,8 @@ export function normaliseDraft(template: TemplateDefinition, partial: Partial<Ho
 
   return {
     templateId: partial.templateId ?? template.id,
-    paletteId: partial.paletteId ?? 'emerald',
-    fontPairId: partial.fontPairId ?? 'inter-amiri',
+    paletteId: partial.paletteId ?? template.defaultPaletteId ?? 'emerald',
+    fontPairId: partial.fontPairId ?? template.defaultFontPairId ?? 'inter-amiri',
     customColors: partial.customColors ?? null,
     sectionOrder,
     sectionsEnabled,

@@ -19,10 +19,22 @@ const prayers = [
   ['Isha', 'isha', 'ishaIqamah']
 ] as const
 
+const currentMinutes = ref<number | null>(null)
+
+function updateCurrentMinutes() {
+  const now = new Date()
+  currentMinutes.value = now.getHours() * 60 + now.getMinutes()
+}
+
+onMounted(() => {
+  updateCurrentMinutes()
+  const interval = window.setInterval(updateCurrentMinutes, 60_000)
+  onBeforeUnmount(() => window.clearInterval(interval))
+})
+
 const nextPrayer = computed(() => {
   const data = (props.data?.prayerTimes ?? {}) as Record<string, string | undefined>
-  const now = new Date()
-  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+  const minutesNow = currentMinutes.value
 
   for (const [name, adhanKey, iqamahKey] of prayers) {
     const value = props.showIqamah ? data[iqamahKey] || data[adhanKey] : data[adhanKey]
@@ -31,14 +43,14 @@ const nextPrayer = computed(() => {
     const hours = parts[0] ?? 0
     const minutes = parts[1] ?? 0
     const total = hours * 60 + minutes
-    if (total >= currentMinutes) {
-      return { name, time: value, minutes: total - currentMinutes }
+    if (minutesNow === null || total >= minutesNow) {
+      return { name, time: value, minutes: minutesNow === null ? null : total - minutesNow }
     }
   }
 
   const first = prayers[0]
   const time = data[first[2]] || data[first[1]] || '--:--'
-  return { name: first[0], time, minutes: 0 }
+  return { name: first[0], time, minutes: currentMinutes.value === null ? null : 0 }
 })
 </script>
 
@@ -53,7 +65,7 @@ const nextPrayer = computed(() => {
           {{ nextPrayer.name }}
         </h3>
       </div>
-      <UIcon name="i-lucide-timer" class="size-10 text-[var(--color-secondary)]" />
+      <IconGlyph name="islamic-prayer-times" class="size-10 text-[var(--color-secondary)]" />
     </div>
 
     <div :class="compact ? 'mt-5' : 'mt-8'">
@@ -61,7 +73,7 @@ const nextPrayer = computed(() => {
         {{ nextPrayer.time }}
       </p>
       <p class="mt-2 text-sm text-white/75">
-        {{ nextPrayer.minutes > 0 ? `${nextPrayer.minutes} minutes remaining` : 'Starting soon' }}
+        {{ nextPrayer.minutes === null ? 'Today' : nextPrayer.minutes > 0 ? `${nextPrayer.minutes} minutes remaining` : 'Starting soon' }}
       </p>
     </div>
   </div>

@@ -45,9 +45,12 @@ const featured = computed(() => campaigns.value.find((item: any) => item.isFeatu
           :to="featured?.paymentUrl || '#'"
           target="_blank"
           color="neutral"
-          icon="i-lucide-hand-heart"
           :label="buttonLabel"
-        />
+        >
+          <template #leading>
+            <IconGlyph name="islamic-donation" class="size-4" />
+          </template>
+        </UButton>
       </div>
     </div>
 
@@ -78,9 +81,12 @@ const featured = computed(() => campaigns.value.find((item: any) => item.isFeatu
           class="mt-4"
           color="neutral"
           size="sm"
-          icon="i-lucide-hand-heart"
           :label="buttonLabel"
-        />
+        >
+          <template #leading>
+            <IconGlyph name="islamic-donation" class="size-4" />
+          </template>
+        </UButton>
       </article>
     </div>
   </div>

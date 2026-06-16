@@ -167,9 +167,20 @@ Expected result:
 
 The build may show Rollup pure annotation warnings from `@vueuse/core` and chunk size warnings from editor dependencies such as Tiptap. Those warnings are known for the current implementation.
 
-## Browser Testing Checklist
+## Rendered E2E QA Guideline
 
-Use the in-app browser or Playwright to verify:
+For every editor, public-site, or responsive UI change, run rendered E2E-style QA with Chrome DevTools MCP or the available in-app Chrome/browser tooling before handoff. Do this in addition to typecheck/build commands.
+
+Minimum checks:
+
+- Confirm the route identity and expected tenant/template are loaded.
+- Confirm the page is non-blank and has no framework error overlay.
+- Check browser console errors and warnings.
+- Exercise at least one real interaction related to the changed flow.
+- Capture screenshot evidence for the affected desktop/mobile/tablet state when layout changed.
+- Check mobile and tablet widths for horizontal overflow and clipped text.
+
+Use this baseline route checklist:
 
 - `/` loads and lists all three seeded tenants.
 - `/site/al-noor` renders the public homepage.
@@ -180,10 +191,11 @@ Use the in-app browser or Playwright to verify:
 - Reloading the editor keeps the saved homepage configuration.
 - Mobile preview and a real narrow viewport do not show horizontal overflow.
 
+When the change is scoped to a single widget or template, focus the interaction and screenshots on that component, but still check the surrounding page for console health and overflow.
+
 ## Known Local Notes
 
 - Use an absolute `DATABASE_URL` for preview because Nuxt preview runs from `.output`.
 - `npm run dev` may fail locally with watcher limits until the `EMFILE` issue is resolved.
 - Prisma is pinned to v6 to preserve the datasource syntax used by the implementation plan.
 - Manual SQLite migration application was used in this environment because Prisma schema-engine commands failed on `db push` and `migrate dev`.
-

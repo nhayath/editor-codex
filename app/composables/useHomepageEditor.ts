@@ -136,8 +136,8 @@ export function useHomepageEditor() {
     template.value = nextTemplate
     draft.value = normaliseDraft(nextTemplate, {
       templateId,
-      paletteId: draft.value?.paletteId,
-      fontPairId: draft.value?.fontPairId,
+      paletteId: nextTemplate.defaultPaletteId ?? draft.value?.paletteId,
+      fontPairId: nextTemplate.defaultFontPairId ?? draft.value?.fontPairId,
       customColors: draft.value?.customColors ?? null
     })
     activeSectionId.value = draft.value.sectionOrder[0] ?? null

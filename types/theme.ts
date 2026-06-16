@@ -52,6 +52,28 @@ export const colorPalettes: ColorPalette[] = [
     textMuted: '#78716C'
   },
   {
+    id: 'plum-gold',
+    name: 'Plum & Gold',
+    primary: '#45143E',
+    secondary: '#F5BC42',
+    accent: '#8F6A78',
+    background: '#D4C39F',
+    surface: '#F8F6F2',
+    text: '#2A092A',
+    textMuted: '#876F65'
+  },
+  {
+    id: 'navy-coral',
+    name: 'Navy, Coral & Mint',
+    primary: '#16213E',
+    secondary: '#FFD166',
+    accent: '#F26B5E',
+    background: '#F7F8F3',
+    surface: '#FFFFFF',
+    text: '#1F2933',
+    textMuted: '#64748B'
+  },
+  {
     id: 'teal',
     name: 'Teal Serenity',
     primary: '#0D9488',

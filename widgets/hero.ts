@@ -10,7 +10,8 @@ export const heroWidget: WidgetDefinition = {
     { id: 'simple', name: 'Simple' },
     { id: 'with-image', name: 'With image' },
     { id: 'with-buttons', name: 'With buttons' },
-    { id: 'split', name: 'Split' }
+    { id: 'split', name: 'Split' },
+    { id: 'immersive', name: 'Immersive' }
   ],
   component: 'WidgetHero',
   propSchema: [
@@ -18,7 +19,8 @@ export const heroWidget: WidgetDefinition = {
       { label: 'Simple', value: 'simple' },
       { label: 'With image', value: 'with-image' },
       { label: 'With buttons', value: 'with-buttons' },
-      { label: 'Split', value: 'split' }
+      { label: 'Split', value: 'split' },
+      { label: 'Immersive', value: 'immersive' }
     ] },
     { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Welcome to' },
     { key: 'title', label: 'Title', type: 'text', default: 'Al-Noor Mosque' },

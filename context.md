@@ -11,7 +11,7 @@ The implementation follows the plan structure without changing the planned produ
 - Nuxt 4 app wrapper with `UApp`, Nuxt UI v4, app CSS variables, and root component auto-imports with `pathPrefix: false`.
 - Prisma SQLite schema for users, tenants, settings, homepage config, prayer times, Jumu'ah times, events, announcements, donation campaigns, media assets, and nav items.
 - TypeScript registries for:
-  - templates: `classic`, `modern`
+  - templates: `classic`, `modern`, `fattan`
   - widgets: all 16 planned widgets
   - theme palettes and font pairs
 - Seed data for the 3 planned tenants:
@@ -95,10 +95,36 @@ Browser checks performed against `http://localhost:3000`:
 - Mobile responsive sweep verified in the in-app Chrome/browser QA loop:
   - Donation, about, contact, footer, prayer times, services, gallery, carousel, location map, and related remaining public widgets use container-aware breakpoints where they appear inside the embedded editor preview.
   - Classic and modern seeded tenants were checked in editor Mobile preview; key cards/columns stack at 390px with no horizontal overflow and no relevant console errors.
+- Fattan-style template variation added and verified in the in-app Chrome/browser QA loop:
+  - New `fattan` template registered with a warm plum/gold editorial mosque layout inspired by the provided reference HTML.
+  - Added `Plum & Gold` palette, template default palette/font support, and a `/templates/fattan.svg` thumbnail.
+  - `tenant-site` now exposes `data-template`, allowing the Fattan template to use scoped shell styling without leaking to Classic/Modern.
+  - Editor Theme tab selection was tested by selecting `Fattan` from `/editor/al-noor`.
+  - Mobile preview at 390px and tablet preview at 768px both rendered all 8 Fattan sections with no horizontal overflow and no relevant console errors.
+  - Mobile menu interaction was tested after the header breakpoint was raised so tablet/mobile previews keep the compact menu instead of truncating the mosque name.
+  - Screenshot evidence saved at `/private/tmp/fattan-template-mobile.png` and `/private/tmp/fattan-template-tablet.png`.
+- Prayer Times feature-panel style added and verified in the in-app Chrome/browser QA loop:
+  - `WidgetPrayerTimes` now supports a `feature-panel` variant with a plum/gold panel, highlighted next-prayer card, mosque-image wash, skyline footer treatment, and the original Fattan prayer icon tokens (`☼`, `☀`, `☾`).
+  - The Prayer Times widget registry exposes the new `Feature panel` style option.
+  - The Fattan template uses `feature-panel` for its required Prayer Times section.
+  - Editor QA selected Fattan on `/editor/al-noor` without persisting the tenant config, then checked desktop, mobile, and tablet preview widths.
+  - Browser metrics confirmed 5 prayer cards, expected icon tokens, no card overflow, no root horizontal overflow, and no relevant console errors.
+  - Screenshot evidence saved at `/private/tmp/prayer-feature-desktop-focused.png`, `/private/tmp/prayer-feature-mobile-focused.png`, and `/private/tmp/prayer-feature-tablet-focused.png`.
+  - Public `/site/al-noor` was also checked after the tenant was on Fattan: desktop and 390px mobile renders showed the feature panel with no root/card overflow and no relevant console errors.
+  - Public screenshot evidence saved at `/private/tmp/prayer-feature-public-site.png`, `/private/tmp/prayer-feature-public-mobile.png`, and `/private/tmp/prayer-feature-public-mobile-full.png`.
 
 ## QA Workflow Note
 
-For future editor/UI changes, run E2E-style rendered QA with the Chrome DevTools MCP or the available in-app Chrome/browser tooling. At minimum, verify page identity, non-blank render, absence of framework overlays, console health, screenshot evidence, and one real interaction proof for the changed flow.
+For future editor/UI changes, run E2E-style rendered QA with Chrome DevTools MCP or the available in-app Chrome/browser tooling before handoff. This is now part of the project guideline, also documented in `docs/usage-and-testing-guide.md`.
+
+Minimum QA evidence:
+
+- Route identity and expected tenant/template are loaded.
+- Page is non-blank and has no framework error overlay.
+- Browser console has no relevant errors or warnings.
+- At least one real interaction related to the changed flow is exercised.
+- Screenshot evidence is captured for affected desktop/mobile/tablet states when layout changes.
+- Mobile and tablet widths are checked for horizontal overflow and clipped text.
 
 ## Next Steps
 
@@ -109,3 +135,4 @@ For future editor/UI changes, run E2E-style rendered QA with the Chrome DevTools
 - Add focused automated tests for config normalization, required-section enforcement, and config PUT/GET round trips.
 - Improve bundle size by lazy-loading editor-only controls such as Tiptap and draggable components.
 - Replace placeholder SVG media with production mosque imagery or generated bitmap assets before product-facing review.
+- Consider whether the Fattan template should get production-specific imagery and richer lecture/newsletter widgets if those become part of the editor scope.

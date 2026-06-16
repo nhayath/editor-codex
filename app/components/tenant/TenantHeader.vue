@@ -19,14 +19,14 @@ const navItems = computed(() => props.tenant?.navItems ?? [])
         class="flex min-w-0 items-center gap-3"
       >
         <div class="grid size-10 shrink-0 place-items-center rounded-md bg-[var(--color-primary)] text-white">
-          <UIcon name="i-lucide-moon-star" class="size-5" />
+          <IconGlyph name="islamic-mosque" class="size-5" />
         </div>
         <span class="tenant-heading truncate text-xl font-bold text-[var(--color-text)]">
           {{ tenant?.name }}
         </span>
       </NuxtLink>
 
-      <nav class="hidden items-center gap-1 @md:flex">
+      <nav class="hidden items-center gap-1 @4xl:flex">
         <UButton
           v-for="item in navItems"
           :key="item.id"
@@ -34,17 +34,19 @@ const navItems = computed(() => props.tenant?.navItems ?? [])
           color="neutral"
           variant="ghost"
           size="sm"
+          class="text-[var(--color-text-muted)] hover:text-[var(--color-primary)]"
           :label="item.label"
         />
       </nav>
 
-      <div class="hidden @md:block">
+      <div class="hidden @4xl:block">
         <UButton
           to="#contact"
           color="primary"
           icon="i-lucide-mail"
           label="Contact"
           size="sm"
+          class="bg-[var(--color-accent)] text-white hover:bg-[color:color-mix(in_srgb,var(--color-accent)_86%,black)]"
         />
       </div>
 
@@ -54,14 +56,14 @@ const navItems = computed(() => props.tenant?.navItems ?? [])
         icon="i-lucide-menu"
         size="sm"
         :aria-label="menuOpen ? 'Close menu' : 'Open menu'"
-        class="@md:hidden"
+        class="text-[var(--color-primary)] hover:text-[var(--color-accent)] @4xl:hidden"
         @click="menuOpen = !menuOpen"
       />
     </div>
 
     <nav
       v-if="menuOpen"
-      class="tenant-container grid gap-2 border-t border-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)] py-3 @md:hidden"
+      class="tenant-container grid gap-2 border-t border-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)] py-3 @4xl:hidden"
       aria-label="Mobile navigation"
     >
       <UButton
@@ -71,7 +73,7 @@ const navItems = computed(() => props.tenant?.navItems ?? [])
         color="neutral"
         variant="ghost"
         size="sm"
-        class="justify-start"
+        class="justify-start text-[var(--color-text-muted)] hover:text-[var(--color-primary)]"
         :label="item.label"
         @click="menuOpen = false"
       />

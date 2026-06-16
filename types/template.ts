@@ -5,6 +5,8 @@ export interface TemplateDefinition {
   name: string
   description: string
   thumbnail: string
+  defaultPaletteId?: string
+  defaultFontPairId?: string
   sections: TemplateSectionDef[]
   header: { component: string, props: Record<string, unknown> }
   footer: { component: string, props: Record<string, unknown> }
