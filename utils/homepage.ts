@@ -21,6 +21,46 @@ function schemaDefaults(schema: WidgetPropSchema[] = []) {
   return Object.fromEntries(schema.map(field => [field.key, field.default]))
 }
 
+function mergePropSchema(base: WidgetPropSchema[] = [], override: WidgetPropSchema[] = []) {
+  const overrideByKey = new Map(override.map(field => [field.key, field]))
+  const baseKeys = new Set(base.map(field => field.key))
+
+  return [
+    ...base.map(field => overrideByKey.get(field.key) ?? field),
+    ...override.filter(field => !baseKeys.has(field.key))
+  ]
+}
+
+export function resolveWidgetDefinition(template: TemplateDefinition, widgetId: string): WidgetDefinition | undefined {
+  const base = getWidgetDefinition(widgetId)
+  const override = template.widgets?.[widgetId]
+
+  if (!base && !override) return undefined
+
+  if (!base) {
+    return {
+      id: widgetId,
+      name: override?.name ?? widgetId,
+      icon: override?.icon ?? 'i-lucide-box',
+      description: override?.description ?? '',
+      category: override?.category ?? 'content',
+      variants: override?.variants,
+      propSchema: override?.propSchema ?? [],
+      dataDependencies: override?.dataDependencies,
+      component: override?.component ?? ''
+    }
+  }
+
+  if (!override) return base
+
+  return {
+    ...base,
+    ...override,
+    id: widgetId,
+    propSchema: mergePropSchema(base.propSchema, override.propSchema)
+  }
+}
+
 function getSectionDefaultProps(section: TemplateSectionDef, widget?: WidgetDefinition) {
   return {
     ...schemaDefaults(widget?.propSchema),
@@ -109,7 +149,7 @@ export function resolveSections(template: TemplateDefinition, draft: HomepageCon
     const enabled = section.required ? true : draft.sectionsEnabled[section.id] ?? true
 
     if (section.type === 'single' && section.widgetId) {
-      const widget = getWidgetDefinition(section.widgetId)
+      const widget = resolveWidgetDefinition(template, section.widgetId)
 
       return {
         id: section.id,
@@ -119,6 +159,9 @@ export function resolveSections(template: TemplateDefinition, draft: HomepageCon
         removable: section.removable,
         enabled,
         widgetId: section.widgetId,
+        name: widget?.name,
+        icon: widget?.icon,
+        component: widget?.component,
         propSchema: widget?.propSchema ?? [],
         resolvedProps: {
           ...getSectionDefaultProps(section, widget),
@@ -143,12 +186,16 @@ export function resolveSections(template: TemplateDefinition, draft: HomepageCon
       },
       groupPropSchema: section.group?.groupProps ?? [],
       resolvedWidgets: section.group?.widgets.map((groupWidget) => {
-        const widget = getWidgetDefinition(groupWidget.widgetId)
+        const widget = resolveWidgetDefinition(template, groupWidget.widgetId)
         const widgetOverride = override.widgets?.[groupWidget.slot]?.props ?? {}
 
         return {
           slot: groupWidget.slot,
           widgetId: groupWidget.widgetId,
+          name: widget?.name,
+          icon: widget?.icon,
+          component: widget?.component,
+          propSchema: widget?.propSchema ?? [],
           resolvedProps: {
             ...schemaDefaults(widget?.propSchema),
             ...(groupWidget.defaultProps ?? {}),

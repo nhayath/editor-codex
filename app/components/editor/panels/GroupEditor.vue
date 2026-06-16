@@ -7,10 +7,7 @@ const props = defineProps<{
 }>()
 
 const editor = useHomepageEditor()
-const registry = useWidgetRegistry()
 const tenantId = computed(() => editor.tenant.value?.id as string | undefined)
-
-onMounted(() => registry.loadWidgets())
 
 function updateGroup(key: string, value: unknown) {
   editor.updateGroupProps(props.section.id, { [key]: value })
@@ -52,20 +49,20 @@ function groupField(field: { key: string, label: string, type: string, default: 
       <div class="flex items-center justify-between gap-3">
         <div>
           <p class="text-sm font-semibold text-default">
-            {{ registry.getWidget(widget.widgetId)?.name ?? widget.widgetId }}
+            {{ widget.name ?? widget.widgetId }}
           </p>
           <p class="text-xs text-muted">
             Slot: {{ widget.slot }}
           </p>
         </div>
         <UIcon
-          :name="registry.getWidget(widget.widgetId)?.icon ?? 'i-lucide-box'"
+          :name="widget.icon ?? 'i-lucide-box'"
           class="size-5 text-muted"
         />
       </div>
 
       <PropField
-        v-for="field in registry.getWidget(widget.widgetId)?.propSchema ?? []"
+        v-for="field in widget.propSchema ?? []"
         :key="field.key"
         :field="field"
         :model-value="widget.resolvedProps[field.key]"

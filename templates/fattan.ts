@@ -7,6 +7,23 @@ export const fattanTemplate: TemplateDefinition = {
   thumbnail: '/templates/fattan.svg',
   defaultPaletteId: 'plum-gold',
   defaultFontPairId: 'playfair-lato',
+  widgets: {
+    'prayer-times': {
+      name: 'Fattan Prayer Times',
+      description: 'Plum and gold feature panel with highlighted next prayer.',
+      component: 'FattanPrayerTimes',
+      variants: [
+        { id: 'feature-panel', name: 'Feature panel' }
+      ],
+      propSchema: [
+        { key: 'variant', label: 'Style', type: 'select', default: 'feature-panel', options: [
+          { label: 'Feature panel', value: 'feature-panel' }
+        ] },
+        { key: 'hijriDate', label: 'Hijri date', type: 'text', default: '16 Dhul Qaadah 1447' },
+        { key: 'backgroundImageUrl', label: 'Background image', type: 'image', default: '/templates/mosque-hero-3.svg' }
+      ]
+    }
+  },
   header: {
     component: 'TenantHeader',
     props: { sticky: true, style: 'fattan' }
@@ -48,7 +65,9 @@ export const fattanTemplate: TemplateDefinition = {
         variant: 'feature-panel',
         title: 'Prayer Times',
         showIqamah: true,
-        showSunrise: false
+        showSunrise: false,
+        hijriDate: '16 Dhul Qaadah 1447',
+        backgroundImageUrl: '/templates/mosque-hero-3.svg'
       }
     },
     {

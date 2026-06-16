@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { ResolvedSection } from '~~/types/template'
-import { widgetComponents } from './widgetComponents'
+import { resolveWidgetComponent } from './widgetComponents'
 
-defineProps<{
+const props = defineProps<{
   section: ResolvedSection
   data?: Record<string, unknown>
 }>()
 
+const widgetComponent = computed(() => resolveWidgetComponent(props.section.component, props.section.widgetId))
 </script>
 
 <template>
@@ -23,7 +24,8 @@ defineProps<{
   >
     <div class="tenant-container">
       <component
-        :is="widgetComponents[section.widgetId]"
+        :is="widgetComponent"
+        v-if="widgetComponent"
         v-bind="section.resolvedProps"
         :data="data"
       />

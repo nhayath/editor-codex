@@ -1,4 +1,6 @@
-import type { WidgetPropSchema } from './widget'
+import type { WidgetDefinition, WidgetPropSchema } from './widget'
+
+export type TemplateWidgetOverride = Partial<Omit<WidgetDefinition, 'id'>>
 
 export interface TemplateDefinition {
   id: string
@@ -7,6 +9,7 @@ export interface TemplateDefinition {
   thumbnail: string
   defaultPaletteId?: string
   defaultFontPairId?: string
+  widgets?: Record<string, TemplateWidgetOverride>
   sections: TemplateSectionDef[]
   header: { component: string, props: Record<string, unknown> }
   footer: { component: string, props: Record<string, unknown> }
@@ -63,6 +66,10 @@ export interface SectionOverride {
 export interface ResolvedWidget {
   slot: string
   widgetId: string
+  name?: string
+  icon?: string
+  component?: string
+  propSchema?: WidgetPropSchema[]
   resolvedProps: Record<string, unknown>
 }
 
@@ -74,6 +81,9 @@ export interface ResolvedSection {
   removable: boolean
   enabled: boolean
   widgetId?: string
+  name?: string
+  icon?: string
+  component?: string
   resolvedProps?: Record<string, unknown>
   resolvedGroupProps?: Record<string, unknown>
   resolvedWidgets?: ResolvedWidget[]

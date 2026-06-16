@@ -9,8 +9,7 @@ export const prayerTimesWidget: WidgetDefinition = {
   variants: [
     { id: 'table', name: 'Table' },
     { id: 'cards', name: 'Cards' },
-    { id: 'compact', name: 'Compact' },
-    { id: 'feature-panel', name: 'Feature panel' }
+    { id: 'compact', name: 'Compact' }
   ],
   component: 'WidgetPrayerTimes',
   dataDependencies: ['prayerTimes'],
@@ -18,8 +17,7 @@ export const prayerTimesWidget: WidgetDefinition = {
     { key: 'variant', label: 'Style', type: 'select', default: 'cards', options: [
       { label: 'Table', value: 'table' },
       { label: 'Cards', value: 'cards' },
-      { label: 'Compact', value: 'compact' },
-      { label: 'Feature panel', value: 'feature-panel' }
+      { label: 'Compact', value: 'compact' }
     ] },
     { key: 'title', label: 'Title', type: 'text', default: 'Today Prayer Times' },
     { key: 'showIqamah', label: 'Show iqamah', type: 'toggle', default: true },

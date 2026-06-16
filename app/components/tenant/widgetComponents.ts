@@ -16,6 +16,7 @@ import WidgetText from '~/components/widgets/WidgetText.vue'
 import WidgetRichText from '~/components/widgets/WidgetRichText.vue'
 import WidgetImage from '~/components/widgets/WidgetImage.vue'
 import WidgetQuickLinks from '~/components/widgets/WidgetQuickLinks.vue'
+import FattanPrayerTimes from '~/components/templates/fattan/widgets/FattanPrayerTimes.vue'
 
 export const widgetComponents: Record<string, Component> = {
   hero: WidgetHero,
@@ -35,4 +36,45 @@ export const widgetComponents: Record<string, Component> = {
   'rich-text': WidgetRichText,
   image: WidgetImage,
   'quick-links': WidgetQuickLinks
+}
+
+const namedWidgetComponents: Record<string, Component> = {
+  WidgetHero,
+  WidgetCarousel,
+  WidgetPrayerTimes,
+  WidgetPrayerCountdown,
+  WidgetJummahTimes,
+  WidgetAnnouncements,
+  WidgetEvents,
+  WidgetDonationCta,
+  WidgetAboutMosque,
+  WidgetServices,
+  WidgetGallery,
+  WidgetContact,
+  WidgetLocationMap,
+  WidgetText,
+  WidgetRichText,
+  WidgetImage,
+  WidgetQuickLinks,
+  FattanPrayerTimes
+}
+
+export function resolveWidgetComponent(component?: string, widgetId?: string) {
+  if (component && namedWidgetComponents[component]) {
+    return namedWidgetComponents[component]
+  }
+
+  if (import.meta.dev && component && widgetId && widgetComponents[widgetId]) {
+    console.warn(`Unknown widget component "${component}" for "${widgetId}". Falling back to the global widget.`)
+  }
+
+  if (widgetId && widgetComponents[widgetId]) {
+    return widgetComponents[widgetId]
+  }
+
+  if (import.meta.dev && (component || widgetId)) {
+    console.warn(`Unable to resolve widget component for "${component ?? widgetId}".`)
+  }
+
+  return undefined
 }

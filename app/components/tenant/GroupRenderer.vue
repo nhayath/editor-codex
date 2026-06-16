@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ResolvedSection } from '~~/types/template'
-import { widgetComponents } from './widgetComponents'
+import type { ResolvedSection, ResolvedWidget } from '~~/types/template'
+import { resolveWidgetComponent } from './widgetComponents'
 
 const props = defineProps<{
   section: ResolvedSection
@@ -13,6 +13,10 @@ const layoutClass = computed(() => {
     ? 'grid gap-6'
     : 'grid gap-6 @xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]'
 })
+
+function componentFor(widget: ResolvedWidget) {
+  return resolveWidgetComponent(widget.component, widget.widgetId)
+}
 </script>
 
 <template>
@@ -26,13 +30,17 @@ const layoutClass = computed(() => {
         class="@container"
         :class="layoutClass"
       >
-        <component
-          :is="widgetComponents[widget.widgetId]"
+        <template
           v-for="widget in section.resolvedWidgets"
           :key="widget.slot"
-          v-bind="widget.resolvedProps"
-          :data="data"
-        />
+        >
+          <component
+            :is="componentFor(widget)"
+            v-if="componentFor(widget)"
+            v-bind="widget.resolvedProps"
+            :data="data"
+          />
+        </template>
       </div>
     </div>
   </section>
