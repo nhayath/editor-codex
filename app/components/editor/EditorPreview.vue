@@ -31,14 +31,20 @@ const style = computed(() => {
         :data-template="editor.draft.value.templateId"
         :style="style"
       >
-        <TenantHeader :tenant="editor.tenant.value" />
+        <TenantHeader
+          :tenant="editor.tenant.value"
+          :template-id="editor.draft.value.templateId"
+        />
         <SectionRenderer
           v-for="section in editor.resolvedSections.value"
           :key="section.id"
           :section="section"
           :data="editor.siteData.value"
         />
-        <TenantFooter :tenant="editor.tenant.value" />
+        <TenantFooter
+          :tenant="editor.tenant.value"
+          :template-id="editor.draft.value.templateId"
+        />
       </div>
     </div>
   </section>

@@ -19,6 +19,9 @@ The implementation follows the plan structure without changing the planned produ
   - `resolveWidgetDefinition` merges default widget schemas with template-specific prop schemas
   - resolved sections/widgets carry effective component, name, icon, prop schema, and merged default props for both rendering and editor panels
   - renderers use a component resolver that tries the template component first and falls back to the global widget component
+- Documentation:
+  - `docs/template-authoring-guide.md` explains how to create templates from scratch, define single/group sections, create template-only widgets, override global widgets, extend prop schemas, register components, and QA responsive output.
+  - `docs/usage-and-testing-guide.md` covers local usage and the expected testing workflow.
 - Seed data for the 3 planned tenants:
   - `al-noor`
   - `east-london-ic`

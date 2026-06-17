@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join, parse } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
-const uploadRoot = join(process.cwd(), 'public', 'uploads')
+export const uploadRoot = join(process.cwd(), 'public', 'uploads')
 
 export function sanitizeFilename(filename: string) {
   const parsed = parse(filename)

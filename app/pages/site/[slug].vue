@@ -56,14 +56,20 @@ useHead(() => ({
     </UContainer>
 
     <template v-else-if="data">
-      <TenantHeader :tenant="data.tenant" />
+      <TenantHeader
+        :tenant="data.tenant"
+        :template-id="data.config.templateId"
+      />
       <SectionRenderer
         v-for="section in data.resolvedSections"
         :key="section.id"
         :section="section"
         :data="data.data"
       />
-      <TenantFooter :tenant="data.tenant" />
+      <TenantFooter
+        :tenant="data.tenant"
+        :template-id="data.config.templateId"
+      />
     </template>
   </div>
 </template>

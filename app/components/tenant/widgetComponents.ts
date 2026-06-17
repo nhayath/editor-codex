@@ -17,6 +17,12 @@ import WidgetRichText from '~/components/widgets/WidgetRichText.vue'
 import WidgetImage from '~/components/widgets/WidgetImage.vue'
 import WidgetQuickLinks from '~/components/widgets/WidgetQuickLinks.vue'
 import FattanPrayerTimes from '~/components/templates/fattan/widgets/FattanPrayerTimes.vue'
+import SacredModernHero from '~/components/templates/sacred-modern/widgets/SacredModernHero.vue'
+import SacredModernPrayerTimes from '~/components/templates/sacred-modern/widgets/SacredModernPrayerTimes.vue'
+import SacredModernKhutbahCard from '~/components/templates/sacred-modern/widgets/SacredModernKhutbahCard.vue'
+import SacredModernEvents from '~/components/templates/sacred-modern/widgets/SacredModernEvents.vue'
+import SacredModernDonationCta from '~/components/templates/sacred-modern/widgets/SacredModernDonationCta.vue'
+import SacredModernSupportLinks from '~/components/templates/sacred-modern/widgets/SacredModernSupportLinks.vue'
 
 export const widgetComponents: Record<string, Component> = {
   hero: WidgetHero,
@@ -56,7 +62,13 @@ const namedWidgetComponents: Record<string, Component> = {
   WidgetRichText,
   WidgetImage,
   WidgetQuickLinks,
-  FattanPrayerTimes
+  FattanPrayerTimes,
+  SacredModernHero,
+  SacredModernPrayerTimes,
+  SacredModernKhutbahCard,
+  SacredModernEvents,
+  SacredModernDonationCta,
+  SacredModernSupportLinks
 }
 
 export function resolveWidgetComponent(component?: string, widgetId?: string) {

@@ -9,13 +9,36 @@ const props = defineProps<{
 
 const layoutClass = computed(() => {
   const layout = props.section.resolvedGroupProps?.layout
-  return layout === 'stack'
-    ? 'grid gap-6'
-    : 'grid gap-6 @xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]'
+  const arrangement = props.section.resolvedGroupProps?.arrangement
+
+  if (layout === 'stack') {
+    return 'grid gap-6'
+  }
+
+  if (arrangement === 'three-card') {
+    return 'grid gap-6 @xl:grid-cols-3'
+  }
+
+  if (arrangement === 'side-main') {
+    return 'grid gap-6 @xl:grid-cols-[minmax(260px,0.68fr)_minmax(0,1.32fr)]'
+  }
+
+  return 'grid gap-6 @xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]'
 })
 
 function componentFor(widget: ResolvedWidget) {
   return resolveWidgetComponent(widget.component, widget.widgetId)
+}
+
+function widgetShellClass(widget: ResolvedWidget) {
+  const arrangement = props.section.resolvedGroupProps?.arrangement
+
+  if (arrangement === 'side-main') {
+    if (widget.slot === 'prayers') return 'min-w-0 order-1 @xl:order-2'
+    if (widget.slot === 'khutbah') return 'min-w-0 order-2 @xl:order-1'
+  }
+
+  return 'min-w-0'
 }
 </script>
 
@@ -26,21 +49,24 @@ function componentFor(widget: ResolvedWidget) {
     class="tenant-section"
   >
     <div class="tenant-container">
-      <div
-        class="@container"
-        :class="layoutClass"
-      >
-        <template
-          v-for="widget in section.resolvedWidgets"
-          :key="widget.slot"
+      <div class="@container">
+        <div
+          :class="layoutClass"
         >
-          <component
-            :is="componentFor(widget)"
-            v-if="componentFor(widget)"
-            v-bind="widget.resolvedProps"
-            :data="data"
-          />
-        </template>
+          <template
+            v-for="widget in section.resolvedWidgets"
+            :key="widget.slot"
+          >
+            <div :class="widgetShellClass(widget)">
+              <component
+                :is="componentFor(widget)"
+                v-if="componentFor(widget)"
+                v-bind="widget.resolvedProps"
+                :data="data"
+              />
+            </div>
+          </template>
+        </div>
       </div>
     </div>
   </section>

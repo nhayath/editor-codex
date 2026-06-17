@@ -161,6 +161,36 @@ body {
   color: white;
 }
 
+.tenant-site[data-template='sacred-modern'] {
+  background:
+    linear-gradient(180deg, var(--color-bg) 0%, color-mix(in srgb, var(--color-surface) 52%, var(--color-bg)) 100%);
+}
+
+.tenant-site[data-template='sacred-modern'] .tenant-container {
+  width: min(1160px, calc(100% - clamp(2rem, 7vw, 6rem)));
+}
+
+.tenant-site[data-template='sacred-modern'] > .tenant-section {
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.tenant-site[data-template='sacred-modern'] > .tenant-section:first-of-type {
+  padding-block: clamp(1rem, 2vw, 2rem) clamp(3rem, 6vw, 5rem);
+}
+
+.tenant-site[data-template='sacred-modern'] > .tenant-section:nth-of-type(2) {
+  padding-top: clamp(1rem, 3vw, 2rem);
+}
+
+.tenant-site[data-template='sacred-modern'] > .tenant-section:nth-of-type(3) {
+  padding-top: clamp(1rem, 3vw, 2rem);
+  padding-bottom: clamp(5rem, 8vw, 7rem);
+}
+
+.tenant-site[data-template='sacred-modern'] footer {
+  border-top: 1px solid color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+
 @media (max-width: 1024px) {
   .tenant-site[data-template='fattan'] {
     padding-block: 0.75rem 1.75rem;
@@ -179,6 +209,10 @@ body {
   .tenant-site[data-template='noor'] .tenant-container {
     width: min(100% - 2rem, 760px);
   }
+
+  .tenant-site[data-template='sacred-modern'] .tenant-container {
+    width: min(100% - 2rem, 760px);
+  }
 }
 
 @media (max-width: 640px) {
@@ -194,6 +228,14 @@ body {
 
   .tenant-site[data-template='noor'] .tenant-container {
     width: calc(100% - 1.25rem);
+  }
+
+  .tenant-site[data-template='sacred-modern'] .tenant-container {
+    width: calc(100% - 1.25rem);
+  }
+
+  .tenant-site[data-template='sacred-modern'] > .tenant-section {
+    padding-block: 2.5rem;
   }
 }
 

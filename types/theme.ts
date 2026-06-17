@@ -30,6 +30,17 @@ export const colorPalettes: ColorPalette[] = [
     textMuted: '#64748B'
   },
   {
+    id: 'sacred-modern',
+    name: 'Sacred Modern',
+    primary: '#004532',
+    secondary: '#DDBB32',
+    accent: '#0B7658',
+    background: '#FBF9F5',
+    surface: '#FFFFFF',
+    text: '#1B1C1A',
+    textMuted: '#4B5563'
+  },
+  {
     id: 'midnight',
     name: 'Midnight Blue',
     primary: '#1E3A5F',
@@ -101,5 +112,6 @@ export const fontPairs: FontPair[] = [
   { id: 'inter-amiri', name: 'Inter & Amiri', heading: 'Amiri', body: 'Inter' },
   { id: 'outfit-inter', name: 'Outfit & Inter', heading: 'Outfit', body: 'Inter' },
   { id: 'playfair-lato', name: 'Playfair & Lato', heading: 'Playfair Display', body: 'Lato' },
+  { id: 'playfair-jakarta', name: 'Playfair & Jakarta', heading: 'Playfair Display', body: 'Plus Jakarta Sans' },
   { id: 'poppins-roboto', name: 'Poppins & Roboto', heading: 'Poppins', body: 'Roboto' }
 ]
