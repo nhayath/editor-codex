@@ -31,6 +31,10 @@ function mergePropSchema(base: WidgetPropSchema[] = [], override: WidgetPropSche
   ]
 }
 
+function isCustomSection(sectionId: string, overrides: Record<string, SectionOverride>) {
+  return Boolean(overrides[sectionId]?.customWidgetId)
+}
+
 export function resolveWidgetDefinition(template: TemplateDefinition, widgetId: string): WidgetDefinition | undefined {
   const base = getWidgetDefinition(widgetId)
   const override = template.widgets?.[widgetId]
@@ -78,7 +82,9 @@ export function defaultSectionsEnabled(template: TemplateDefinition) {
 
 export function normaliseDraft(template: TemplateDefinition, partial: Partial<HomepageConfigDraft> = {}): HomepageConfigDraft {
   const templateIds = template.sections.map(section => section.id)
-  const providedOrder = partial.sectionOrder?.filter(id => templateIds.includes(id)) ?? []
+  const templateIdSet = new Set(templateIds)
+  const sectionOverrides = partial.sectionOverrides ?? {}
+  const providedOrder = partial.sectionOrder?.filter(id => templateIdSet.has(id) || isCustomSection(id, sectionOverrides)) ?? []
   const sectionOrder = [
     ...providedOrder,
     ...templateIds.filter(id => !providedOrder.includes(id))
@@ -89,6 +95,11 @@ export function normaliseDraft(template: TemplateDefinition, partial: Partial<Ho
     const requested = partial.sectionsEnabled?.[section.id]
     sectionsEnabled[section.id] = section.required ? true : requested ?? true
   }
+  for (const sectionId of sectionOrder) {
+    if (!templateIdSet.has(sectionId) && isCustomSection(sectionId, sectionOverrides)) {
+      sectionsEnabled[sectionId] = partial.sectionsEnabled?.[sectionId] ?? true
+    }
+  }
 
   return {
     templateId: partial.templateId ?? template.id,
@@ -97,7 +108,7 @@ export function normaliseDraft(template: TemplateDefinition, partial: Partial<Ho
     customColors: partial.customColors ?? null,
     sectionOrder,
     sectionsEnabled,
-    sectionOverrides: partial.sectionOverrides ?? {}
+    sectionOverrides
   }
 }
 
@@ -141,7 +152,22 @@ export function serialiseDraftForDatabase(draft: HomepageConfigDraft) {
 export function resolveSections(template: TemplateDefinition, draft: HomepageConfigDraft): ResolvedSection[] {
   const sectionMap = new Map(template.sections.map(section => [section.id, section]))
   const orderedSections = draft.sectionOrder
-    .map(id => sectionMap.get(id))
+    .map((id) => {
+      const templateSection = sectionMap.get(id)
+      if (templateSection) return templateSection
+
+      const override = draft.sectionOverrides[id]
+      if (!override?.customWidgetId) return undefined
+
+      return {
+        id,
+        title: override.customTitle,
+        type: 'single',
+        required: false,
+        removable: true,
+        widgetId: override.customWidgetId
+      } satisfies TemplateSectionDef
+    })
     .filter((section): section is TemplateSectionDef => Boolean(section))
 
   return orderedSections.map((section) => {

@@ -5,6 +5,7 @@ import { resolveWidgetComponent } from './widgetComponents'
 const props = defineProps<{
   section: ResolvedSection
   data?: Record<string, unknown>
+  highlighted?: boolean
 }>()
 
 const layoutClass = computed(() => {
@@ -47,6 +48,7 @@ function widgetShellClass(widget: ResolvedWidget) {
     v-if="section.enabled"
     :id="section.id"
     class="tenant-section"
+    :class="{ 'editor-new-section-highlight': highlighted }"
   >
     <div class="tenant-container">
       <div class="@container">

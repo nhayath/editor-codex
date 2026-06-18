@@ -14,6 +14,7 @@ export function useHomepageEditor() {
   const originalConfig = useState<HomepageConfigDraft | null>('editorOriginalConfig', () => null)
   const draft = useState<HomepageConfigDraft | null>('editorDraft', () => null)
   const activeSectionId = useState<string | null>('editorActiveSectionId', () => null)
+  const recentlyAddedSectionId = useState<string | null>('editorRecentlyAddedSectionId', () => null)
   const activeTab = useState<'theme' | 'sections' | 'settings'>('editorActiveTab', () => 'theme')
   const previewDevice = useState<'desktop' | 'tablet' | 'mobile'>('editorPreviewDevice', () => 'desktop')
   const loading = useState('editorLoading', () => false)
@@ -46,6 +47,7 @@ export function useHomepageEditor() {
       originalConfig.value = cloneDraft(payload.config)
       draft.value = cloneDraft(payload.config)
       activeSectionId.value = payload.resolvedSections[0]?.id ?? null
+      recentlyAddedSectionId.value = null
       lastSavedAt.value = new Date().toISOString()
     } finally {
       loading.value = false
@@ -67,6 +69,7 @@ export function useHomepageEditor() {
       siteData.value = payload.data
       originalConfig.value = cloneDraft(payload.config)
       draft.value = cloneDraft(payload.config)
+      recentlyAddedSectionId.value = null
       lastSavedAt.value = new Date().toISOString()
     } finally {
       saving.value = false
@@ -125,8 +128,45 @@ export function useHomepageEditor() {
   function reorderSections(newOrder: string[]) {
     if (!draft.value || !template.value) return
 
-    const validIds = new Set(template.value.sections.map(section => section.id))
+    const templateIds = template.value.sections.map(section => section.id)
+    const customIds = Object.entries(draft.value.sectionOverrides)
+      .filter(([, override]) => Boolean(override.customWidgetId))
+      .map(([id]) => id)
+    const validIds = new Set([...templateIds, ...customIds])
     draft.value.sectionOrder = newOrder.filter(id => validIds.has(id))
+  }
+
+  function addWidgetSection(widgetId: string, title: string) {
+    if (!draft.value) return
+
+    const sectionId = `custom-${widgetId}-${Date.now().toString(36)}`
+    draft.value.sectionOverrides[sectionId] = {
+      customWidgetId: widgetId,
+      customTitle: title
+    }
+    draft.value.sectionsEnabled[sectionId] = true
+    draft.value.sectionOrder.push(sectionId)
+    activeSectionId.value = sectionId
+    recentlyAddedSectionId.value = sectionId
+    activeTab.value = 'sections'
+  }
+
+  function removeSection(sectionId: string) {
+    if (!draft.value || !template.value) return
+
+    const templateSection = template.value.sections.find(section => section.id === sectionId)
+    if (templateSection?.required) return
+
+    draft.value.sectionOrder = draft.value.sectionOrder.filter(id => id !== sectionId)
+    delete draft.value.sectionsEnabled[sectionId]
+    delete draft.value.sectionOverrides[sectionId]
+
+    if (activeSectionId.value === sectionId) {
+      activeSectionId.value = draft.value.sectionOrder[0] ?? null
+    }
+    if (recentlyAddedSectionId.value === sectionId) {
+      recentlyAddedSectionId.value = null
+    }
   }
 
   function setTemplate(templateId: string) {
@@ -141,6 +181,7 @@ export function useHomepageEditor() {
       customColors: draft.value?.customColors ?? null
     })
     activeSectionId.value = draft.value.sectionOrder[0] ?? null
+    recentlyAddedSectionId.value = null
   }
 
   function setPalette(paletteId: string) {
@@ -163,6 +204,7 @@ export function useHomepageEditor() {
     resolvedSections,
     isDirty,
     activeSectionId,
+    recentlyAddedSectionId,
     activeTab,
     previewDevice,
     loading,
@@ -175,6 +217,8 @@ export function useHomepageEditor() {
     updateGroupWidgetProps,
     toggleSection,
     reorderSections,
+    addWidgetSection,
+    removeSection,
     setTemplate,
     setPalette,
     setFontPair

@@ -58,6 +58,8 @@ export interface HomepageConfigDraft {
 }
 
 export interface SectionOverride {
+  customWidgetId?: string
+  customTitle?: string
   props?: Record<string, unknown>
   groupProps?: Record<string, unknown>
   widgets?: Record<string, { props?: Record<string, unknown> }>

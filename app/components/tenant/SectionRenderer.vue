@@ -5,6 +5,7 @@ import { resolveWidgetComponent } from './widgetComponents'
 const props = defineProps<{
   section: ResolvedSection
   data?: Record<string, unknown>
+  highlighted?: boolean
 }>()
 
 const widgetComponent = computed(() => resolveWidgetComponent(props.section.component, props.section.widgetId))
@@ -15,12 +16,14 @@ const widgetComponent = computed(() => resolveWidgetComponent(props.section.comp
     v-if="section.type === 'group'"
     :section="section"
     :data="data"
+    :highlighted="highlighted"
   />
 
   <section
     v-else-if="section.enabled && section.widgetId"
     :id="section.id"
     class="tenant-section"
+    :class="{ 'editor-new-section-highlight': highlighted }"
   >
     <div class="tenant-container">
       <component
