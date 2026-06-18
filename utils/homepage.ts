@@ -175,7 +175,10 @@ export function resolveSections(template: TemplateDefinition, draft: HomepageCon
     const enabled = section.required ? true : draft.sectionsEnabled[section.id] ?? true
 
     if (section.type === 'single' && section.widgetId) {
-      const widget = resolveWidgetDefinition(template, section.widgetId)
+      const isCustomWidgetSection = Boolean(override.customWidgetId)
+      const widget = isCustomWidgetSection
+        ? getWidgetDefinition(section.widgetId)
+        : resolveWidgetDefinition(template, section.widgetId)
 
       return {
         id: section.id,
