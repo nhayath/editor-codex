@@ -37,6 +37,10 @@ const previewWidth = computed(() => {
   return '100%'
 })
 
+const showPreviewLoading = computed(() => {
+  return editor.loading.value || !editor.tenant.value || !editor.draft.value
+})
+
 const style = computed(() => {
   if (!editor.draft.value) return {}
   return getThemeStyle(
@@ -113,7 +117,32 @@ onBeforeUnmount(() => {
       :style="{ width: previewWidth, maxWidth: '100%' }"
     >
       <div
-        v-if="editor.tenant.value && editor.draft.value"
+        v-if="showPreviewLoading"
+        class="grid min-h-full place-items-center p-6"
+      >
+        <div class="w-full max-w-4xl space-y-8">
+          <div class="space-y-4">
+            <USkeleton class="h-10 w-48" />
+            <USkeleton class="h-5 w-72 max-w-full" />
+          </div>
+
+          <div class="space-y-4">
+            <USkeleton class="h-12 w-2/3 max-w-full" />
+            <USkeleton class="h-5 w-full" />
+            <USkeleton class="h-5 w-11/12" />
+            <USkeleton class="h-64 w-full" />
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-3">
+            <USkeleton class="h-28 w-full" />
+            <USkeleton class="h-28 w-full" />
+            <USkeleton class="h-28 w-full" />
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-else
         class="tenant-site min-h-full"
         :data-template="editor.draft.value.templateId"
         :style="style"

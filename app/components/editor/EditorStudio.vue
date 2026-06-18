@@ -16,12 +16,22 @@ onMounted(() => {
 
     <div
       v-if="editor.loading.value"
-      class="grid flex-1 place-items-center"
+      class="flex min-h-0 flex-1"
     >
-      <div class="grid w-72 gap-4">
-        <USkeleton class="h-10 w-full" />
-        <USkeleton class="h-32 w-full" />
-      </div>
+      <aside class="flex w-[360px] shrink-0 flex-col border-r border-muted bg-elevated">
+        <div class="border-b border-muted px-3 pt-3">
+          <USkeleton class="h-10 w-full" />
+        </div>
+
+        <div class="grid gap-4 p-4">
+          <USkeleton class="h-8 w-40" />
+          <USkeleton class="h-24 w-full" />
+          <USkeleton class="h-24 w-full" />
+          <USkeleton class="h-24 w-full" />
+        </div>
+      </aside>
+
+      <EditorPreview />
     </div>
 
     <div
