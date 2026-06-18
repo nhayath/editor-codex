@@ -8,11 +8,13 @@ const props = defineProps<{
   highlighted?: boolean
   activeHighlight?: boolean
   editingHighlight?: boolean
+  editable?: boolean
 }>()
 
 const emit = defineEmits<{
-  focusSection: []
-  blurSection: []
+  'focus-section': []
+  'blur-section': []
+  'edit-section': []
 }>()
 
 const widgetComponent = computed(() => resolveWidgetComponent(props.section.component, props.section.widgetId))
@@ -26,8 +28,10 @@ const widgetComponent = computed(() => resolveWidgetComponent(props.section.comp
     :highlighted="highlighted"
     :active-highlight="activeHighlight"
     :editing-highlight="editingHighlight"
-    @focus-section="emit('focusSection')"
-    @blur-section="emit('blurSection')"
+    :editable="editable"
+    @focus-section="emit('focus-section')"
+    @blur-section="emit('blur-section')"
+    @edit-section="emit('edit-section')"
   />
 
   <section
@@ -35,13 +39,23 @@ const widgetComponent = computed(() => resolveWidgetComponent(props.section.comp
     :id="section.id"
     class="tenant-section"
     :class="{
+      'editor-preview-editable-section': editable,
       'editor-new-section-highlight': highlighted,
       'editor-preview-section-highlight': activeHighlight,
       'editor-preview-section-edit-highlight': editingHighlight
     }"
-    @mouseenter="emit('focusSection')"
-    @mouseleave="emit('blurSection')"
+    @mouseenter="emit('focus-section')"
+    @mouseleave="emit('blur-section')"
   >
+    <button
+      v-if="editable"
+      type="button"
+      class="editor-preview-edit-link"
+      aria-label="Edit section"
+      @click.stop="emit('edit-section')"
+    >
+      <span aria-hidden="true">Edit</span>
+    </button>
     <div class="tenant-container">
       <component
         :is="widgetComponent"

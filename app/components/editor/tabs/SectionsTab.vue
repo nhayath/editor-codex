@@ -63,7 +63,7 @@ function scrollRowIntoView(sectionId: string) {
 }
 
 watch(
-  () => editor.focusedSectionId.value,
+  () => editor.recentlyAddedSectionId.value,
   async (sectionId) => {
     if (!sectionId) return
 
@@ -84,9 +84,21 @@ watch(
   }
 )
 
+watch(
+  () => editor.editorScrollRequest.value,
+  async (request) => {
+    if (!request) return
+
+    editor.activeTab.value = 'sections'
+    await nextTick()
+    scrollRowIntoView(request.sectionId)
+  }
+)
+
 function selectSection(section: ResolvedSection) {
-  editor.activeSectionId.value = editor.activeSectionId.value === section.id ? null : section.id
+  editor.activeSectionId.value = section.id
   editor.focusSection(section.id)
+  editor.requestPreviewScroll(section.id)
 }
 
 function addWidget(widgetId: string, title: string) {

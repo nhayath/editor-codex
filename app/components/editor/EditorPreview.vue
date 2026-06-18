@@ -66,10 +66,10 @@ watch(
 )
 
 watch(
-  () => editor.focusedSectionId.value,
-  async (sectionId) => {
-    if (sectionId) {
-      await scrollPreviewToSection(sectionId)
+  () => editor.previewScrollRequest.value,
+  async (request) => {
+    if (request) {
+      await scrollPreviewToSection(request.sectionId)
     }
   }
 )
@@ -130,8 +130,10 @@ onBeforeUnmount(() => {
           :highlighted="section.id === editor.recentlyAddedSectionId.value"
           :active-highlight="section.id === editor.recentlyEditedSectionId.value || section.id === editor.focusedSectionId.value"
           :editing-highlight="section.id === editor.recentlyEditedSectionId.value"
+          editable
           @focus-section="editor.focusSection(section.id)"
           @blur-section="editor.focusSection(null)"
+          @edit-section="editor.openSectionEditor(section.id)"
         />
         <TenantFooter
           :tenant="editor.tenant.value"
@@ -162,6 +164,10 @@ onBeforeUnmount(() => {
   transition: outline-color 160ms ease, box-shadow 160ms ease;
 }
 
+.tenant-section.editor-preview-editable-section {
+  position: relative;
+}
+
 .tenant-section.editor-preview-section-highlight::after {
   pointer-events: none;
   content: "";
@@ -169,6 +175,40 @@ onBeforeUnmount(() => {
   inset: 0.5rem;
   border-radius: inherit;
   border: 1px solid color-mix(in srgb, var(--color-primary) 46%, transparent);
+}
+
+.tenant-section .editor-preview-edit-link {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 36%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-surface) 92%, white);
+  color: var(--color-text);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--color-text) 18%, transparent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0;
+  padding: 0.5rem 0.7rem;
+  pointer-events: auto;
+  transform: translateY(-0.25rem);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.tenant-section:hover .editor-preview-edit-link,
+.tenant-section .editor-preview-edit-link:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tenant-section .editor-preview-edit-link:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 60%, transparent);
+  color: var(--color-primary);
 }
 
 .tenant-section.editor-new-section-highlight::before {
