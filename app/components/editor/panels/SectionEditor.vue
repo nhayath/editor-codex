@@ -15,7 +15,10 @@ function update(key: string, value: unknown) {
 </script>
 
 <template>
-  <div class="grid gap-4">
+  <div
+    class="grid gap-4"
+    @focusin="editor.focusSection(section.id)"
+  >
     <PropField
       v-for="field in section.propSchema ?? []"
       :key="field.key"

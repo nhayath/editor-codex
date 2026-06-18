@@ -7,6 +7,7 @@ const editor = useHomepageEditor()
 const widgetRegistry = useWidgetRegistry()
 const showWidgetPicker = ref(false)
 const widgetSearch = ref('')
+const sectionsPanel = ref<HTMLElement | null>(null)
 
 const sections = computed<ResolvedSection[]>({
   get: () => editor.resolvedSections.value,
@@ -41,8 +42,51 @@ onMounted(() => {
   widgetRegistry.loadWidgets()
 })
 
+function scrollRowIntoView(sectionId: string) {
+  const panel = sectionsPanel.value
+  const scrollContainer = panel?.parentElement
+  const row = panel?.querySelector<HTMLElement>(`[data-section-row="${CSS.escape(sectionId)}"]`)
+  if (!scrollContainer || !row) return
+
+  const rowRect = row.getBoundingClientRect()
+  const scrollContainerRect = scrollContainer.getBoundingClientRect()
+  const isAbove = rowRect.top < scrollContainerRect.top
+  const isBelow = rowRect.bottom > scrollContainerRect.bottom
+
+  if (isAbove || isBelow) {
+    row.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest'
+    })
+  }
+}
+
+watch(
+  () => editor.focusedSectionId.value,
+  async (sectionId) => {
+    if (!sectionId) return
+
+    editor.activeTab.value = 'sections'
+    await nextTick()
+    scrollRowIntoView(sectionId)
+  }
+)
+
+watch(
+  () => editor.recentlyEditedSectionId.value,
+  async (sectionId) => {
+    if (!sectionId) return
+
+    editor.activeTab.value = 'sections'
+    await nextTick()
+    scrollRowIntoView(sectionId)
+  }
+)
+
 function selectSection(section: ResolvedSection) {
   editor.activeSectionId.value = editor.activeSectionId.value === section.id ? null : section.id
+  editor.focusSection(section.id)
 }
 
 function addWidget(widgetId: string, title: string) {
@@ -53,7 +97,10 @@ function addWidget(widgetId: string, title: string) {
 </script>
 
 <template>
-  <div class="grid gap-4">
+  <div
+    ref="sectionsPanel"
+    class="grid gap-4"
+  >
     <div class="flex items-center justify-between gap-3">
       <div>
         <h2 class="text-sm font-semibold text-default">
@@ -140,7 +187,17 @@ function addWidget(widgetId: string, title: string) {
       class="grid gap-2"
     >
       <template #item="{ element }">
-        <div class="rounded-md border border-muted bg-default">
+        <div
+          class="rounded-md border border-muted bg-default transition"
+          :class="{
+            'editor-section-row-highlight': editor.focusedSectionId.value === element.id || editor.recentlyEditedSectionId.value === element.id,
+            'editor-section-row-edit-highlight': editor.recentlyEditedSectionId.value === element.id,
+            'ring-2 ring-primary/50 shadow-[0_0_22px_color-mix(in_srgb,var(--ui-primary)_24%,transparent)]': editor.focusedSectionId.value === element.id || editor.recentlyEditedSectionId.value === element.id
+          }"
+          :data-section-row="element.id"
+          @mouseenter="editor.focusSection(element.id)"
+          @mouseleave="editor.focusSection(null)"
+        >
           <button
             type="button"
             class="flex w-full items-center gap-3 p-3 text-left"
@@ -206,3 +263,30 @@ function addWidget(widgetId: string, title: string) {
     </Draggable>
   </div>
 </template>
+
+<style scoped>
+.editor-section-row-highlight {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--ui-primary) 9%, transparent),
+      transparent 58%
+    ),
+    var(--ui-bg);
+}
+
+.editor-section-row-edit-highlight {
+  animation: editor-section-row-edit-pulse 0.9s ease-in-out 2;
+}
+
+@keyframes editor-section-row-edit-pulse {
+  0%,
+  100% {
+    filter: none;
+  }
+
+  50% {
+    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--ui-primary) 34%, transparent));
+  }
+}
+</style>

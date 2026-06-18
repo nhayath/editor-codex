@@ -23,7 +23,10 @@ function groupField(field: { key: string, label: string, type: string, default: 
 </script>
 
 <template>
-  <div class="grid gap-5">
+  <div
+    class="grid gap-5"
+    @focusin="editor.focusSection(section.id)"
+  >
     <div
       v-if="section.groupPropSchema?.length"
       class="grid gap-4 rounded-md border border-muted p-3"

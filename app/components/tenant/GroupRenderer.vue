@@ -6,6 +6,13 @@ const props = defineProps<{
   section: ResolvedSection
   data?: Record<string, unknown>
   highlighted?: boolean
+  activeHighlight?: boolean
+  editingHighlight?: boolean
+}>()
+
+const emit = defineEmits<{
+  focusSection: []
+  blurSection: []
 }>()
 
 const layoutClass = computed(() => {
@@ -48,7 +55,13 @@ function widgetShellClass(widget: ResolvedWidget) {
     v-if="section.enabled"
     :id="section.id"
     class="tenant-section"
-    :class="{ 'editor-new-section-highlight': highlighted }"
+    :class="{
+      'editor-new-section-highlight': highlighted,
+      'editor-preview-section-highlight': activeHighlight,
+      'editor-preview-section-edit-highlight': editingHighlight
+    }"
+    @mouseenter="emit('focusSection')"
+    @mouseleave="emit('blurSection')"
   >
     <div class="tenant-container">
       <div class="@container">

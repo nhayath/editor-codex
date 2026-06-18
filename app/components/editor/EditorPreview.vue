@@ -4,6 +4,32 @@ import { getThemeStyle } from '~/composables/useTheme'
 const editor = useHomepageEditor()
 const previewShell = ref<HTMLElement | null>(null)
 let highlightTimer: ReturnType<typeof setTimeout> | undefined
+let editHighlightTimer: ReturnType<typeof setTimeout> | undefined
+
+function scrollIntoViewIfNeeded(element: HTMLElement, container: HTMLElement) {
+  const elementRect = element.getBoundingClientRect()
+  const containerRect = container.getBoundingClientRect()
+  const isAbove = elementRect.top < containerRect.top
+  const isBelow = elementRect.bottom > containerRect.bottom
+
+  if (isAbove || isBelow) {
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest'
+    })
+  }
+}
+
+async function scrollPreviewToSection(sectionId: string) {
+  await nextTick()
+
+  const preview = previewShell.value
+  const section = preview?.querySelector<HTMLElement>(`#${CSS.escape(sectionId)}`)
+  if (!preview || !section) return
+
+  scrollIntoViewIfNeeded(section, preview)
+}
 
 const previewWidth = computed(() => {
   if (editor.previewDevice.value === 'mobile') return '390px'
@@ -25,14 +51,7 @@ watch(
   async (sectionId) => {
     if (!sectionId) return
 
-    await nextTick()
-
-    const section = previewShell.value?.querySelector<HTMLElement>(`#${CSS.escape(sectionId)}`)
-    section?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-      inline: 'nearest'
-    })
+    await scrollPreviewToSection(sectionId)
 
     if (highlightTimer) {
       clearTimeout(highlightTimer)
@@ -46,9 +65,40 @@ watch(
   }
 )
 
+watch(
+  () => editor.focusedSectionId.value,
+  async (sectionId) => {
+    if (sectionId) {
+      await scrollPreviewToSection(sectionId)
+    }
+  }
+)
+
+watch(
+  () => editor.recentlyEditedSectionId.value,
+  async (sectionId) => {
+    if (!sectionId) return
+
+    await scrollPreviewToSection(sectionId)
+
+    if (editHighlightTimer) {
+      clearTimeout(editHighlightTimer)
+    }
+
+    editHighlightTimer = setTimeout(() => {
+      if (editor.recentlyEditedSectionId.value === sectionId) {
+        editor.recentlyEditedSectionId.value = null
+      }
+    }, 1800)
+  }
+)
+
 onBeforeUnmount(() => {
   if (highlightTimer) {
     clearTimeout(highlightTimer)
+  }
+  if (editHighlightTimer) {
+    clearTimeout(editHighlightTimer)
   }
 })
 </script>
@@ -78,6 +128,10 @@ onBeforeUnmount(() => {
           :section="section"
           :data="editor.siteData.value"
           :highlighted="section.id === editor.recentlyAddedSectionId.value"
+          :active-highlight="section.id === editor.recentlyEditedSectionId.value || section.id === editor.focusedSectionId.value"
+          :editing-highlight="section.id === editor.recentlyEditedSectionId.value"
+          @focus-section="editor.focusSection(section.id)"
+          @blur-section="editor.focusSection(null)"
         />
         <TenantFooter
           :tenant="editor.tenant.value"
@@ -96,6 +150,27 @@ onBeforeUnmount(() => {
   animation: editor-new-section-glow 1.2s ease-in-out 3;
 }
 
+.tenant-section.editor-preview-section-highlight {
+  position: relative;
+  z-index: 1;
+  border-radius: 1rem;
+  outline: 2px solid color-mix(in srgb, var(--color-primary) 70%, white);
+  outline-offset: -0.5rem;
+  box-shadow:
+    inset 0 0 0 9999px color-mix(in srgb, var(--color-primary) 6%, transparent),
+    0 0 34px color-mix(in srgb, var(--color-primary) 28%, transparent);
+  transition: outline-color 160ms ease, box-shadow 160ms ease;
+}
+
+.tenant-section.editor-preview-section-highlight::after {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 46%, transparent);
+}
+
 .tenant-section.editor-new-section-highlight::before {
   pointer-events: none;
   content: "";
@@ -109,6 +184,10 @@ onBeforeUnmount(() => {
   animation: editor-new-section-blink 0.6s ease-in-out 6;
 }
 
+.tenant-section.editor-preview-section-edit-highlight {
+  animation: editor-preview-edit-pulse 0.9s ease-in-out 2;
+}
+
 @keyframes editor-new-section-glow {
   0%,
   100% {
@@ -117,6 +196,17 @@ onBeforeUnmount(() => {
 
   45% {
     filter: drop-shadow(0 0 22px color-mix(in srgb, var(--color-secondary) 42%, transparent));
+  }
+}
+
+@keyframes editor-preview-edit-pulse {
+  0%,
+  100% {
+    filter: none;
+  }
+
+  50% {
+    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--color-primary) 34%, transparent));
   }
 }
 

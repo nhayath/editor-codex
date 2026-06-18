@@ -14,7 +14,9 @@ export function useHomepageEditor() {
   const originalConfig = useState<HomepageConfigDraft | null>('editorOriginalConfig', () => null)
   const draft = useState<HomepageConfigDraft | null>('editorDraft', () => null)
   const activeSectionId = useState<string | null>('editorActiveSectionId', () => null)
+  const focusedSectionId = useState<string | null>('editorFocusedSectionId', () => null)
   const recentlyAddedSectionId = useState<string | null>('editorRecentlyAddedSectionId', () => null)
+  const recentlyEditedSectionId = useState<string | null>('editorRecentlyEditedSectionId', () => null)
   const activeTab = useState<'theme' | 'sections' | 'settings'>('editorActiveTab', () => 'theme')
   const previewDevice = useState<'desktop' | 'tablet' | 'mobile'>('editorPreviewDevice', () => 'desktop')
   const loading = useState('editorLoading', () => false)
@@ -47,7 +49,9 @@ export function useHomepageEditor() {
       originalConfig.value = cloneDraft(payload.config)
       draft.value = cloneDraft(payload.config)
       activeSectionId.value = payload.resolvedSections[0]?.id ?? null
+      focusedSectionId.value = null
       recentlyAddedSectionId.value = null
+      recentlyEditedSectionId.value = null
       lastSavedAt.value = new Date().toISOString()
     } finally {
       loading.value = false
@@ -69,7 +73,9 @@ export function useHomepageEditor() {
       siteData.value = payload.data
       originalConfig.value = cloneDraft(payload.config)
       draft.value = cloneDraft(payload.config)
+      focusedSectionId.value = null
       recentlyAddedSectionId.value = null
+      recentlyEditedSectionId.value = null
       lastSavedAt.value = new Date().toISOString()
     } finally {
       saving.value = false
@@ -79,6 +85,7 @@ export function useHomepageEditor() {
   function updateSectionProps(sectionId: string, props: Record<string, unknown>) {
     if (!draft.value) return
 
+    markSectionEdited(sectionId)
     draft.value.sectionOverrides[sectionId] = {
       ...(draft.value.sectionOverrides[sectionId] ?? {}),
       props: {
@@ -91,6 +98,7 @@ export function useHomepageEditor() {
   function updateGroupProps(sectionId: string, groupProps: Record<string, unknown>) {
     if (!draft.value) return
 
+    markSectionEdited(sectionId)
     draft.value.sectionOverrides[sectionId] = {
       ...(draft.value.sectionOverrides[sectionId] ?? {}),
       groupProps: {
@@ -103,6 +111,7 @@ export function useHomepageEditor() {
   function updateGroupWidgetProps(sectionId: string, slot: string, props: Record<string, unknown>) {
     if (!draft.value) return
 
+    markSectionEdited(sectionId)
     const override = draft.value.sectionOverrides[sectionId] ?? {}
     draft.value.sectionOverrides[sectionId] = {
       ...override,
@@ -147,6 +156,7 @@ export function useHomepageEditor() {
     draft.value.sectionsEnabled[sectionId] = true
     draft.value.sectionOrder.push(sectionId)
     activeSectionId.value = sectionId
+    focusedSectionId.value = sectionId
     recentlyAddedSectionId.value = sectionId
     activeTab.value = 'sections'
   }
@@ -164,8 +174,14 @@ export function useHomepageEditor() {
     if (activeSectionId.value === sectionId) {
       activeSectionId.value = draft.value.sectionOrder[0] ?? null
     }
+    if (focusedSectionId.value === sectionId) {
+      focusedSectionId.value = null
+    }
     if (recentlyAddedSectionId.value === sectionId) {
       recentlyAddedSectionId.value = null
+    }
+    if (recentlyEditedSectionId.value === sectionId) {
+      recentlyEditedSectionId.value = null
     }
   }
 
@@ -181,7 +197,9 @@ export function useHomepageEditor() {
       customColors: draft.value?.customColors ?? null
     })
     activeSectionId.value = draft.value.sectionOrder[0] ?? null
+    focusedSectionId.value = null
     recentlyAddedSectionId.value = null
+    recentlyEditedSectionId.value = null
   }
 
   function setPalette(paletteId: string) {
@@ -194,6 +212,17 @@ export function useHomepageEditor() {
     draft.value.fontPairId = fontPairId
   }
 
+  function focusSection(sectionId: string | null) {
+    focusedSectionId.value = sectionId
+  }
+
+  function markSectionEdited(sectionId: string) {
+    activeSectionId.value = sectionId
+    focusedSectionId.value = sectionId
+    recentlyEditedSectionId.value = sectionId
+    activeTab.value = 'sections'
+  }
+
   return {
     tenant,
     template,
@@ -204,7 +233,9 @@ export function useHomepageEditor() {
     resolvedSections,
     isDirty,
     activeSectionId,
+    focusedSectionId,
     recentlyAddedSectionId,
+    recentlyEditedSectionId,
     activeTab,
     previewDevice,
     loading,
@@ -221,6 +252,8 @@ export function useHomepageEditor() {
     removeSection,
     setTemplate,
     setPalette,
-    setFontPair
+    setFontPair,
+    focusSection,
+    markSectionEdited
   }
 }
