@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getTenantInitials } from '~/components/templates/chrome'
+import { getTenantInitials, getTenantLogoUrl } from '~/components/templates/chrome'
 
 const props = defineProps<{
   tenant?: Record<string, any> | null
@@ -11,6 +11,7 @@ const props = defineProps<{
 const menuOpen = ref(false)
 const navItems = computed(() => props.tenant?.navItems ?? [])
 const logoInitials = computed(() => getTenantInitials(props.tenant))
+const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 </script>
 
 <template>
@@ -24,8 +25,14 @@ const logoInitials = computed(() => getTenantInitials(props.tenant))
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-4"
       >
-        <div class="grid size-14 shrink-0 place-items-center rounded-2xl bg-[var(--color-primary)] text-white shadow-[0_16px_34px_color-mix(in_srgb,var(--color-primary)_22%,transparent)]">
-          <span class="tenant-heading text-xl font-black leading-none">{{ logoInitials }}</span>
+        <div class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[var(--color-primary)] text-white shadow-[0_16px_34px_color-mix(in_srgb,var(--color-primary)_22%,transparent)]">
+          <img
+            v-if="logoUrl"
+            :src="logoUrl"
+            :alt="`${tenant?.name ?? 'Mosque'} logo`"
+            class="size-full object-contain p-1.5"
+          >
+          <span v-else class="tenant-heading text-xl font-black leading-none">{{ logoInitials }}</span>
         </div>
         <span class="min-w-0">
           <span class="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-[var(--color-secondary)]">Community mosque</span>

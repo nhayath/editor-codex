@@ -55,6 +55,10 @@ export async function getTenantContentData(tenantId: string) {
 
 export async function buildHomepageConfigResponse(slug: string) {
   const tenant = await getTenantOrThrow(slug)
+  const allNavItems = await prisma.navItem.findMany({
+    where: { tenantId: tenant.id },
+    orderBy: { order: 'asc' }
+  })
   const template = getTemplateDefinition(tenant.homepageConfig?.templateId ?? 'classic')
   const config = buildDraftFromDatabase(tenant.homepageConfig)
   const data = await getTenantContentData(tenant.id)
@@ -67,7 +71,8 @@ export async function buildHomepageConfigResponse(slug: string) {
       domain: tenant.domain,
       status: tenant.status,
       settings: tenant.settings,
-      navItems: tenant.navItems
+      navItems: tenant.navItems,
+      allNavItems
     },
     template,
     config,

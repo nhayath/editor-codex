@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getTenantInitials } from '~/components/templates/chrome'
+import { getTenantInitials, getTenantLogoUrl } from '~/components/templates/chrome'
 
 const props = defineProps<{
   tenant?: Record<string, any> | null
@@ -11,6 +11,7 @@ const props = defineProps<{
 const menuOpen = ref(false)
 const navItems = computed(() => props.tenant?.navItems ?? [])
 const logoInitials = computed(() => getTenantInitials(props.tenant, 'N'))
+const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 </script>
 
 <template>
@@ -24,8 +25,14 @@ const logoInitials = computed(() => getTenantInitials(props.tenant, 'N'))
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-3"
       >
-        <div class="grid size-11 shrink-0 place-items-center rounded-sm bg-[var(--color-secondary)] text-[var(--color-primary)]">
-          <span class="tenant-heading text-lg font-black leading-none">{{ logoInitials }}</span>
+        <div class="grid size-11 shrink-0 place-items-center overflow-hidden rounded-sm bg-[var(--color-secondary)] text-[var(--color-primary)]">
+          <img
+            v-if="logoUrl"
+            :src="logoUrl"
+            :alt="`${tenant?.name ?? 'Mosque'} logo`"
+            class="size-full object-contain p-1"
+          >
+          <span v-else class="tenant-heading text-lg font-black leading-none">{{ logoInitials }}</span>
         </div>
         <span class="tenant-heading truncate text-xl font-bold text-white">
           {{ tenant?.name }}

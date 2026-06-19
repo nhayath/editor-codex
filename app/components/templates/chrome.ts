@@ -17,6 +17,11 @@ export function getTenantInitials(tenant?: Record<string, any> | null, fallback 
   return initials || fallback
 }
 
+export function getTenantLogoUrl(tenant?: Record<string, any> | null) {
+  const logoUrl = tenant?.settings?.logoUrl
+  return typeof logoUrl === 'string' && logoUrl.trim().length ? logoUrl.trim() : ''
+}
+
 export const sacredModernNavItems: ChromeNavItem[] = [
   { id: 'prayer-times', label: 'Prayer Times', href: '#prayer-times' },
   { id: 'events', label: 'Events', href: '#events' },

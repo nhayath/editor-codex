@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getTenantLogoUrl } from '~/components/templates/chrome'
+
 const props = defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
@@ -9,6 +11,7 @@ const props = defineProps<{
 const menuOpen = ref(false)
 
 const navItems = computed(() => props.tenant?.navItems ?? [])
+const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 </script>
 
 <template>
@@ -22,8 +25,14 @@ const navItems = computed(() => props.tenant?.navItems ?? [])
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-3"
       >
-        <div class="grid size-10 shrink-0 place-items-center rounded-md bg-[var(--color-primary)] text-white">
-          <IconGlyph name="islamic-mosque" class="size-5" />
+        <div class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-[var(--color-primary)] text-white">
+          <img
+            v-if="logoUrl"
+            :src="logoUrl"
+            :alt="`${tenant?.name ?? 'Mosque'} logo`"
+            class="size-full object-contain p-1"
+          >
+          <IconGlyph v-else name="islamic-mosque" class="size-5" />
         </div>
         <span class="tenant-heading truncate text-xl font-bold text-[var(--color-text)]">
           {{ tenant?.name }}

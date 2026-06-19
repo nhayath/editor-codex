@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getTenantInitials, sacredModernNavItems } from '~/components/templates/chrome'
+import { getTenantInitials, getTenantLogoUrl } from '~/components/templates/chrome'
 
 const props = defineProps<{
   tenant?: Record<string, any> | null
@@ -9,7 +9,9 @@ const props = defineProps<{
 }>()
 
 const menuOpen = ref(false)
+const navItems = computed(() => props.tenant?.navItems ?? [])
 const logoInitials = computed(() => getTenantInitials(props.tenant))
+const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 </script>
 
 <template>
@@ -23,8 +25,14 @@ const logoInitials = computed(() => getTenantInitials(props.tenant))
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-3"
       >
-        <div class="grid size-12 shrink-0 place-items-center rounded-xl bg-[var(--color-primary)] text-white shadow-[0_12px_24px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]">
-          <span class="tenant-heading text-xl font-black leading-none">{{ logoInitials }}</span>
+        <div class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-[var(--color-primary)] text-white shadow-[0_12px_24px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]">
+          <img
+            v-if="logoUrl"
+            :src="logoUrl"
+            :alt="`${tenant?.name ?? 'Mosque'} logo`"
+            class="size-full object-contain p-1.5"
+          >
+          <span v-else class="tenant-heading text-xl font-black leading-none">{{ logoInitials }}</span>
         </div>
         <span class="tenant-heading truncate text-2xl font-bold text-[var(--color-primary)]">
           {{ tenant?.name }}
@@ -33,8 +41,8 @@ const logoInitials = computed(() => getTenantInitials(props.tenant))
 
       <nav class="hidden items-center gap-6 @5xl:flex">
         <UButton
-          v-for="item in sacredModernNavItems"
-          :key="item.href"
+          v-for="item in navItems"
+          :key="item.id"
           :to="item.href"
           color="neutral"
           variant="ghost"
@@ -85,8 +93,8 @@ const logoInitials = computed(() => getTenantInitials(props.tenant))
       aria-label="Mobile navigation"
     >
       <UButton
-        v-for="item in sacredModernNavItems"
-        :key="item.href"
+        v-for="item in navItems"
+        :key="item.id"
         :to="item.href"
         color="neutral"
         variant="ghost"

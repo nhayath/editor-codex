@@ -2,8 +2,48 @@ import type { HomepageConfigDraft, ResolvedSection, TemplateDefinition } from '~
 import type { HomepageConfigResponse } from '~~/types/editor'
 import { normaliseDraft, resolveSections } from '~~/utils/homepage'
 
+export interface TenantSettingsDraft {
+  domain: string
+  logoUrl: string
+}
+
+export interface TenantNavItemDraft {
+  id?: string
+  label: string
+  href: string
+  isActive: boolean
+}
+
 function cloneDraft(draft: HomepageConfigDraft): HomepageConfigDraft {
   return JSON.parse(JSON.stringify(draft)) as HomepageConfigDraft
+}
+
+function cloneSettingsDraft(draft: TenantSettingsDraft): TenantSettingsDraft {
+  return JSON.parse(JSON.stringify(draft)) as TenantSettingsDraft
+}
+
+function cloneNavItemsDraft(draft: TenantNavItemDraft[]): TenantNavItemDraft[] {
+  return JSON.parse(JSON.stringify(draft)) as TenantNavItemDraft[]
+}
+
+function buildSettingsDraft(tenant: Record<string, unknown> | null): TenantSettingsDraft {
+  const settings = (tenant?.settings ?? {}) as Record<string, unknown>
+
+  return {
+    domain: typeof tenant?.domain === 'string' ? tenant.domain : '',
+    logoUrl: typeof settings.logoUrl === 'string' ? settings.logoUrl : ''
+  }
+}
+
+function buildNavItemsDraft(tenant: Record<string, unknown> | null): TenantNavItemDraft[] {
+  const navItems = ((tenant?.allNavItems ?? tenant?.navItems ?? []) as Array<Record<string, unknown>>)
+
+  return navItems.map(item => ({
+    id: typeof item.id === 'string' ? item.id : undefined,
+    label: typeof item.label === 'string' ? item.label : '',
+    href: typeof item.href === 'string' ? item.href : '',
+    isActive: item.isActive !== false
+  }))
 }
 
 export function useHomepageEditor() {
@@ -13,6 +53,10 @@ export function useHomepageEditor() {
   const siteData = useState<Record<string, unknown>>('editorSiteData', () => ({}))
   const originalConfig = useState<HomepageConfigDraft | null>('editorOriginalConfig', () => null)
   const draft = useState<HomepageConfigDraft | null>('editorDraft', () => null)
+  const originalSettingsDraft = useState<TenantSettingsDraft | null>('editorOriginalSettingsDraft', () => null)
+  const settingsDraft = useState<TenantSettingsDraft | null>('editorSettingsDraft', () => null)
+  const originalNavItemsDraft = useState<TenantNavItemDraft[]>('editorOriginalNavItemsDraft', () => [])
+  const navItemsDraft = useState<TenantNavItemDraft[]>('editorNavItemsDraft', () => [])
   const activeSectionId = useState<string | null>('editorActiveSectionId', () => null)
   const focusedSectionId = useState<string | null>('editorFocusedSectionId', () => null)
   const recentlyAddedSectionId = useState<string | null>('editorRecentlyAddedSectionId', () => null)
@@ -31,9 +75,34 @@ export function useHomepageEditor() {
   })
 
   const isDirty = computed(() => {
+    return configDirty.value || settingsDirty.value || navItemsDirty.value
+  })
+
+  const configDirty = computed(() => {
     if (!originalConfig.value || !draft.value) return false
     return JSON.stringify(originalConfig.value) !== JSON.stringify(draft.value)
   })
+
+  const settingsDirty = computed(() => {
+    if (!originalSettingsDraft.value || !settingsDraft.value) return false
+    return JSON.stringify(originalSettingsDraft.value) !== JSON.stringify(settingsDraft.value)
+  })
+
+  const navItemsDirty = computed(() => {
+    return JSON.stringify(originalNavItemsDraft.value) !== JSON.stringify(navItemsDraft.value)
+  })
+
+  function applyPayload(payload: HomepageConfigResponse) {
+    tenant.value = payload.tenant
+    template.value = payload.template
+    siteData.value = payload.data
+    originalConfig.value = cloneDraft(payload.config)
+    draft.value = cloneDraft(payload.config)
+    originalSettingsDraft.value = buildSettingsDraft(payload.tenant)
+    settingsDraft.value = cloneSettingsDraft(originalSettingsDraft.value)
+    originalNavItemsDraft.value = buildNavItemsDraft(payload.tenant)
+    navItemsDraft.value = cloneNavItemsDraft(originalNavItemsDraft.value)
+  }
 
   async function loadConfig(slug: string) {
     loading.value = true
@@ -44,12 +113,8 @@ export function useHomepageEditor() {
         $fetch<TemplateDefinition[]>('/api/templates')
       ])
 
-      tenant.value = payload.tenant
-      template.value = payload.template
-      siteData.value = payload.data
+      applyPayload(payload)
       availableTemplates.value = templates
-      originalConfig.value = cloneDraft(payload.config)
-      draft.value = cloneDraft(payload.config)
       activeSectionId.value = payload.resolvedSections[0]?.id ?? null
       focusedSectionId.value = null
       recentlyAddedSectionId.value = null
@@ -67,16 +132,34 @@ export function useHomepageEditor() {
 
     saving.value = true
     try {
-      const payload = await $fetch<HomepageConfigResponse>(`/api/tenant/${tenant.value.slug}/config`, {
-        method: 'PUT',
-        body: draft.value
-      })
+      const slug = tenant.value.slug
+      let payload: HomepageConfigResponse | null = null
 
-      tenant.value = payload.tenant
-      template.value = payload.template
-      siteData.value = payload.data
-      originalConfig.value = cloneDraft(payload.config)
-      draft.value = cloneDraft(payload.config)
+      if (configDirty.value) {
+        payload = await $fetch<HomepageConfigResponse>(`/api/tenant/${slug}/config`, {
+          method: 'PUT',
+          body: draft.value
+        })
+      }
+
+      if (settingsDirty.value && settingsDraft.value) {
+        payload = await $fetch<HomepageConfigResponse>(`/api/tenant/${slug}/settings`, {
+          method: 'PUT',
+          body: settingsDraft.value
+        })
+      }
+
+      if (navItemsDirty.value) {
+        payload = await $fetch<HomepageConfigResponse>(`/api/tenant/${slug}/nav-items`, {
+          method: 'PUT',
+          body: { items: navItemsDraft.value }
+        })
+      }
+
+      if (payload) {
+        applyPayload(payload)
+      }
+
       focusedSectionId.value = null
       recentlyAddedSectionId.value = null
       recentlyEditedSectionId.value = null
@@ -226,6 +309,38 @@ export function useHomepageEditor() {
     draft.value.fontPairId = fontPairId
   }
 
+  function updateSettingsDraft(settings: Partial<TenantSettingsDraft>) {
+    if (!settingsDraft.value) {
+      settingsDraft.value = { domain: '', logoUrl: '' }
+    }
+
+    settingsDraft.value = {
+      ...settingsDraft.value,
+      ...settings
+    }
+  }
+
+  function addNavItem() {
+    navItemsDraft.value.push({
+      label: 'New link',
+      href: '#top',
+      isActive: true
+    })
+  }
+
+  function removeNavItem(index: number) {
+    navItemsDraft.value.splice(index, 1)
+  }
+
+  function moveNavItem(index: number, direction: -1 | 1) {
+    const nextIndex = index + direction
+    if (nextIndex < 0 || nextIndex >= navItemsDraft.value.length) return
+
+    const [item] = navItemsDraft.value.splice(index, 1)
+    if (!item) return
+    navItemsDraft.value.splice(nextIndex, 0, item)
+  }
+
   function focusSection(sectionId: string | null) {
     focusedSectionId.value = sectionId
   }
@@ -265,7 +380,14 @@ export function useHomepageEditor() {
     siteData,
     originalConfig,
     draft,
+    originalSettingsDraft,
+    settingsDraft,
+    originalNavItemsDraft,
+    navItemsDraft,
     resolvedSections,
+    configDirty,
+    settingsDirty,
+    navItemsDirty,
     isDirty,
     activeSectionId,
     focusedSectionId,
@@ -290,6 +412,10 @@ export function useHomepageEditor() {
     setTemplate,
     setPalette,
     setFontPair,
+    updateSettingsDraft,
+    addNavItem,
+    removeNavItem,
+    moveNavItem,
     focusSection,
     markSectionEdited,
     requestPreviewScroll,

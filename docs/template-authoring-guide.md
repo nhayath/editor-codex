@@ -5,6 +5,7 @@ This guide explains how to create a website template from scratch for the mosque
 The current system is intentionally template-aware:
 
 - Templates decide the homepage section structure.
+- Templates choose their own header and footer components.
 - Global widgets provide reusable defaults.
 - A template may override any widget by stable widget ID.
 - Editor changes are saved in the existing `sectionOverrides` object.
@@ -22,7 +23,10 @@ The current system is intentionally template-aware:
 | Template/widget resolver | `utils/homepage.ts` |
 | Global widget Vue components | `app/components/widgets/*.vue` |
 | Template-specific widget Vue components | `app/components/templates/<template-id>/widgets/*.vue` |
-| Component registration and fallback | `app/components/tenant/widgetComponents.ts` |
+| Template-specific header/footer Vue components | `app/components/templates/<template-id>/chrome/*.vue` |
+| Widget component registration and fallback | `app/components/tenant/widgetComponents.ts` |
+| Header/footer component registration and fallback | `app/components/tenant/chromeComponents.ts` |
+| Header/footer renderer | `app/components/tenant/TenantChrome.vue` |
 | Single section renderer | `app/components/tenant/SectionRenderer.vue` |
 | Group section renderer | `app/components/tenant/GroupRenderer.vue` |
 | Editor section controls | `app/components/editor/panels/SectionEditor.vue` |
@@ -36,9 +40,13 @@ flowchart TD
   B --> C["resolveSections(template, draft)"]
   D["Global widget registry"] --> C
   E["Template widget overrides"] --> C
+  A --> K["Template header/footer"]
   C --> F["Resolved sections"]
+  K --> L["TenantChrome"]
   F --> G["Editor preview"]
   F --> H["Public site"]
+  L --> G
+  L --> H
   F --> I["Editor controls"]
   I --> J["sectionOverrides"]
   J --> B
@@ -53,6 +61,8 @@ The important function is `resolveSections(template, draft)` in `utils/homepage.
 5. Saved user edits from `sectionOverrides`.
 
 The result is a list of `ResolvedSection` objects. Renderers and editor panels should use these resolved objects instead of looking up global widgets directly.
+
+Header and footer components are resolved separately from sections. `TenantChrome` reads `template.header` and `template.footer`, looks up the named component in `chromeComponents.ts`, and falls back to the generic `TenantHeader` or `TenantFooter` if a custom component is not registered.
 
 ## Step 1: Pick a Template ID
 
@@ -72,6 +82,7 @@ Recommended file layout:
 ```text
 templates/urban-minaret.ts
 app/components/templates/urban-minaret/widgets/
+app/components/templates/urban-minaret/chrome/
 public/templates/urban-minaret.svg
 ```
 
@@ -92,12 +103,12 @@ export const urbanMinaretTemplate: TemplateDefinition = {
   defaultPaletteId: 'emerald',
   defaultFontPairId: 'inter-amiri',
   header: {
-    component: 'TenantHeader',
-    props: { sticky: true, style: 'default' }
+    component: 'UrbanMinaretHeader',
+    props: { sticky: true, style: 'urban-minaret' }
   },
   footer: {
-    component: 'TenantFooter',
-    props: { style: 'default' }
+    component: 'UrbanMinaretFooter',
+    props: { style: 'urban-minaret' }
   },
   dataDependencies: [
     'settings',
@@ -820,7 +831,180 @@ sections: [
 
 The Group editor will show the resolved widget name, icon, and prop schema from the template override.
 
-## Step 17: Add Data Dependencies
+## Step 17: Create Header and Footer Components
+
+Templates can choose custom header and footer components with the same component-name override pattern used by widgets. This is how template switching changes the site chrome: logo placement, desktop nav layout, mobile menu treatment, CTA placement, and footer structure.
+
+Template-specific chrome components live under:
+
+```text
+app/components/templates/<template-id>/chrome/
+```
+
+Example:
+
+```text
+app/components/templates/urban-minaret/chrome/UrbanMinaretHeader.vue
+app/components/templates/urban-minaret/chrome/UrbanMinaretFooter.vue
+```
+
+### Header Component
+
+Chrome components receive the tenant, template ID, and any props from `template.header.props` or `template.footer.props`.
+
+```vue
+<script setup lang="ts">
+const props = defineProps<{
+  tenant?: Record<string, any> | null
+  templateId?: string
+  sticky?: boolean
+  style?: string
+}>()
+
+const menuOpen = ref(false)
+const navItems = computed(() => props.tenant?.navItems ?? [])
+</script>
+
+<template>
+  <header
+    id="top"
+    class="@container z-30 bg-[var(--color-surface)]"
+    :class="sticky !== false ? 'sticky top-0' : ''"
+  >
+    <div class="tenant-container flex min-h-20 items-center justify-between gap-4">
+      <NuxtLink :to="`/site/${tenant?.slug ?? ''}`" class="flex min-w-0 items-center gap-3">
+        <div class="grid size-11 shrink-0 place-items-center rounded-md bg-[var(--color-primary)] text-white">
+          <IconGlyph name="islamic-mosque" class="size-5" />
+        </div>
+        <span class="tenant-heading truncate text-xl font-bold text-[var(--color-text)]">
+          {{ tenant?.name }}
+        </span>
+      </NuxtLink>
+
+      <nav class="hidden items-center gap-2 @5xl:flex">
+        <UButton
+          v-for="item in navItems"
+          :key="item.id"
+          :to="item.href"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          :label="item.label"
+        />
+      </nav>
+
+      <UButton
+        color="neutral"
+        variant="ghost"
+        icon="i-lucide-menu"
+        size="sm"
+        :aria-label="menuOpen ? 'Close menu' : 'Open menu'"
+        class="@5xl:hidden"
+        @click="menuOpen = !menuOpen"
+      />
+    </div>
+
+    <nav
+      v-if="menuOpen"
+      class="tenant-container grid gap-2 py-4 @5xl:hidden"
+      aria-label="Mobile navigation"
+    >
+      <UButton
+        v-for="item in navItems"
+        :key="item.id"
+        :to="item.href"
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        class="justify-start"
+        :label="item.label"
+        @click="menuOpen = false"
+      />
+    </nav>
+  </header>
+</template>
+```
+
+### Footer Component
+
+```vue
+<script setup lang="ts">
+defineProps<{
+  tenant?: Record<string, any> | null
+  templateId?: string
+  style?: string
+}>()
+
+const year = new Date().getFullYear()
+</script>
+
+<template>
+  <footer class="@container bg-[var(--color-primary)] py-12 text-white">
+    <div class="tenant-container grid gap-8 @2xl:grid-cols-[1fr_auto]">
+      <div>
+        <p class="tenant-heading text-2xl font-bold text-white">
+          {{ tenant?.name }}
+        </p>
+        <p class="mt-4 max-w-xl text-sm leading-6 text-white/72">
+          {{ tenant?.settings?.aboutText }}
+        </p>
+      </div>
+
+      <div class="grid gap-2 text-sm text-white/72">
+        <span>{{ tenant?.settings?.address }}</span>
+        <span>{{ tenant?.settings?.city }} {{ tenant?.settings?.postcode }}</span>
+        <span>{{ tenant?.settings?.email }}</span>
+      </div>
+    </div>
+
+    <div class="tenant-container mt-8 border-t border-white/12 pt-5 text-xs text-white/60">
+      © {{ year }} {{ tenant?.name }}
+    </div>
+  </footer>
+</template>
+```
+
+### Register Chrome Components
+
+Add the components to `app/components/tenant/chromeComponents.ts`.
+
+```ts
+import UrbanMinaretHeader from '~/components/templates/urban-minaret/chrome/UrbanMinaretHeader.vue'
+import UrbanMinaretFooter from '~/components/templates/urban-minaret/chrome/UrbanMinaretFooter.vue'
+
+const headerComponents: Record<string, Component> = {
+  TenantHeader,
+  UrbanMinaretHeader
+}
+
+const footerComponents: Record<string, Component> = {
+  TenantFooter,
+  UrbanMinaretFooter
+}
+```
+
+Then reference those component names in the template definition:
+
+```ts
+header: {
+  component: 'UrbanMinaretHeader',
+  props: { sticky: true, style: 'urban-minaret' }
+},
+footer: {
+  component: 'UrbanMinaretFooter',
+  props: { style: 'urban-minaret' }
+}
+```
+
+The resolver has fallback behavior:
+
+- If the header component name exists in `headerComponents`, it renders that component.
+- If the footer component name exists in `footerComponents`, it renders that component.
+- If a named component is missing, the renderer falls back to `TenantHeader` or `TenantFooter` and logs a dev-only warning.
+
+Chrome props are not editor-editable in the current implementation. Use them for static template-level choices such as `sticky`, `style`, `tone`, or CTA labels.
+
+## Step 18: Add Data Dependencies
 
 Use `dataDependencies` to declare the data a template or widget needs.
 
@@ -856,7 +1040,7 @@ widgets: {
 
 Only request what the rendered template actually needs.
 
-## Step 18: Responsive Design Requirements
+## Step 19: Responsive Design Requirements
 
 Every template and template-specific widget must be checked on:
 
@@ -902,7 +1086,7 @@ Avoid fixed widths that exceed mobile screens. Prefer:
 - `break-words`
 - `overflow-hidden` only when intentional
 
-## Step 19: Test the Template
+## Step 20: Test the Template
 
 Run typecheck:
 
@@ -926,7 +1110,7 @@ Then test with Chrome DevTools MCP/in-app Browser:
 
 1. Open `/editor/al-noor`.
 2. Switch to the new template in the Theme tab.
-3. Confirm the template renders in desktop preview.
+3. Confirm the template header, footer, and sections render in desktop preview.
 4. Open the Sections tab.
 5. Select each section and confirm expected props appear.
 6. Edit template-specific props and confirm the preview updates live.
@@ -934,10 +1118,11 @@ Then test with Chrome DevTools MCP/in-app Browser:
 8. Open `/site/al-noor`.
 9. Check desktop, tablet, and mobile viewports.
 10. Confirm there is no horizontal overflow.
-11. Confirm there are no relevant console errors or warnings.
-12. Capture screenshots for desktop, tablet, and mobile.
+11. Confirm each mobile header menu opens, closes, and shows the expected nav items.
+12. Confirm there are no relevant console errors or warnings.
+13. Capture screenshots for desktop, tablet, and mobile.
 
-## Step 20: Common Mistakes
+## Step 21: Common Mistakes
 
 ### Component Name Does Not Match Registration
 
@@ -960,6 +1145,42 @@ const namedWidgetComponents: Record<string, Component> = {
 ```
 
 If the names do not match, the renderer falls back to the global widget when possible.
+
+### Header or Footer Name Does Not Match Registration
+
+Template chrome:
+
+```ts
+header: {
+  component: 'UrbanMinaretHeader',
+  props: { sticky: true, style: 'urban-minaret' }
+}
+```
+
+Registration must include the same key in `chromeComponents.ts`:
+
+```ts
+const headerComponents: Record<string, Component> = {
+  TenantHeader,
+  UrbanMinaretHeader
+}
+```
+
+If the name is missing, `TenantChrome` falls back to `TenantHeader` or `TenantFooter` and logs a dev-only warning.
+
+### Header or Footer Ignores Template Props
+
+`template.header.props` and `template.footer.props` are passed directly to the resolved chrome component. If a prop is set in the template but does not change the UI, check that the component declares and uses it.
+
+```ts
+const props = defineProps<{
+  sticky?: boolean
+}>()
+```
+
+```vue
+<header :class="props.sticky !== false ? 'sticky top-0' : ''">
+```
 
 ### Added Prop Does Not Change UI
 
@@ -1005,9 +1226,14 @@ Before considering a template complete:
 - Groups have unique slot names.
 - Widget overrides use stable widget IDs.
 - Template-specific components are registered in `widgetComponents.ts`.
+- Template-specific header/footer components are registered in `chromeComponents.ts`.
+- Template definition references the intended header/footer component names.
+- Header and footer render differently enough to support the template identity.
+- Mobile header menu opens, closes, and avoids horizontal overflow.
 - Template-specific props appear in the editor.
 - Template-specific props update the live preview.
 - Public site uses the same widget overrides as the editor.
+- Public site uses the same header/footer as the editor preview.
 - Mobile, tablet, and desktop have no horizontal overflow.
 - `nuxi typecheck` passes.
 - `nuxt build` passes.
