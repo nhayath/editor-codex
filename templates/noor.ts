@@ -8,11 +8,11 @@ export const noorTemplate: TemplateDefinition = {
   defaultPaletteId: 'navy-coral',
   defaultFontPairId: 'outfit-inter',
   header: {
-    component: 'TenantHeader',
+    component: 'NoorHeader',
     props: { sticky: true, style: 'modern' }
   },
   footer: {
-    component: 'TenantFooter',
+    component: 'NoorFooter',
     props: { style: 'modern' }
   },
   dataDependencies: ['settings', 'navItems', 'prayerTimes', 'jummahTimes', 'events', 'announcements', 'donations'],

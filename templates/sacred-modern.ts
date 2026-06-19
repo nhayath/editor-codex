@@ -98,11 +98,11 @@ export const sacredModernTemplate: TemplateDefinition = {
     }
   },
   header: {
-    component: 'TenantHeader',
+    component: 'SacredModernHeader',
     props: { sticky: true, style: 'sacred-modern' }
   },
   footer: {
-    component: 'TenantFooter',
+    component: 'SacredModernFooter',
     props: { style: 'sacred-modern' }
   },
   dataDependencies: ['settings', 'navItems', 'prayerTimes', 'jummahTimes', 'events', 'announcements', 'donations'],

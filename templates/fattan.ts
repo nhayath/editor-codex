@@ -25,11 +25,11 @@ export const fattanTemplate: TemplateDefinition = {
     }
   },
   header: {
-    component: 'TenantHeader',
+    component: 'FattanHeader',
     props: { sticky: true, style: 'fattan' }
   },
   footer: {
-    component: 'TenantFooter',
+    component: 'FattanFooter',
     props: { style: 'fattan' }
   },
   dataDependencies: ['settings', 'navItems', 'prayerTimes', 'jummahTimes', 'events', 'announcements', 'donations'],

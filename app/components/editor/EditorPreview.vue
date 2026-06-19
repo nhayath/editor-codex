@@ -147,7 +147,9 @@ onBeforeUnmount(() => {
         :data-template="editor.draft.value.templateId"
         :style="style"
       >
-        <TenantHeader
+        <TenantChrome
+          area="header"
+          :chrome="editor.template.value?.header"
           :tenant="editor.tenant.value"
           :template-id="editor.draft.value.templateId"
         />
@@ -164,7 +166,9 @@ onBeforeUnmount(() => {
           @blur-section="editor.focusSection(null)"
           @edit-section="editor.openSectionEditor(section.id)"
         />
-        <TenantFooter
+        <TenantChrome
+          area="footer"
+          :chrome="editor.template.value?.footer"
           :tenant="editor.tenant.value"
           :template-id="editor.draft.value.templateId"
         />

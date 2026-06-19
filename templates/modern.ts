@@ -6,11 +6,11 @@ export const modernTemplate: TemplateDefinition = {
   description: 'Contemporary mosque homepage with carousel, cards, gallery, and flexible content.',
   thumbnail: '/templates/modern.svg',
   header: {
-    component: 'TenantHeader',
+    component: 'ModernHeader',
     props: { sticky: true, style: 'modern' }
   },
   footer: {
-    component: 'TenantFooter',
+    component: 'ModernFooter',
     props: { style: 'modern' }
   },
   dataDependencies: ['settings', 'navItems', 'prayerTimes', 'jummahTimes', 'events', 'announcements', 'donations'],

@@ -56,7 +56,9 @@ useHead(() => ({
     </UContainer>
 
     <template v-else-if="data">
-      <TenantHeader
+      <TenantChrome
+        area="header"
+        :chrome="data.template.header"
         :tenant="data.tenant"
         :template-id="data.config.templateId"
       />
@@ -66,7 +68,9 @@ useHead(() => ({
         :section="section"
         :data="data.data"
       />
-      <TenantFooter
+      <TenantChrome
+        area="footer"
+        :chrome="data.template.footer"
         :tenant="data.tenant"
         :template-id="data.config.templateId"
       />
