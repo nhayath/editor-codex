@@ -4,6 +4,16 @@ import type { TenantSettingsDraft } from '~/composables/useHomepageEditor'
 const editor = useHomepageEditor()
 
 const tenantId = computed(() => editor.tenant.value?.id as string | undefined)
+const activeSettingsPanel = ref<'brand' | 'domain' | 'navigation' | 'footer'>('brand')
+const activeNavIndex = ref(0)
+const activeFooterIndex = ref(0)
+
+const settingsPanels = [
+  { label: 'Brand', value: 'brand', icon: 'i-lucide-badge' },
+  { label: 'Domain', value: 'domain', icon: 'i-lucide-globe' },
+  { label: 'Nav', value: 'navigation', icon: 'i-lucide-menu' },
+  { label: 'Footer', value: 'footer', icon: 'i-lucide-panel-bottom' }
+]
 
 function settingsField(key: keyof TenantSettingsDraft) {
   return computed({
@@ -23,6 +33,9 @@ const email = settingsField('email')
 const facebook = settingsField('facebook')
 const instagram = settingsField('instagram')
 const youtube = settingsField('youtube')
+
+const activeNavItem = computed(() => editor.navItemsDraft.value[activeNavIndex.value] ?? null)
+const activeFooterLink = computed(() => editor.footerLinksDraft.value[activeFooterIndex.value] ?? null)
 
 const anchorSuggestions = computed(() => {
   const sectionAnchors = editor.resolvedSections.value
@@ -90,26 +103,98 @@ function removeLogo() {
   logoUrl.value = ''
 }
 
+function addNavItem() {
+  editor.addNavItem()
+  activeNavIndex.value = editor.navItemsDraft.value.length - 1
+}
+
+function removeNavItem(index: number) {
+  editor.removeNavItem(index)
+  activeNavIndex.value = Math.max(0, Math.min(activeNavIndex.value, editor.navItemsDraft.value.length - 1))
+}
+
+function moveNavItem(index: number, direction: -1 | 1) {
+  editor.moveNavItem(index, direction)
+  activeNavIndex.value = index + direction
+}
+
+function addFooterLink() {
+  editor.addFooterLink()
+  activeFooterIndex.value = editor.footerLinksDraft.value.length - 1
+}
+
+function removeFooterLink(index: number) {
+  editor.removeFooterLink(index)
+  activeFooterIndex.value = Math.max(0, Math.min(activeFooterIndex.value, editor.footerLinksDraft.value.length - 1))
+}
+
+function moveFooterLink(index: number, direction: -1 | 1) {
+  editor.moveFooterLink(index, direction)
+  activeFooterIndex.value = index + direction
+}
+
 watch(
   [() => editor.settingsDraft.value, () => editor.navItemsDraft.value, () => editor.footerLinksDraft.value],
   syncPreviewChrome,
   { deep: true }
 )
+
+watch(
+  () => editor.navItemsDraft.value.length,
+  length => {
+    if (!length) {
+      activeNavIndex.value = 0
+      return
+    }
+
+    activeNavIndex.value = Math.min(activeNavIndex.value, length - 1)
+  }
+)
+
+watch(
+  () => editor.footerLinksDraft.value.length,
+  length => {
+    if (!length) {
+      activeFooterIndex.value = 0
+      return
+    }
+
+    activeFooterIndex.value = Math.min(activeFooterIndex.value, length - 1)
+  }
+)
 </script>
 
 <template>
-  <div class="grid gap-6">
-    <section class="grid gap-3">
-      <div>
+  <div class="grid gap-4">
+    <UTabs
+      v-model="activeSettingsPanel"
+      :items="settingsPanels"
+      :content="false"
+      size="sm"
+      variant="pill"
+    />
+
+    <section
+      v-if="activeSettingsPanel === 'brand'"
+      class="grid gap-3"
+    >
+      <div class="flex items-center justify-between gap-3">
         <h2 class="text-sm font-semibold text-default">
           Brand
         </h2>
+
+        <UTooltip text="Templates decide placement and shape; this only changes the mosque mark.">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            icon="i-lucide-info"
+            aria-label="Logo help"
+          />
+        </UTooltip>
       </div>
 
-      <UFormField
-        label="Logo"
-        description="Templates decide placement and shape; this only changes the mosque mark."
-      >
+      <UFormField label="Logo">
         <ImagePicker
           v-model="logoUrl"
           :tenant-id="tenantId"
@@ -128,7 +213,10 @@ watch(
       </div>
     </section>
 
-    <section class="grid gap-3">
+    <section
+      v-else-if="activeSettingsPanel === 'domain'"
+      class="grid gap-3"
+    >
       <div>
         <h2 class="text-sm font-semibold text-default">
           Domain
@@ -152,7 +240,10 @@ watch(
       </UFormField>
     </section>
 
-    <section class="grid gap-3">
+    <section
+      v-else-if="activeSettingsPanel === 'navigation'"
+      class="grid gap-3"
+    >
       <div class="flex items-center justify-between gap-3">
         <h2 class="text-sm font-semibold text-default">
           Navigation
@@ -164,7 +255,7 @@ watch(
           size="sm"
           icon="i-lucide-plus"
           label="Add link"
-          @click="editor.addNavItem"
+          @click="addNavItem"
         />
       </div>
 
@@ -172,87 +263,103 @@ watch(
         <div
           v-for="(item, index) in editor.navItemsDraft.value"
           :key="item.id ?? `new-${index}`"
-          class="grid gap-3 rounded-md border border-muted bg-default p-3"
+          class="flex items-center gap-2 rounded-md border p-2 transition"
+          :class="index === activeNavIndex ? 'border-primary bg-primary/10' : 'border-muted bg-default'"
         >
-          <div class="flex items-center justify-between gap-2">
-            <UFormField
-              class="min-w-0 flex-1"
-              label="Label"
-            >
-              <UInput
-                v-model="item.label"
-                aria-label="Navigation label"
-              />
-            </UFormField>
-
-            <div class="mt-6 flex shrink-0 items-center gap-1">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                icon="i-lucide-arrow-up"
-                aria-label="Move link up"
-                :disabled="index === 0"
-                @click="editor.moveNavItem(index, -1)"
-              />
-              <UButton
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                icon="i-lucide-arrow-down"
-                aria-label="Move link down"
-                :disabled="index === editor.navItemsDraft.value.length - 1"
-                @click="editor.moveNavItem(index, 1)"
-              />
-              <UButton
-                color="error"
-                variant="ghost"
-                size="xs"
-                icon="i-lucide-trash-2"
-                aria-label="Remove link"
-                @click="editor.removeNavItem(index)"
-              />
-            </div>
-          </div>
-
-          <UFormField label="Link">
-            <UInput
-              v-model="item.href"
-              aria-label="Navigation URL"
-            />
-          </UFormField>
-
-          <div class="flex flex-wrap gap-1.5">
-            <UButton
-              v-for="anchor in anchorSuggestions"
-              :key="`${index}-${anchor.href}`"
-              color="neutral"
-              variant="ghost"
-              size="xs"
-              :label="anchor.label"
-              @click="item.href = anchor.href"
-            />
-          </div>
+          <button
+            type="button"
+            class="grid min-w-0 flex-1 gap-0.5 text-left"
+            @click="activeNavIndex = index"
+          >
+            <span class="truncate text-sm font-medium text-default">{{ item.label || 'Untitled link' }}</span>
+            <span class="truncate text-xs text-muted">{{ item.href || 'No link set' }}</span>
+          </button>
 
           <USwitch
             v-model="item.isActive"
-            label="Show in menu"
+            aria-label="Show in menu"
+          />
+        </div>
+      </div>
+
+      <div
+        v-if="activeNavItem"
+        class="grid gap-3 rounded-md border border-muted bg-default p-3"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <h3 class="truncate text-xs font-semibold uppercase text-muted">
+            Edit selected link
+          </h3>
+
+          <div class="flex shrink-0 items-center gap-1">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              icon="i-lucide-arrow-up"
+              aria-label="Move link up"
+              :disabled="activeNavIndex === 0"
+              @click="moveNavItem(activeNavIndex, -1)"
+            />
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              icon="i-lucide-arrow-down"
+              aria-label="Move link down"
+              :disabled="activeNavIndex === editor.navItemsDraft.value.length - 1"
+              @click="moveNavItem(activeNavIndex, 1)"
+            />
+            <UButton
+              color="error"
+              variant="ghost"
+              size="xs"
+              icon="i-lucide-trash-2"
+              aria-label="Remove link"
+              @click="removeNavItem(activeNavIndex)"
+            />
+          </div>
+        </div>
+
+        <UFormField label="Label">
+          <UInput
+            v-model="activeNavItem.label"
+            aria-label="Navigation label"
+          />
+        </UFormField>
+
+        <UFormField label="Link">
+          <UInput
+            v-model="activeNavItem.href"
+            aria-label="Navigation URL"
+          />
+        </UFormField>
+
+        <div class="flex flex-wrap gap-1.5">
+          <UButton
+            v-for="anchor in anchorSuggestions"
+            :key="`nav-${activeNavIndex}-${anchor.href}`"
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            :label="anchor.label"
+            @click="activeNavItem.href = anchor.href"
           />
         </div>
       </div>
     </section>
 
-    <section class="grid gap-4">
+    <section
+      v-else
+      class="grid gap-4"
+    >
       <div>
         <h2 class="text-sm font-semibold text-default">
           Footer
         </h2>
       </div>
 
-      <UFormField
-        label="Footer description"
-        description="Templates decide placement, columns, and CTA styling."
-      >
+      <UFormField label="Footer description">
         <UTextarea
           v-model="aboutText"
           :rows="4"
@@ -347,8 +454,8 @@ watch(
             variant="soft"
             size="sm"
             icon="i-lucide-plus"
-            label="Add footer link"
-            @click="editor.addFooterLink"
+            label="Add link"
+            @click="addFooterLink"
           />
         </div>
 
@@ -356,71 +463,87 @@ watch(
           <div
             v-for="(item, index) in editor.footerLinksDraft.value"
             :key="item.id ?? `new-footer-${index}`"
-            class="grid gap-3 rounded-md border border-muted bg-default p-3"
+            class="flex items-center gap-2 rounded-md border p-2 transition"
+            :class="index === activeFooterIndex ? 'border-primary bg-primary/10' : 'border-muted bg-default'"
           >
-            <div class="flex items-center justify-between gap-2">
-              <UFormField
-                class="min-w-0 flex-1"
-                label="Label"
-              >
-                <UInput
-                  v-model="item.label"
-                  aria-label="Footer link label"
-                />
-              </UFormField>
-
-              <div class="mt-6 flex shrink-0 items-center gap-1">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  size="xs"
-                  icon="i-lucide-arrow-up"
-                  aria-label="Move footer link up"
-                  :disabled="index === 0"
-                  @click="editor.moveFooterLink(index, -1)"
-                />
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  size="xs"
-                  icon="i-lucide-arrow-down"
-                  aria-label="Move footer link down"
-                  :disabled="index === editor.footerLinksDraft.value.length - 1"
-                  @click="editor.moveFooterLink(index, 1)"
-                />
-                <UButton
-                  color="error"
-                  variant="ghost"
-                  size="xs"
-                  icon="i-lucide-trash-2"
-                  aria-label="Remove footer link"
-                  @click="editor.removeFooterLink(index)"
-                />
-              </div>
-            </div>
-
-            <UFormField label="Link">
-              <UInput
-                v-model="item.href"
-                aria-label="Footer link URL"
-              />
-            </UFormField>
-
-            <div class="flex flex-wrap gap-1.5">
-              <UButton
-                v-for="anchor in anchorSuggestions"
-                :key="`footer-${index}-${anchor.href}`"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                :label="anchor.label"
-                @click="item.href = anchor.href"
-              />
-            </div>
+            <button
+              type="button"
+              class="grid min-w-0 flex-1 gap-0.5 text-left"
+              @click="activeFooterIndex = index"
+            >
+              <span class="truncate text-sm font-medium text-default">{{ item.label || 'Untitled link' }}</span>
+              <span class="truncate text-xs text-muted">{{ item.href || 'No link set' }}</span>
+            </button>
 
             <USwitch
               v-model="item.isActive"
-              label="Show in footer"
+              aria-label="Show in footer"
+            />
+          </div>
+        </div>
+
+        <div
+          v-if="activeFooterLink"
+          class="grid gap-3 rounded-md border border-muted bg-default p-3"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="truncate text-xs font-semibold uppercase text-muted">
+              Edit selected footer link
+            </h3>
+
+            <div class="flex shrink-0 items-center gap-1">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                icon="i-lucide-arrow-up"
+                aria-label="Move footer link up"
+                :disabled="activeFooterIndex === 0"
+                @click="moveFooterLink(activeFooterIndex, -1)"
+              />
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                icon="i-lucide-arrow-down"
+                aria-label="Move footer link down"
+                :disabled="activeFooterIndex === editor.footerLinksDraft.value.length - 1"
+                @click="moveFooterLink(activeFooterIndex, 1)"
+              />
+              <UButton
+                color="error"
+                variant="ghost"
+                size="xs"
+                icon="i-lucide-trash-2"
+                aria-label="Remove footer link"
+                @click="removeFooterLink(activeFooterIndex)"
+              />
+            </div>
+          </div>
+
+          <UFormField label="Label">
+            <UInput
+              v-model="activeFooterLink.label"
+              aria-label="Footer link label"
+            />
+          </UFormField>
+
+          <UFormField label="Link">
+            <UInput
+              v-model="activeFooterLink.href"
+              aria-label="Footer link URL"
+            />
+          </UFormField>
+
+          <div class="flex flex-wrap gap-1.5">
+            <UButton
+              v-for="anchor in anchorSuggestions"
+              :key="`footer-${activeFooterIndex}-${anchor.href}`"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              :label="anchor.label"
+              @click="activeFooterLink.href = anchor.href"
             />
           </div>
         </div>
