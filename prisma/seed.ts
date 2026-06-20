@@ -141,6 +141,7 @@ const prayerRows = [
 
 async function main() {
   await prisma.mediaAsset.deleteMany()
+  await prisma.footerLink.deleteMany()
   await prisma.navItem.deleteMany()
   await prisma.donationCampaign.deleteMany()
   await prisma.announcement.deleteMany()
@@ -240,6 +241,16 @@ async function main() {
         { tenantId: tenant.id, label: 'Events', href: '#events', order: 2 },
         { tenantId: tenant.id, label: 'About', href: '#about-mosque', order: 3 },
         { tenantId: tenant.id, label: 'Contact', href: '#contact', order: 4 }
+      ]
+    })
+
+    await prisma.footerLink.createMany({
+      data: [
+        { tenantId: tenant.id, label: 'Home', href: '#top', order: 0 },
+        { tenantId: tenant.id, label: 'About Us', href: '#about-mosque', order: 1 },
+        { tenantId: tenant.id, label: 'Services', href: '#events', order: 2 },
+        { tenantId: tenant.id, label: 'Programs', href: '#announcements', order: 3 },
+        { tenantId: tenant.id, label: 'Get Involved', href: '#donate', order: 4 }
       ]
     })
   }

@@ -1,11 +1,14 @@
 <script setup lang="ts">
-defineProps<{
+import { getTenantFooterLinks } from '~/components/templates/chrome'
+
+const props = defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
   chromeStyle?: string
 }>()
 
 const year = new Date().getFullYear()
+const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
 </script>
 
 <template>
@@ -35,6 +38,19 @@ const year = new Date().getFullYear()
 
     <div class="tenant-container mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)] pt-6 text-xs text-[var(--color-text-muted)]">
       <span>© {{ year }} {{ tenant?.name }}</span>
+      <nav
+        v-if="footerLinks.length"
+        class="flex flex-wrap items-center gap-x-4 gap-y-2 font-semibold"
+      >
+        <NuxtLink
+          v-for="item in footerLinks"
+          :key="item.id ?? item.href"
+          :to="item.href"
+          class="hover:text-[var(--color-primary)]"
+        >
+          {{ item.label }}
+        </NuxtLink>
+      </nav>
       <div class="flex items-center gap-2">
         <UButton
           v-if="tenant?.settings?.facebook"

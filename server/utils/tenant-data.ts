@@ -10,7 +10,8 @@ export async function getTenantOrThrow(slug: string) {
     include: {
       settings: true,
       homepageConfig: true,
-      navItems: { where: { isActive: true }, orderBy: { order: 'asc' } }
+      navItems: { where: { isActive: true }, orderBy: { order: 'asc' } },
+      footerLinks: { where: { isActive: true }, orderBy: { order: 'asc' } }
     }
   })
 
@@ -59,6 +60,10 @@ export async function buildHomepageConfigResponse(slug: string) {
     where: { tenantId: tenant.id },
     orderBy: { order: 'asc' }
   })
+  const allFooterLinks = await prisma.footerLink.findMany({
+    where: { tenantId: tenant.id },
+    orderBy: { order: 'asc' }
+  })
   const template = getTemplateDefinition(tenant.homepageConfig?.templateId ?? 'classic')
   const config = buildDraftFromDatabase(tenant.homepageConfig)
   const data = await getTenantContentData(tenant.id)
@@ -72,7 +77,9 @@ export async function buildHomepageConfigResponse(slug: string) {
       status: tenant.status,
       settings: tenant.settings,
       navItems: tenant.navItems,
-      allNavItems
+      allNavItems,
+      footerLinks: tenant.footerLinks,
+      allFooterLinks
     },
     template,
     config,
@@ -80,7 +87,8 @@ export async function buildHomepageConfigResponse(slug: string) {
     data: {
       ...data,
       settings: tenant.settings,
-      navItems: tenant.navItems
+      navItems: tenant.navItems,
+      footerLinks: tenant.footerLinks
     }
   }
 }

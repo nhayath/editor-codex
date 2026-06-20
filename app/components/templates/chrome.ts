@@ -22,6 +22,19 @@ export function getTenantLogoUrl(tenant?: Record<string, any> | null) {
   return typeof logoUrl === 'string' && logoUrl.trim().length ? logoUrl.trim() : ''
 }
 
+export function getTenantFooterLinks(tenant?: Record<string, any> | null): ChromeNavItem[] {
+  const footerLinks = tenant?.footerLinks
+  if (!Array.isArray(footerLinks)) return []
+
+  return footerLinks
+    .filter(item => typeof item?.label === 'string' && typeof item?.href === 'string')
+    .map(item => ({
+      id: typeof item.id === 'string' ? item.id : undefined,
+      label: item.label,
+      href: item.href
+    }))
+}
+
 export const sacredModernNavItems: ChromeNavItem[] = [
   { id: 'prayer-times', label: 'Prayer Times', href: '#prayer-times' },
   { id: 'events', label: 'Events', href: '#events' },

@@ -5,9 +5,25 @@ import { normaliseDraft, resolveSections } from '~~/utils/homepage'
 export interface TenantSettingsDraft {
   domain: string
   logoUrl: string
+  address: string
+  city: string
+  postcode: string
+  phone: string
+  email: string
+  aboutText: string
+  facebook: string
+  instagram: string
+  youtube: string
 }
 
 export interface TenantNavItemDraft {
+  id?: string
+  label: string
+  href: string
+  isActive: boolean
+}
+
+export interface TenantFooterLinkDraft {
   id?: string
   label: string
   href: string
@@ -26,12 +42,41 @@ function cloneNavItemsDraft(draft: TenantNavItemDraft[]): TenantNavItemDraft[] {
   return JSON.parse(JSON.stringify(draft)) as TenantNavItemDraft[]
 }
 
+function cloneFooterLinksDraft(draft: TenantFooterLinkDraft[]): TenantFooterLinkDraft[] {
+  return JSON.parse(JSON.stringify(draft)) as TenantFooterLinkDraft[]
+}
+
+function emptySettingsDraft(): TenantSettingsDraft {
+  return {
+    domain: '',
+    logoUrl: '',
+    address: '',
+    city: '',
+    postcode: '',
+    phone: '',
+    email: '',
+    aboutText: '',
+    facebook: '',
+    instagram: '',
+    youtube: ''
+  }
+}
+
 function buildSettingsDraft(tenant: Record<string, unknown> | null): TenantSettingsDraft {
   const settings = (tenant?.settings ?? {}) as Record<string, unknown>
 
   return {
     domain: typeof tenant?.domain === 'string' ? tenant.domain : '',
-    logoUrl: typeof settings.logoUrl === 'string' ? settings.logoUrl : ''
+    logoUrl: typeof settings.logoUrl === 'string' ? settings.logoUrl : '',
+    address: typeof settings.address === 'string' ? settings.address : '',
+    city: typeof settings.city === 'string' ? settings.city : '',
+    postcode: typeof settings.postcode === 'string' ? settings.postcode : '',
+    phone: typeof settings.phone === 'string' ? settings.phone : '',
+    email: typeof settings.email === 'string' ? settings.email : '',
+    aboutText: typeof settings.aboutText === 'string' ? settings.aboutText : '',
+    facebook: typeof settings.facebook === 'string' ? settings.facebook : '',
+    instagram: typeof settings.instagram === 'string' ? settings.instagram : '',
+    youtube: typeof settings.youtube === 'string' ? settings.youtube : ''
   }
 }
 
@@ -39,6 +84,17 @@ function buildNavItemsDraft(tenant: Record<string, unknown> | null): TenantNavIt
   const navItems = ((tenant?.allNavItems ?? tenant?.navItems ?? []) as Array<Record<string, unknown>>)
 
   return navItems.map(item => ({
+    id: typeof item.id === 'string' ? item.id : undefined,
+    label: typeof item.label === 'string' ? item.label : '',
+    href: typeof item.href === 'string' ? item.href : '',
+    isActive: item.isActive !== false
+  }))
+}
+
+function buildFooterLinksDraft(tenant: Record<string, unknown> | null): TenantFooterLinkDraft[] {
+  const footerLinks = ((tenant?.allFooterLinks ?? tenant?.footerLinks ?? []) as Array<Record<string, unknown>>)
+
+  return footerLinks.map(item => ({
     id: typeof item.id === 'string' ? item.id : undefined,
     label: typeof item.label === 'string' ? item.label : '',
     href: typeof item.href === 'string' ? item.href : '',
@@ -57,6 +113,8 @@ export function useHomepageEditor() {
   const settingsDraft = useState<TenantSettingsDraft | null>('editorSettingsDraft', () => null)
   const originalNavItemsDraft = useState<TenantNavItemDraft[]>('editorOriginalNavItemsDraft', () => [])
   const navItemsDraft = useState<TenantNavItemDraft[]>('editorNavItemsDraft', () => [])
+  const originalFooterLinksDraft = useState<TenantFooterLinkDraft[]>('editorOriginalFooterLinksDraft', () => [])
+  const footerLinksDraft = useState<TenantFooterLinkDraft[]>('editorFooterLinksDraft', () => [])
   const activeSectionId = useState<string | null>('editorActiveSectionId', () => null)
   const focusedSectionId = useState<string | null>('editorFocusedSectionId', () => null)
   const recentlyAddedSectionId = useState<string | null>('editorRecentlyAddedSectionId', () => null)
@@ -75,7 +133,7 @@ export function useHomepageEditor() {
   })
 
   const isDirty = computed(() => {
-    return configDirty.value || settingsDirty.value || navItemsDirty.value
+    return configDirty.value || settingsDirty.value || navItemsDirty.value || footerLinksDirty.value
   })
 
   const configDirty = computed(() => {
@@ -92,6 +150,10 @@ export function useHomepageEditor() {
     return JSON.stringify(originalNavItemsDraft.value) !== JSON.stringify(navItemsDraft.value)
   })
 
+  const footerLinksDirty = computed(() => {
+    return JSON.stringify(originalFooterLinksDraft.value) !== JSON.stringify(footerLinksDraft.value)
+  })
+
   function applyPayload(payload: HomepageConfigResponse) {
     tenant.value = payload.tenant
     template.value = payload.template
@@ -102,6 +164,8 @@ export function useHomepageEditor() {
     settingsDraft.value = cloneSettingsDraft(originalSettingsDraft.value)
     originalNavItemsDraft.value = buildNavItemsDraft(payload.tenant)
     navItemsDraft.value = cloneNavItemsDraft(originalNavItemsDraft.value)
+    originalFooterLinksDraft.value = buildFooterLinksDraft(payload.tenant)
+    footerLinksDraft.value = cloneFooterLinksDraft(originalFooterLinksDraft.value)
   }
 
   async function loadConfig(slug: string) {
@@ -153,6 +217,13 @@ export function useHomepageEditor() {
         payload = await $fetch<HomepageConfigResponse>(`/api/tenant/${slug}/nav-items`, {
           method: 'PUT',
           body: { items: navItemsDraft.value }
+        })
+      }
+
+      if (footerLinksDirty.value) {
+        payload = await $fetch<HomepageConfigResponse>(`/api/tenant/${slug}/footer-links`, {
+          method: 'PUT',
+          body: { items: footerLinksDraft.value }
         })
       }
 
@@ -311,7 +382,7 @@ export function useHomepageEditor() {
 
   function updateSettingsDraft(settings: Partial<TenantSettingsDraft>) {
     if (!settingsDraft.value) {
-      settingsDraft.value = { domain: '', logoUrl: '' }
+      settingsDraft.value = emptySettingsDraft()
     }
 
     settingsDraft.value = {
@@ -339,6 +410,27 @@ export function useHomepageEditor() {
     const [item] = navItemsDraft.value.splice(index, 1)
     if (!item) return
     navItemsDraft.value.splice(nextIndex, 0, item)
+  }
+
+  function addFooterLink() {
+    footerLinksDraft.value.push({
+      label: 'New footer link',
+      href: '#top',
+      isActive: true
+    })
+  }
+
+  function removeFooterLink(index: number) {
+    footerLinksDraft.value.splice(index, 1)
+  }
+
+  function moveFooterLink(index: number, direction: -1 | 1) {
+    const nextIndex = index + direction
+    if (nextIndex < 0 || nextIndex >= footerLinksDraft.value.length) return
+
+    const [item] = footerLinksDraft.value.splice(index, 1)
+    if (!item) return
+    footerLinksDraft.value.splice(nextIndex, 0, item)
   }
 
   function focusSection(sectionId: string | null) {
@@ -384,10 +476,13 @@ export function useHomepageEditor() {
     settingsDraft,
     originalNavItemsDraft,
     navItemsDraft,
+    originalFooterLinksDraft,
+    footerLinksDraft,
     resolvedSections,
     configDirty,
     settingsDirty,
     navItemsDirty,
+    footerLinksDirty,
     isDirty,
     activeSectionId,
     focusedSectionId,
@@ -416,6 +511,9 @@ export function useHomepageEditor() {
     addNavItem,
     removeNavItem,
     moveNavItem,
+    addFooterLink,
+    removeFooterLink,
+    moveFooterLink,
     focusSection,
     markSectionEdited,
     requestPreviewScroll,

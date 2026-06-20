@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getTenantFooterLinks } from '~/components/templates/chrome'
+
 const props = defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
@@ -6,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const year = new Date().getFullYear()
-const navItems = computed(() => props.tenant?.navItems ?? [])
+const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
 </script>
 
 <template>
@@ -21,14 +23,14 @@ const navItems = computed(() => props.tenant?.navItems ?? [])
         </p>
       </div>
 
-      <div>
+      <div v-if="footerLinks.length">
         <h2 class="tenant-heading text-xl font-bold text-[var(--color-secondary)]">
           Site
         </h2>
         <nav class="mt-4 grid gap-3 text-sm font-bold text-white/74">
           <NuxtLink
-            v-for="item in navItems"
-            :key="item.id"
+            v-for="item in footerLinks"
+            :key="item.id ?? item.href"
             :to="item.href"
             class="hover:text-white"
           >

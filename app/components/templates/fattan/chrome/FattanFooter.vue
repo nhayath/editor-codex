@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { footerExploreItems, getTenantInitials } from '~/components/templates/chrome'
+import { getTenantFooterLinks, getTenantInitials } from '~/components/templates/chrome'
 
 const props = defineProps<{
   tenant?: Record<string, any> | null
@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const year = new Date().getFullYear()
 const logoInitials = computed(() => getTenantInitials(props.tenant))
+const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
 </script>
 
 <template>
@@ -52,14 +53,14 @@ const logoInitials = computed(() => getTenantInitials(props.tenant))
         </div>
       </div>
 
-      <div>
+      <div v-if="footerLinks.length">
         <h2 class="tenant-heading text-2xl font-bold text-[var(--color-secondary)]">
           Explore
         </h2>
         <nav class="mt-5 grid gap-3 text-sm font-black text-white/72">
           <NuxtLink
-            v-for="item in footerExploreItems"
-            :key="item.href"
+            v-for="item in footerLinks"
+            :key="item.id ?? item.href"
             :to="item.href"
             class="hover:text-white"
           >
