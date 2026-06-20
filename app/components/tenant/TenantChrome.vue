@@ -4,6 +4,10 @@ import { resolveFooterComponent, resolveHeaderComponent } from './chromeComponen
 
 type ChromeDefinition = TemplateDefinition['header'] | TemplateDefinition['footer']
 
+defineOptions({
+  inheritAttrs: false
+})
+
 const props = defineProps<{
   area: 'header' | 'footer'
   tenant?: Record<string, unknown> | null
@@ -11,7 +15,19 @@ const props = defineProps<{
   chrome?: ChromeDefinition
 }>()
 
-const chromeProps = computed(() => props.chrome?.props ?? {})
+const chromeProps = computed(() => {
+  const rawProps = props.chrome?.props ?? {}
+  const { style, ...rest } = rawProps
+
+  if (typeof style === 'undefined') {
+    return rest
+  }
+
+  return {
+    ...rest,
+    chromeStyle: style
+  }
+})
 
 const chromeComponent = computed(() => {
   if (props.area === 'header') {

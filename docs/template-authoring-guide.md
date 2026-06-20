@@ -851,6 +851,7 @@ app/components/templates/urban-minaret/chrome/UrbanMinaretFooter.vue
 ### Header Component
 
 Chrome components receive the tenant, template ID, and any props from `template.header.props` or `template.footer.props`.
+The chrome renderer maps a template-authored `style` prop to `chromeStyle` before passing it to the component, because `style` is also a Vue-native attribute.
 
 ```vue
 <script setup lang="ts">
@@ -858,7 +859,7 @@ const props = defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
   sticky?: boolean
-  style?: string
+  chromeStyle?: string
 }>()
 
 const menuOpen = ref(false)
@@ -932,7 +933,7 @@ const navItems = computed(() => props.tenant?.navItems ?? [])
 defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
-  style?: string
+  chromeStyle?: string
 }>()
 
 const year = new Date().getFullYear()

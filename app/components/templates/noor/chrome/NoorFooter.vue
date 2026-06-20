@@ -2,7 +2,7 @@
 const props = defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
-  style?: string
+  chromeStyle?: string
 }>()
 
 const year = new Date().getFullYear()

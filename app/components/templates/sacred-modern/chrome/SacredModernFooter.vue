@@ -4,7 +4,7 @@ import { footerExploreItems, getTenantInitials } from '~/components/templates/ch
 const props = defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
-  style?: string
+  chromeStyle?: string
 }>()
 
 const year = new Date().getFullYear()

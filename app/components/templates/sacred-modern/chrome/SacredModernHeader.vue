@@ -5,7 +5,7 @@ const props = defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
   sticky?: boolean
-  style?: string
+  chromeStyle?: string
 }>()
 
 const menuOpen = ref(false)
