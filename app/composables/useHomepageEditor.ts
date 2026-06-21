@@ -121,6 +121,7 @@ export function useHomepageEditor() {
   const recentlyEditedSectionId = useState<string | null>('editorRecentlyEditedSectionId', () => null)
   const previewScrollRequest = useState<{ sectionId: string, nonce: number } | null>('editorPreviewScrollRequest', () => null)
   const editorScrollRequest = useState<{ sectionId: string, nonce: number } | null>('editorSectionScrollRequest', () => null)
+  const editorOpenRequest = useState<{ sectionId: string, widgetSlot?: string, nonce: number } | null>('editorOpenRequest', () => null)
   const activeTab = useState<'theme' | 'sections' | 'settings'>('editorActiveTab', () => 'theme')
   const previewDevice = useState<'desktop' | 'tablet' | 'mobile'>('editorPreviewDevice', () => 'desktop')
   const loading = useState('editorLoading', () => false)
@@ -185,6 +186,7 @@ export function useHomepageEditor() {
       recentlyEditedSectionId.value = null
       previewScrollRequest.value = null
       editorScrollRequest.value = null
+      editorOpenRequest.value = null
       lastSavedAt.value = new Date().toISOString()
     } finally {
       loading.value = false
@@ -236,6 +238,7 @@ export function useHomepageEditor() {
       recentlyEditedSectionId.value = null
       previewScrollRequest.value = null
       editorScrollRequest.value = null
+      editorOpenRequest.value = null
       lastSavedAt.value = new Date().toISOString()
     } finally {
       saving.value = false
@@ -349,6 +352,9 @@ export function useHomepageEditor() {
     if (editorScrollRequest.value?.sectionId === sectionId) {
       editorScrollRequest.value = null
     }
+    if (editorOpenRequest.value?.sectionId === sectionId) {
+      editorOpenRequest.value = null
+    }
   }
 
   function setTemplate(templateId: string) {
@@ -368,6 +374,7 @@ export function useHomepageEditor() {
     recentlyEditedSectionId.value = null
     previewScrollRequest.value = null
     editorScrollRequest.value = null
+    editorOpenRequest.value = null
   }
 
   function setPalette(paletteId: string) {
@@ -462,6 +469,22 @@ export function useHomepageEditor() {
     activeTab.value = 'sections'
     activeSectionId.value = sectionId
     focusedSectionId.value = sectionId
+    editorOpenRequest.value = {
+      sectionId,
+      nonce: Date.now()
+    }
+    requestEditorScroll(sectionId)
+  }
+
+  function openWidgetEditor(sectionId: string, widgetSlot: string) {
+    activeTab.value = 'sections'
+    activeSectionId.value = sectionId
+    focusedSectionId.value = sectionId
+    editorOpenRequest.value = {
+      sectionId,
+      widgetSlot,
+      nonce: Date.now()
+    }
     requestEditorScroll(sectionId)
   }
 
@@ -490,6 +513,7 @@ export function useHomepageEditor() {
     recentlyEditedSectionId,
     previewScrollRequest,
     editorScrollRequest,
+    editorOpenRequest,
     activeTab,
     previewDevice,
     loading,
@@ -518,6 +542,7 @@ export function useHomepageEditor() {
     markSectionEdited,
     requestPreviewScroll,
     requestEditorScroll,
-    openSectionEditor
+    openSectionEditor,
+    openWidgetEditor
   }
 }

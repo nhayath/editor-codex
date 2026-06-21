@@ -15,6 +15,7 @@ const emit = defineEmits<{
   'focus-section': []
   'blur-section': []
   'edit-section': []
+  'edit-widget': [slot: string]
 }>()
 
 const widgetComponent = computed(() => resolveWidgetComponent(props.section.component, props.section.widgetId))
@@ -32,6 +33,7 @@ const widgetComponent = computed(() => resolveWidgetComponent(props.section.comp
     @focus-section="emit('focus-section')"
     @blur-section="emit('blur-section')"
     @edit-section="emit('edit-section')"
+    @edit-widget="emit('edit-widget', $event)"
   />
 
   <section

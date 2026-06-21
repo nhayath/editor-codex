@@ -6,7 +6,6 @@ import type { WidgetCategory, WidgetPropSchema } from '~~/types/widget'
 type SectionsPanel =
   | { name: 'root' }
   | { name: 'section', sectionId: string }
-  | { name: 'groupLayout', sectionId: string }
   | { name: 'widget', sectionId: string, slot: string }
   | { name: 'widgetPicker' }
 
@@ -34,7 +33,6 @@ const activeWidget = computed(() => {
 const panelTitle = computed(() => {
   if (currentPanel.value.name === 'root') return 'Sections'
   if (currentPanel.value.name === 'widgetPicker') return 'Add widget'
-  if (currentPanel.value.name === 'groupLayout') return 'Group layout'
   if (currentPanel.value.name === 'widget') return activeWidget.value?.name ?? activeWidget.value?.widgetId ?? 'Widget'
   return activeSection.value?.title ?? activeSection.value?.name ?? activeSection.value?.id ?? 'Section'
 })
@@ -84,12 +82,6 @@ function openSection(section: ResolvedSection) {
   editor.focusSection(section.id)
   editor.requestPreviewScroll(section.id)
   openPanel({ name: 'section', sectionId: section.id })
-}
-
-function openGroupLayout(section: ResolvedSection) {
-  editor.activeSectionId.value = section.id
-  editor.focusSection(section.id)
-  openPanel({ name: 'groupLayout', sectionId: section.id })
 }
 
 function openWidget(section: ResolvedSection, widget: ResolvedWidget) {
@@ -169,7 +161,23 @@ watch(
     if (!request) return
 
     editor.activeTab.value = 'sections'
-    panelStack.value = [{ name: 'root' }]
+    await nextTick()
+    scrollRowIntoView(request.sectionId)
+  }
+)
+
+watch(
+  () => editor.editorOpenRequest.value,
+  async (request) => {
+    if (!request) return
+
+    editor.activeTab.value = 'sections'
+    editor.activeSectionId.value = request.sectionId
+    editor.focusSection(request.sectionId)
+    transitionName.value = 'sections-slide-forward'
+    panelStack.value = request.widgetSlot
+      ? [{ name: 'root' }, { name: 'section', sectionId: request.sectionId }, { name: 'widget', sectionId: request.sectionId, slot: request.widgetSlot }]
+      : [{ name: 'root' }, { name: 'section', sectionId: request.sectionId }]
     await nextTick()
     scrollRowIntoView(request.sectionId)
   }
@@ -205,18 +213,19 @@ watch(
       <section
         v-if="currentPanel.name === 'root'"
         key="root"
-        class="grid gap-4"
+        class="grid w-full min-w-0 gap-4 overflow-hidden"
       >
-        <div class="flex items-center justify-between gap-3">
-          <div>
+        <div class="flex w-full min-w-0 items-center justify-between gap-3 overflow-hidden">
+          <div class="min-w-0 flex-1">
             <h2 class="text-sm font-semibold text-default">
               Sections
             </h2>
-            <p class="text-xs text-muted">
+            <p class="truncate text-xs text-muted">
               Reorder, edit, or add widgets.
             </p>
           </div>
           <UButton
+            class="shrink-0"
             icon="i-lucide-plus"
             label="Widget"
             size="sm"
@@ -228,11 +237,11 @@ watch(
           v-model="sections"
           item-key="id"
           handle=".drag-handle"
-          class="grid gap-2"
+          class="grid w-full min-w-0 gap-2 overflow-hidden"
         >
           <template #item="{ element }">
             <div
-              class="rounded-md border border-muted bg-default transition"
+              class="w-full min-w-0 overflow-hidden rounded-md border border-muted bg-default transition"
               :class="{
                 'editor-section-row-highlight': editor.focusedSectionId.value === element.id || editor.recentlyEditedSectionId.value === element.id,
                 'editor-section-row-edit-highlight': editor.recentlyEditedSectionId.value === element.id,
@@ -244,7 +253,7 @@ watch(
             >
               <button
                 type="button"
-                class="flex w-full min-w-0 items-center gap-3 overflow-hidden p-3 text-left"
+                class="flex w-full min-w-0 items-center gap-2 overflow-hidden p-3 text-left"
                 @click="openSection(element)"
               >
                 <UIcon
@@ -270,6 +279,7 @@ watch(
                 />
                 <UButton
                   v-if="element.removable"
+                  class="shrink-0"
                   icon="i-lucide-trash-2"
                   color="neutral"
                   variant="ghost"
@@ -278,6 +288,7 @@ watch(
                   @click.stop="editor.removeSection(element.id)"
                 />
                 <USwitch
+                  class="shrink-0"
                   :model-value="element.enabled"
                   :disabled="element.required"
                   @click.stop
@@ -296,7 +307,7 @@ watch(
       <section
         v-else-if="currentPanel.name === 'widgetPicker'"
         key="widgetPicker"
-        class="grid gap-3"
+        class="grid w-full min-w-0 gap-3 overflow-hidden"
       >
         <UInput
           v-model="widgetSearch"
@@ -307,7 +318,7 @@ watch(
 
         <div
           v-if="widgetRegistry.loading.value"
-          class="grid gap-2"
+          class="grid w-full min-w-0 gap-2 overflow-hidden"
         >
           <USkeleton class="h-14 w-full" />
           <USkeleton class="h-14 w-full" />
@@ -315,7 +326,7 @@ watch(
 
         <div
           v-else-if="filteredWidgetGroups.length"
-          class="grid gap-4"
+          class="grid w-full min-w-0 gap-4 overflow-hidden"
         >
           <div
             v-for="group in filteredWidgetGroups"
@@ -359,29 +370,27 @@ watch(
       <section
         v-else-if="currentPanel.name === 'section' && activeSection"
         :key="`section-${activeSection.id}`"
-        class="grid gap-3"
+          class="grid w-full min-w-0 gap-3 overflow-hidden"
         @focusin="editor.focusSection(activeSection.id)"
       >
         <template v-if="activeSection.type === 'group'">
-          <button
+          <div
             v-if="activeSection.groupPropSchema?.length"
-            type="button"
-            class="flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
-            @click="openGroupLayout(activeSection)"
+            class="grid w-full min-w-0 gap-4 overflow-hidden rounded-md border border-muted bg-default p-3"
           >
-            <UIcon
-              name="i-lucide-layout-template"
-              class="size-4 shrink-0 text-muted"
+            <p class="text-sm font-semibold text-default">
+              Group layout
+            </p>
+
+            <PropField
+              v-for="field in activeSection.groupPropSchema"
+              :key="field.key"
+              :field="groupField(field)"
+              :model-value="activeSection.resolvedGroupProps?.[field.key]"
+              :values="activeSection.resolvedGroupProps"
+              @update:model-value="updateGroup(activeSection, field.key, $event)"
             />
-            <span class="min-w-0 flex-1">
-              <span class="block truncate text-sm font-medium text-default">Group layout</span>
-              <span class="block truncate text-xs text-muted">{{ activeSection.groupPropSchema.length }} layout settings</span>
-            </span>
-            <UIcon
-              name="i-lucide-chevron-right"
-              class="size-4 shrink-0 text-muted"
-            />
-          </button>
+          </div>
 
           <button
             v-for="widget in activeSection.resolvedWidgets ?? []"
@@ -419,25 +428,9 @@ watch(
       </section>
 
       <section
-        v-else-if="currentPanel.name === 'groupLayout' && activeSection"
-        :key="`group-${activeSection.id}`"
-        class="grid gap-4"
-        @focusin="editor.focusSection(activeSection.id)"
-      >
-        <PropField
-          v-for="field in activeSection.groupPropSchema ?? []"
-          :key="field.key"
-          :field="groupField(field)"
-          :model-value="activeSection.resolvedGroupProps?.[field.key]"
-          :values="activeSection.resolvedGroupProps"
-          @update:model-value="updateGroup(activeSection, field.key, $event)"
-        />
-      </section>
-
-      <section
         v-else-if="currentPanel.name === 'widget' && activeSection && activeWidget"
         :key="`widget-${activeSection.id}-${activeWidget.slot}`"
-        class="grid gap-4"
+        class="grid w-full min-w-0 gap-4 overflow-hidden"
         @focusin="editor.focusSection(activeSection.id)"
       >
         <PropField

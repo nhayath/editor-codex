@@ -15,6 +15,7 @@ const emit = defineEmits<{
   'focus-section': []
   'blur-section': []
   'edit-section': []
+  'edit-widget': [slot: string]
 }>()
 
 const layoutClass = computed(() => {
@@ -84,7 +85,19 @@ function widgetShellClass(widget: ResolvedWidget) {
             v-for="widget in section.resolvedWidgets"
             :key="widget.slot"
           >
-            <div :class="widgetShellClass(widget)">
+            <div
+              class="editor-preview-widget-shell"
+              :class="widgetShellClass(widget)"
+            >
+              <button
+                v-if="editable"
+                type="button"
+                class="editor-preview-edit-link editor-preview-widget-edit-link"
+                aria-label="Edit widget"
+                @click.stop="emit('edit-widget', widget.slot)"
+              >
+                <span aria-hidden="true">Edit</span>
+              </button>
               <component
                 :is="componentFor(widget)"
                 v-if="componentFor(widget)"

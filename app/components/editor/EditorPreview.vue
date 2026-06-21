@@ -165,6 +165,7 @@ onBeforeUnmount(() => {
           @focus-section="editor.focusSection(section.id)"
           @blur-section="editor.focusSection(null)"
           @edit-section="editor.openSectionEditor(section.id)"
+          @edit-widget="editor.openWidgetEditor(section.id, $event)"
         />
         <TenantChrome
           area="footer"
@@ -198,6 +199,10 @@ onBeforeUnmount(() => {
 }
 
 .tenant-section.editor-preview-editable-section {
+  position: relative;
+}
+
+.tenant-section .editor-preview-widget-shell {
   position: relative;
 }
 
@@ -237,6 +242,11 @@ onBeforeUnmount(() => {
 .tenant-section .editor-preview-edit-link:focus-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.tenant-section .editor-preview-widget-edit-link {
+  top: 0.5rem;
+  left: 0.5rem;
 }
 
 .tenant-section .editor-preview-edit-link:hover {
