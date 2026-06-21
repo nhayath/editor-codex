@@ -1,7 +1,23 @@
 <script setup lang="ts">
 import { colorPalettes, fontPairs } from '~~/types/theme'
 
+type ThemePanel = 'root' | 'template' | 'palette' | 'fonts'
+
 const editor = useHomepageEditor()
+const panelStack = ref<ThemePanel[]>(['root'])
+const transitionName = ref('theme-slide-forward')
+
+const currentPanel = computed(() => panelStack.value[panelStack.value.length - 1] ?? 'root')
+const panelTitle = computed(() => {
+  const titles: Record<ThemePanel, string> = {
+    root: 'Theme',
+    template: 'Template',
+    palette: 'Palette',
+    fonts: 'Fonts'
+  }
+
+  return titles[currentPanel.value]
+})
 
 const paletteModel = computed({
   get: () => editor.draft.value?.paletteId ?? '',
@@ -12,23 +28,138 @@ const fontModel = computed({
   get: () => editor.draft.value?.fontPairId ?? '',
   set: (value: string) => editor.setFontPair(value)
 })
+
+const activeTemplate = computed(() => {
+  return editor.availableTemplates.value.find(template => template.id === editor.draft.value?.templateId)
+})
+
+const activePalette = computed(() => {
+  return colorPalettes.find(palette => palette.id === paletteModel.value)
+})
+
+const activeFontPair = computed(() => {
+  return fontPairs.find(pair => pair.id === fontModel.value)
+})
+
+function openPanel(panel: ThemePanel) {
+  transitionName.value = 'theme-slide-forward'
+  panelStack.value.push(panel)
+}
+
+function goBack() {
+  if (panelStack.value.length <= 1) return
+  transitionName.value = 'theme-slide-back'
+  panelStack.value.pop()
+}
 </script>
 
 <template>
-  <div class="grid gap-6">
-    <section class="grid gap-3">
-      <div>
-        <h2 class="text-sm font-semibold text-default">
-          Template
-        </h2>
-      </div>
+  <div class="theme-panel-shell">
+    <div
+      v-if="currentPanel !== 'root'"
+      class="mb-4 flex items-center gap-2"
+    >
+      <UButton
+        color="neutral"
+        variant="ghost"
+        size="xs"
+        icon="i-lucide-chevron-left"
+        aria-label="Back"
+        @click="goBack"
+      />
+      <h2 class="truncate text-sm font-semibold text-default">
+        {{ panelTitle }}
+      </h2>
+    </div>
 
-      <div class="grid gap-3">
+    <Transition
+      :name="transitionName"
+      mode="out-in"
+    >
+      <section
+        v-if="currentPanel === 'root'"
+        key="root"
+        class="grid w-full min-w-0 gap-2 overflow-hidden"
+      >
+        <button
+          type="button"
+          class="flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
+          @click="openPanel('template')"
+        >
+          <UIcon
+            name="i-lucide-layout-template"
+            class="size-4 shrink-0 text-muted"
+          />
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm font-medium text-default">Template</span>
+            <span class="block truncate text-xs text-muted">{{ activeTemplate?.name ?? 'Choose a template' }}</span>
+          </span>
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-4 shrink-0 text-muted"
+          />
+        </button>
+
+        <button
+          type="button"
+          class="flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
+          @click="openPanel('palette')"
+        >
+          <UIcon
+            name="i-lucide-palette"
+            class="size-4 shrink-0 text-muted"
+          />
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm font-medium text-default">Palette</span>
+            <span class="block truncate text-xs text-muted">{{ activePalette?.name ?? 'Choose colors' }}</span>
+          </span>
+          <span
+            v-if="activePalette"
+            class="flex shrink-0 overflow-hidden rounded-full border border-muted"
+          >
+            <span
+              v-for="color in [activePalette.primary, activePalette.secondary, activePalette.accent]"
+              :key="color"
+              class="size-4"
+              :style="{ backgroundColor: color }"
+            />
+          </span>
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-4 shrink-0 text-muted"
+          />
+        </button>
+
+        <button
+          type="button"
+          class="flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
+          @click="openPanel('fonts')"
+        >
+          <UIcon
+            name="i-lucide-type"
+            class="size-4 shrink-0 text-muted"
+          />
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm font-medium text-default">Fonts</span>
+            <span class="block truncate text-xs text-muted">{{ activeFontPair?.name ?? 'Choose typography' }}</span>
+          </span>
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-4 shrink-0 text-muted"
+          />
+        </button>
+      </section>
+
+      <section
+        v-else-if="currentPanel === 'template'"
+        key="template"
+        class="grid w-full min-w-0 gap-3 overflow-hidden"
+      >
         <button
           v-for="template in editor.availableTemplates.value"
           :key="template.id"
           type="button"
-          class="overflow-hidden rounded-md border border-muted bg-default text-left transition hover:bg-muted"
+          class="w-full min-w-0 overflow-hidden rounded-md border border-muted bg-default text-left transition hover:bg-muted"
           :class="editor.draft.value?.templateId === template.id ? 'ring-2 ring-primary' : ''"
           @click="editor.setTemplate(template.id)"
         >
@@ -37,73 +168,95 @@ const fontModel = computed({
             :alt="template.name"
             class="aspect-[16/9] w-full object-cover"
           >
-          <div class="p-3">
-            <div class="flex items-center justify-between gap-3">
-              <p class="text-sm font-semibold text-default">
+          <div class="min-w-0 p-3">
+            <div class="flex min-w-0 items-center justify-between gap-3">
+              <p class="truncate text-sm font-semibold text-default">
                 {{ template.name }}
               </p>
               <UIcon
                 v-if="editor.draft.value?.templateId === template.id"
                 name="i-lucide-check"
-                class="size-4 text-primary"
+                class="size-4 shrink-0 text-primary"
               />
             </div>
-            <p class="mt-1 text-xs text-muted">
+            <p class="mt-1 line-clamp-2 text-xs text-muted">
               {{ template.description }}
             </p>
           </div>
         </button>
-      </div>
-    </section>
+      </section>
 
-    <section class="grid gap-3">
-      <div>
-        <h2 class="text-sm font-semibold text-default">
-          Palette
-        </h2>
-      </div>
+      <section
+        v-else-if="currentPanel === 'palette'"
+        key="palette"
+        class="grid w-full min-w-0 gap-3 overflow-hidden"
+      >
+        <ColorSwatch
+          v-for="palette in colorPalettes"
+          :key="palette.id"
+          v-model="paletteModel"
+          :value="palette.id"
+          :label="palette.name"
+          :colors="[palette.primary, palette.secondary, palette.accent]"
+        />
+      </section>
 
-      <ColorSwatch
-        v-for="palette in colorPalettes"
-        :key="palette.id"
-        v-model="paletteModel"
-        :value="palette.id"
-        :label="palette.name"
-        :colors="[palette.primary, palette.secondary, palette.accent]"
-      />
-    </section>
+      <section
+        v-else
+        key="fonts"
+        class="grid w-full min-w-0 gap-3 overflow-hidden"
+      >
+        <USelect
+          v-model="fontModel"
+          :items="fontPairs.map(pair => ({ label: pair.name, value: pair.id }))"
+          value-key="value"
+          label-key="label"
+        />
 
-    <section class="grid gap-3">
-      <div>
-        <h2 class="text-sm font-semibold text-default">
-          Fonts
-        </h2>
-      </div>
-
-      <USelect
-        v-model="fontModel"
-        :items="fontPairs.map(pair => ({ label: pair.name, value: pair.id }))"
-        value-key="value"
-        label-key="label"
-      />
-
-      <div class="grid gap-2">
-        <button
-          v-for="pair in fontPairs"
-          :key="pair.id"
-          type="button"
-          class="rounded-md border border-muted bg-default p-3 text-left hover:bg-muted"
-          :class="fontModel === pair.id ? 'ring-2 ring-primary' : ''"
-          @click="fontModel = pair.id"
-        >
-          <p class="text-sm font-semibold text-default">
-            {{ pair.heading }}
-          </p>
-          <p class="text-xs text-muted">
-            {{ pair.body }} body text
-          </p>
-        </button>
-      </div>
-    </section>
+        <div class="grid w-full min-w-0 gap-2 overflow-hidden">
+          <button
+            v-for="pair in fontPairs"
+            :key="pair.id"
+            type="button"
+            class="w-full min-w-0 overflow-hidden rounded-md border border-muted bg-default p-3 text-left hover:bg-muted"
+            :class="fontModel === pair.id ? 'ring-2 ring-primary' : ''"
+            @click="fontModel = pair.id"
+          >
+            <p class="truncate text-sm font-semibold text-default">
+              {{ pair.heading }}
+            </p>
+            <p class="truncate text-xs text-muted">
+              {{ pair.body }} body text
+            </p>
+          </button>
+        </div>
+      </section>
+    </Transition>
   </div>
 </template>
+
+<style scoped>
+.theme-panel-shell {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.theme-slide-forward-enter-active,
+.theme-slide-forward-leave-active,
+.theme-slide-back-enter-active,
+.theme-slide-back-leave-active {
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.theme-slide-forward-enter-from,
+.theme-slide-back-leave-to {
+  opacity: 0;
+  transform: translateX(24px);
+}
+
+.theme-slide-forward-leave-to,
+.theme-slide-back-enter-from {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+</style>
