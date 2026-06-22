@@ -20,7 +20,14 @@ export const prayerTimesWidget: WidgetDefinition = {
       { label: 'Compact', value: 'compact' }
     ] },
     { key: 'title', label: 'Title', type: 'text', default: 'Today Prayer Times' },
-    { key: 'showIqamah', label: 'Show iqamah', type: 'toggle', default: true, span: 'half' },
-    { key: 'showSunrise', label: 'Show sunrise', type: 'toggle', default: true, span: 'half' }
+    { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', options: [
+      { label: 'Primary', value: 'primary' },
+      { label: 'Soft', value: 'soft' },
+      { label: 'Neutral', value: 'neutral' }
+    ] },
+    { key: 'showIcons', label: 'Show icons', type: 'toggle', default: true, group: 'Display', span: 'half' },
+    { key: 'highlightNext', label: 'Highlight next prayer', type: 'toggle', default: true, group: 'Display', span: 'half' },
+    { key: 'showIqamah', label: 'Show iqamah', type: 'toggle', default: true, group: 'Display', span: 'half' },
+    { key: 'showSunrise', label: 'Show sunrise', type: 'toggle', default: true, group: 'Display', span: 'half' }
   ]
 }
