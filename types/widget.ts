@@ -25,7 +25,7 @@ export interface WidgetPropSchema {
   default?: unknown
   required?: boolean
   options?: { label: string; value: unknown }[]
-  showWhen?: { key: string; value: unknown }
+  showWhen?: { key: string; value: unknown | unknown[] }
   placeholder?: string
 }
 

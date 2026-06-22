@@ -10,6 +10,13 @@ const props = withDefaults(defineProps<{
   secondaryUrl?: string
   variant?: string
   align?: string
+  background?: string
+  bgColor?: string
+  gradientFrom?: string
+  gradientTo?: string
+  overlay?: boolean
+  overlayOpacity?: number
+  textTone?: string
 }>(), {
   eyebrow: 'Welcome to',
   title: 'Mosque',
@@ -20,7 +27,14 @@ const props = withDefaults(defineProps<{
   secondaryLabel: 'Upcoming events',
   secondaryUrl: '#events',
   variant: 'with-buttons',
-  align: 'left'
+  align: 'left',
+  background: 'plain',
+  bgColor: '#0f766e',
+  gradientFrom: '#0f766e',
+  gradientTo: '#134e4a',
+  overlay: true,
+  overlayOpacity: 50,
+  textTone: 'light'
 })
 
 const links = computed(() => {
@@ -32,7 +46,33 @@ const links = computed(() => {
   ].filter(link => link.label && link.to)
 })
 
-const orientation = computed(() => props.imageUrl && props.variant !== 'simple' ? 'horizontal' : 'vertical')
+// Plain keeps the original surface card; solid/gradient/image use a styled background.
+const isPlain = computed(() => !['solid', 'gradient', 'image'].includes(props.background))
+const useLightText = computed(() => !isPlain.value && props.textTone === 'light')
+
+// When the image is used as the full background, drop the side-by-side image panel.
+const showSideImage = computed(() => Boolean(props.imageUrl) && props.variant !== 'simple' && props.background !== 'image')
+const orientation = computed(() => showSideImage.value ? 'horizontal' : 'vertical')
+
+const bgStyle = computed(() => {
+  if (props.background === 'solid') return { backgroundColor: props.bgColor }
+  if (props.background === 'gradient') return { backgroundImage: `linear-gradient(135deg, ${props.gradientFrom}, ${props.gradientTo})` }
+  return {}
+})
+
+const wrapperClass = computed(() => [
+  'relative isolate overflow-hidden rounded-lg',
+  isPlain.value ? 'bg-[var(--color-surface)] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]' : ''
+])
+
+const heroUi = computed(() => ({
+  container: showSideImage.value
+    ? '!flex !flex-col !gap-6 !px-4 !py-8 @xl:!grid @xl:!grid-cols-2 @xl:!items-center @xl:!gap-8 @xl:!py-12'
+    : '!flex !flex-col !gap-6 !px-4 !py-8 @xl:!py-12',
+  title: `tenant-heading !text-4xl @md:!text-5xl @xl:!text-6xl tracking-normal break-words ${useLightText.value ? '!text-white' : 'text-[var(--color-text)]'}`,
+  description: useLightText.value ? 'text-white/80' : 'text-[var(--color-text-muted)]',
+  headline: useLightText.value ? 'text-white' : 'text-[var(--color-primary)]'
+}))
 
 const heroClass = computed(() => [
   '@container',
@@ -93,24 +133,33 @@ const heroClass = computed(() => [
 
   <div
     v-else
-    class="overflow-hidden rounded-lg bg-[var(--color-surface)] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]"
+    :class="wrapperClass"
+    :style="bgStyle"
   >
+    <template v-if="background === 'image' && imageUrl">
+      <img
+        :src="imageUrl"
+        :alt="title"
+        class="absolute inset-0 -z-20 h-full w-full object-cover"
+      >
+      <div
+        v-if="overlay"
+        class="absolute inset-0 -z-10 bg-black"
+        :style="{ opacity: Math.min(Math.max(overlayOpacity, 0), 100) / 100 }"
+      />
+    </template>
+
     <UPageHero
       :headline="eyebrow"
       :title="title"
       :description="subtitle"
       :links="links"
       :orientation="orientation"
-      :ui="{
-        container: '!flex !flex-col !gap-6 !px-4 !py-8 @xl:!grid @xl:!grid-cols-2 @xl:!items-center @xl:!gap-8 @xl:!py-12',
-        title: 'tenant-heading !text-4xl @md:!text-5xl @xl:!text-6xl tracking-normal break-words text-[var(--color-text)]',
-        description: 'text-[var(--color-text-muted)]',
-        headline: 'text-[var(--color-primary)]'
-      }"
+      :ui="heroUi"
       :class="heroClass"
     >
       <div
-        v-if="imageUrl && variant !== 'simple'"
+        v-if="showSideImage"
         class="relative isolate min-h-72 overflow-hidden rounded-lg bg-[color:color-mix(in_srgb,var(--color-primary)_12%,white)]"
       >
         <img

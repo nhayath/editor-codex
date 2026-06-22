@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "preview",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "DATABASE_URL=file:/Users/nasimhayath/Apps/msaas-ai/editor-codex/prisma/dev.db node .output/server/index.mjs"
+      ],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}

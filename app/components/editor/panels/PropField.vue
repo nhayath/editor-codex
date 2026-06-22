@@ -41,7 +41,9 @@ const selectItems = computed(() => (props.field.options ?? []) as any[])
 
 const visible = computed(() => {
   if (!props.field.showWhen) return true
-  return props.values?.[props.field.showWhen.key] === props.field.showWhen.value
+  const current = props.values?.[props.field.showWhen.key]
+  const expected = props.field.showWhen.value
+  return Array.isArray(expected) ? expected.includes(current) : current === expected
 })
 </script>
 
