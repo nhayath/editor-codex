@@ -415,14 +415,11 @@ watch(
         </template>
 
         <template v-else>
-          <PropField
-            v-for="field in activeSection.propSchema ?? []"
-            :key="field.key"
-            :field="field"
-            :model-value="activeSection.resolvedProps?.[field.key]"
+          <PropFieldGroups
+            :schema="activeSection.propSchema ?? []"
             :values="activeSection.resolvedProps"
             :tenant-id="tenantId"
-            @update:model-value="updateSection(activeSection, field.key, $event)"
+            @update="(key, value) => activeSection && updateSection(activeSection, key, value)"
           />
         </template>
       </section>
@@ -433,14 +430,11 @@ watch(
         class="grid w-full min-w-0 gap-4 overflow-hidden"
         @focusin="editor.focusSection(activeSection.id)"
       >
-        <PropField
-          v-for="field in activeWidget.propSchema ?? []"
-          :key="field.key"
-          :field="field"
-          :model-value="activeWidget.resolvedProps[field.key]"
+        <PropFieldGroups
+          :schema="activeWidget.propSchema ?? []"
           :values="activeWidget.resolvedProps"
           :tenant-id="tenantId"
-          @update:model-value="updateWidget(activeSection, activeWidget, field.key, $event)"
+          @update="(key, value) => activeSection && activeWidget && updateWidget(activeSection, activeWidget, key, value)"
         />
       </section>
 

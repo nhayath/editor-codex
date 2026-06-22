@@ -9,7 +9,7 @@ export const imageWidget: WidgetDefinition = {
   component: 'WidgetImage',
   propSchema: [
     { key: 'imageUrl', label: 'Image', type: 'image', default: '/templates/mosque-hero-1.svg' },
-    { key: 'alt', label: 'Alt text', type: 'text', default: 'Mosque image' },
-    { key: 'caption', label: 'Caption', type: 'text', default: '' }
+    { key: 'alt', label: 'Alt text', type: 'text', default: 'Mosque image', span: 'half' },
+    { key: 'caption', label: 'Caption', type: 'text', default: '', span: 'half' }
   ]
 }

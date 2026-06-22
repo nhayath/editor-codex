@@ -31,33 +31,33 @@ export const heroWidget: WidgetDefinition = {
       { label: 'Immersive — full background image', value: 'immersive' },
       { label: 'Banner — short strip', value: 'banner' }
     ] },
-    { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Welcome to' },
-    { key: 'title', label: 'Title', type: 'text', default: 'Al-Noor Mosque' },
-    { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'A welcoming place for prayer, learning, and community.' },
-    { key: 'imageUrl', label: 'Image', type: 'image', default: '', showWhen: [
-      { key: 'variant', value: imagePanelVariants },
-      { key: 'background', value: 'image' }
-    ] },
-    { key: 'primaryLabel', label: 'Primary button', type: 'text', default: 'View prayer times', showWhen: { key: 'variant', value: buttonVariants } },
-    { key: 'primaryUrl', label: 'Primary URL', type: 'url', default: '#prayer-times', showWhen: { key: 'variant', value: buttonVariants } },
-    { key: 'secondaryLabel', label: 'Secondary button', type: 'text', default: 'Upcoming events', showWhen: { key: 'variant', value: ['with-image', 'with-buttons', 'split', 'immersive'] } },
-    { key: 'secondaryUrl', label: 'Secondary URL', type: 'url', default: '#events', showWhen: { key: 'variant', value: ['with-image', 'with-buttons', 'split', 'immersive'] } },
-    { key: 'align', label: 'Text alignment', type: 'select', default: 'left', showWhen: { key: 'variant', value: ['simple', 'with-buttons'] }, options: [
+    { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Welcome to', group: 'Content' },
+    { key: 'title', label: 'Title', type: 'text', default: 'Al-Noor Mosque', group: 'Content' },
+    { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'A welcoming place for prayer, learning, and community.', group: 'Content' },
+    { key: 'align', label: 'Text alignment', type: 'select', default: 'left', group: 'Content', showWhen: { key: 'variant', value: ['simple', 'with-buttons'] }, options: [
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
     ] },
-    { key: 'background', label: 'Background style', type: 'select', default: 'plain', options: [
+    { key: 'imageUrl', label: 'Image', type: 'image', default: '', group: 'Content', showWhen: [
+      { key: 'variant', value: imagePanelVariants },
+      { key: 'background', value: 'image' }
+    ] },
+    { key: 'primaryLabel', label: 'Primary button', type: 'text', default: 'View prayer times', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: buttonVariants } },
+    { key: 'primaryUrl', label: 'Primary URL', type: 'url', default: '#prayer-times', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: buttonVariants } },
+    { key: 'secondaryLabel', label: 'Secondary button', type: 'text', default: 'Upcoming events', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: ['with-image', 'with-buttons', 'split', 'immersive'] } },
+    { key: 'secondaryUrl', label: 'Secondary URL', type: 'url', default: '#events', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: ['with-image', 'with-buttons', 'split', 'immersive'] } },
+    { key: 'background', label: 'Background style', type: 'select', default: 'plain', group: 'Background', options: [
       { label: 'Plain', value: 'plain' },
       { label: 'Solid colour', value: 'solid' },
       { label: 'Gradient', value: 'gradient' },
       { label: 'Image', value: 'image' }
     ], showWhen: { key: 'variant', value: backgroundVariants } },
-    { key: 'bgColor', label: 'Background colour', type: 'color', default: '#0f766e', showWhen: { key: 'background', value: 'solid' } },
-    { key: 'gradientFrom', label: 'Gradient start', type: 'color', default: '#0f766e', showWhen: { key: 'background', value: 'gradient' } },
-    { key: 'gradientTo', label: 'Gradient end', type: 'color', default: '#134e4a', showWhen: { key: 'background', value: 'gradient' } },
-    { key: 'overlay', label: 'Darken image for readable text', type: 'toggle', default: true, showWhen: { key: 'background', value: 'image' } },
-    { key: 'overlayOpacity', label: 'Darkness (0-100)', type: 'number', default: 50, showWhen: { key: 'background', value: 'image' } },
-    { key: 'textTone', label: 'Text colour', type: 'select', default: 'light', options: [
+    { key: 'bgColor', label: 'Background colour', type: 'color', default: '#0f766e', group: 'Background', showWhen: { key: 'background', value: 'solid' } },
+    { key: 'gradientFrom', label: 'Gradient start', type: 'color', default: '#0f766e', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
+    { key: 'gradientTo', label: 'Gradient end', type: 'color', default: '#134e4a', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
+    { key: 'overlay', label: 'Darken image', type: 'toggle', default: true, group: 'Background', span: 'half', showWhen: { key: 'background', value: 'image' } },
+    { key: 'overlayOpacity', label: 'Darkness (0-100)', type: 'number', default: 50, group: 'Background', span: 'half', showWhen: { key: 'background', value: 'image' } },
+    { key: 'textTone', label: 'Text colour', type: 'select', default: 'light', group: 'Background', options: [
       { label: 'Light text', value: 'light' },
       { label: 'Dark text', value: 'dark' }
     ], showWhen: { key: 'background', value: ['solid', 'gradient', 'image'] } }

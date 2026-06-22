@@ -20,7 +20,7 @@ export const prayerTimesWidget: WidgetDefinition = {
       { label: 'Compact', value: 'compact' }
     ] },
     { key: 'title', label: 'Title', type: 'text', default: 'Today Prayer Times' },
-    { key: 'showIqamah', label: 'Show iqamah', type: 'toggle', default: true },
-    { key: 'showSunrise', label: 'Show sunrise', type: 'toggle', default: true }
+    { key: 'showIqamah', label: 'Show iqamah', type: 'toggle', default: true, span: 'half' },
+    { key: 'showSunrise', label: 'Show sunrise', type: 'toggle', default: true, span: 'half' }
   ]
 }

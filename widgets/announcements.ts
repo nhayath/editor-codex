@@ -18,7 +18,7 @@ export const announcementsWidget: WidgetDefinition = {
       { label: 'Cards', value: 'cards' }
     ] },
     { key: 'title', label: 'Title', type: 'text', default: 'Announcements' },
-    { key: 'maxItems', label: 'Maximum items', type: 'number', default: 3 },
-    { key: 'showPinnedOnly', label: 'Pinned only', type: 'toggle', default: false }
+    { key: 'maxItems', label: 'Maximum items', type: 'number', default: 3, span: 'half' },
+    { key: 'showPinnedOnly', label: 'Pinned only', type: 'toggle', default: false, span: 'half' }
   ]
 }

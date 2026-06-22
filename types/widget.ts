@@ -27,6 +27,7 @@ export interface WidgetPropSchema {
   label: string
   type: WidgetPropType
   group?: string
+  span?: 'full' | 'half'
   default?: unknown
   required?: boolean
   options?: { label: string; value: unknown }[]

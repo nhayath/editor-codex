@@ -10,7 +10,7 @@ export const prayerCountdownWidget: WidgetDefinition = {
   dataDependencies: ['prayerTimes'],
   propSchema: [
     { key: 'title', label: 'Title', type: 'text', default: 'Next prayer' },
-    { key: 'showIqamah', label: 'Prefer iqamah time', type: 'toggle', default: true },
-    { key: 'compact', label: 'Compact layout', type: 'toggle', default: false }
+    { key: 'showIqamah', label: 'Prefer iqamah time', type: 'toggle', default: true, span: 'half' },
+    { key: 'compact', label: 'Compact layout', type: 'toggle', default: false, span: 'half' }
   ]
 }
