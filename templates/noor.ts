@@ -98,7 +98,7 @@ export const noorTemplate: TemplateDefinition = {
           {
             slot: 'side',
             widgetId: 'jummah-times',
-            defaultProps: { title: "Jumu'ah Khutbah", showLocation: true }
+            defaultProps: { title: "Jumu'ah Khutbah", variant: 'card', showLocation: true }
           }
         ]
       }

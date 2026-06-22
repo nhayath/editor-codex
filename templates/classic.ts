@@ -68,7 +68,7 @@ export const classicTemplate: TemplateDefinition = {
           {
             slot: 'side',
             widgetId: 'jummah-times',
-            defaultProps: { title: "Jumu'ah prayers", showLocation: true }
+            defaultProps: { title: "Jumu'ah prayers", variant: 'card', showLocation: true }
           }
         ]
       }

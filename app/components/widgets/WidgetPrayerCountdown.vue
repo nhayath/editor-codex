@@ -203,9 +203,9 @@ const upcoming = computed(() => {
           {{ dateLabel }}
         </p>
         <div class="mt-1 flex items-center justify-center gap-2">
-          <IconGlyph
+          <UIcon
             v-if="showIcon"
-            name="islamic-prayer-times"
+            :name="next.icon"
             class="size-6"
             :style="{ color: accentTextColor }"
           />
@@ -243,9 +243,9 @@ const upcoming = computed(() => {
     <template v-else-if="effectiveVariant === 'minimal'">
       <div class="flex items-center justify-between gap-3" :class="alignClass">
         <div class="flex items-center gap-2.5">
-          <IconGlyph
+          <UIcon
             v-if="showIcon"
-            :name="'islamic-prayer-times'"
+            :name="next.icon"
             class="size-5 shrink-0"
             :style="{ color: accentTextColor }"
           />
@@ -347,9 +347,9 @@ const upcoming = computed(() => {
             {{ next.name }}
           </h3>
         </div>
-        <IconGlyph
+        <UIcon
           v-if="showIcon"
-          name="islamic-prayer-times"
+          :name="next.icon"
           class="size-10 shrink-0"
           :style="{ color: accentTextColor }"
         />
