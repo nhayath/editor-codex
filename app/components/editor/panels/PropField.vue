@@ -39,11 +39,17 @@ const selectValue = computed({
 
 const selectItems = computed(() => (props.field.options ?? []) as any[])
 
-const visible = computed(() => {
-  if (!props.field.showWhen) return true
-  const current = props.values?.[props.field.showWhen.key]
-  const expected = props.field.showWhen.value
+function matchesCondition(condition: { key: string; value: unknown }) {
+  const current = props.values?.[condition.key]
+  const expected = condition.value
   return Array.isArray(expected) ? expected.includes(current) : current === expected
+}
+
+const visible = computed(() => {
+  const showWhen = props.field.showWhen
+  if (!showWhen) return true
+  // Array of conditions = OR (visible if any match).
+  return Array.isArray(showWhen) ? showWhen.some(matchesCondition) : matchesCondition(showWhen)
 })
 </script>
 

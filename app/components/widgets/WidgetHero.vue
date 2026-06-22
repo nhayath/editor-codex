@@ -37,22 +37,24 @@ const props = withDefaults(defineProps<{
   textTone: 'light'
 })
 
-const links = computed(() => {
+interface HeroLink { label: string; to: string }
+
+const links = computed<HeroLink[]>(() => {
   if (props.variant === 'simple') return []
 
-  return [
-    { label: props.primaryLabel, to: props.primaryUrl, icon: 'i-lucide-clock-3' },
-    { label: props.secondaryLabel, to: props.secondaryUrl, color: 'neutral' as const, variant: 'outline' as const, icon: 'i-lucide-calendar-days' }
+  const all = [
+    { label: props.primaryLabel, to: props.primaryUrl },
+    { label: props.secondaryLabel, to: props.secondaryUrl }
   ].filter(link => link.label && link.to)
+
+  // Banner shows a single action.
+  return props.variant === 'banner' ? all.slice(0, 1) : all
 })
 
-// Plain keeps the original surface card; solid/gradient/image use a styled background.
+// Background system (used by simple / action / banner).
 const isPlain = computed(() => !['solid', 'gradient', 'image'].includes(props.background))
 const useLightText = computed(() => !isPlain.value && props.textTone === 'light')
-
-// When the image is used as the full background, drop the side-by-side image panel.
-const showSideImage = computed(() => Boolean(props.imageUrl) && props.variant !== 'simple' && props.background !== 'image')
-const orientation = computed(() => showSideImage.value ? 'horizontal' : 'vertical')
+const overlayValue = computed(() => Math.min(Math.max(props.overlayOpacity, 0), 100) / 100)
 
 const bgStyle = computed(() => {
   if (props.background === 'solid') return { backgroundColor: props.bgColor }
@@ -60,27 +62,29 @@ const bgStyle = computed(() => {
   return {}
 })
 
-const wrapperClass = computed(() => [
-  'relative isolate overflow-hidden rounded-lg',
+const bgWrapperClass = computed(() => [
+  '@container relative isolate overflow-hidden rounded-lg',
   isPlain.value ? 'bg-[var(--color-surface)] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]' : ''
 ])
 
-const heroUi = computed(() => ({
-  container: showSideImage.value
-    ? '!flex !flex-col !gap-6 !px-4 !py-8 @xl:!grid @xl:!grid-cols-2 @xl:!items-center @xl:!gap-8 @xl:!py-12'
-    : '!flex !flex-col !gap-6 !px-4 !py-8 @xl:!py-12',
-  title: `tenant-heading !text-4xl @md:!text-5xl @xl:!text-6xl tracking-normal break-words ${useLightText.value ? '!text-white' : 'text-[var(--color-text)]'}`,
-  description: useLightText.value ? 'text-white/80' : 'text-[var(--color-text-muted)]',
-  headline: useLightText.value ? 'text-white' : 'text-[var(--color-primary)]'
-}))
+const centered = computed(() => props.align === 'center')
 
-const heroClass = computed(() => [
-  '@container',
-  props.align === 'center' ? 'text-center' : ''
-])
+// Button styling shared across the non-immersive variants.
+// `light` = sitting on a dark surface, so use light-on-dark button colors.
+function buttonClass(index: number, light: boolean) {
+  if (index === 0) {
+    return light
+      ? 'bg-white text-[var(--color-primary)] hover:bg-white/90'
+      : 'bg-[var(--color-primary)] text-white hover:opacity-90'
+  }
+  return light
+    ? 'border border-white/40 text-white hover:bg-white/10'
+    : 'border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-primary)_10%,transparent)]'
+}
 </script>
 
 <template>
+  <!-- IMMERSIVE: full-bleed background image, tall, text on top -->
   <div
     v-if="variant === 'immersive'"
     class="relative isolate min-h-[620px] overflow-hidden rounded-lg bg-[var(--color-primary)] text-white"
@@ -131,43 +135,179 @@ const heroClass = computed(() => [
     </div>
   </div>
 
+  <!-- SPLIT: balanced 50/50, image fills its half edge-to-edge -->
   <div
-    v-else
-    :class="wrapperClass"
+    v-else-if="variant === 'split'"
+    class="@container overflow-hidden rounded-lg ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]"
+  >
+    <div class="grid @xl:grid-cols-2">
+      <div class="flex flex-col justify-center gap-5 bg-[var(--color-surface)] p-6 @xl:p-10">
+        <p v-if="eyebrow" class="text-sm font-bold uppercase tracking-wide text-[var(--color-primary)]">
+          {{ eyebrow }}
+        </p>
+        <h1 class="tenant-heading text-3xl font-bold tracking-normal text-[var(--color-text)] @xl:text-5xl">
+          {{ title }}
+        </h1>
+        <p v-if="subtitle" class="max-w-prose text-base leading-7 text-[var(--color-text-muted)]">
+          {{ subtitle }}
+        </p>
+        <div v-if="links.length" class="mt-1 flex flex-wrap gap-3">
+          <NuxtLink
+            v-for="(link, index) in links"
+            :key="link.to"
+            :to="link.to"
+            class="inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-bold transition"
+            :class="buttonClass(index, false)"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </div>
+      </div>
+      <div class="relative order-first min-h-56 bg-[color:color-mix(in_srgb,var(--color-primary)_12%,white)] @xl:order-none @xl:min-h-[440px]">
+        <img
+          v-if="imageUrl"
+          :src="imageUrl"
+          :alt="title"
+          class="absolute inset-0 h-full w-full object-cover"
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- SPOTLIGHT: image-dominant with a floating text card -->
+  <div
+    v-else-if="variant === 'with-image'"
+    class="@container relative isolate min-h-[460px] overflow-hidden rounded-lg bg-[color:color-mix(in_srgb,var(--color-primary)_14%,white)]"
+  >
+    <img
+      v-if="imageUrl"
+      :src="imageUrl"
+      :alt="title"
+      class="absolute inset-0 -z-10 h-full w-full object-cover"
+    >
+    <div class="flex min-h-[460px] items-center p-5 @lg:p-10">
+      <div class="w-full max-w-md rounded-lg bg-[var(--color-surface)]/95 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)] backdrop-blur-sm @lg:p-8">
+        <p v-if="eyebrow" class="text-sm font-bold uppercase tracking-wide text-[var(--color-primary)]">
+          {{ eyebrow }}
+        </p>
+        <h1 class="tenant-heading mt-3 text-3xl font-bold tracking-normal text-[var(--color-text)] @lg:text-4xl">
+          {{ title }}
+        </h1>
+        <p v-if="subtitle" class="mt-4 text-base leading-7 text-[var(--color-text-muted)]">
+          {{ subtitle }}
+        </p>
+        <div v-if="links.length" class="mt-6 flex flex-wrap gap-3">
+          <NuxtLink
+            v-for="(link, index) in links"
+            :key="link.to"
+            :to="link.to"
+            class="inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-bold transition"
+            :class="buttonClass(index, false)"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANNER: short strip, headline + single action -->
+  <div
+    v-else-if="variant === 'banner'"
+    :class="bgWrapperClass"
     :style="bgStyle"
   >
     <template v-if="background === 'image' && imageUrl">
-      <img
-        :src="imageUrl"
-        :alt="title"
-        class="absolute inset-0 -z-20 h-full w-full object-cover"
+      <img :src="imageUrl" :alt="title" class="absolute inset-0 -z-20 h-full w-full object-cover">
+      <div v-if="overlay" class="absolute inset-0 -z-10 bg-black" :style="{ opacity: overlayValue }" />
+    </template>
+    <div class="flex flex-col items-start gap-4 px-6 py-7 @xl:flex-row @xl:items-center @xl:justify-between @xl:px-10">
+      <div class="min-w-0">
+        <p v-if="eyebrow" class="text-xs font-bold uppercase tracking-wide" :class="useLightText ? 'text-white/80' : 'text-[var(--color-primary)]'">
+          {{ eyebrow }}
+        </p>
+        <h1 class="tenant-heading text-2xl font-bold tracking-normal @xl:text-3xl" :class="useLightText ? 'text-white' : 'text-[var(--color-text)]'">
+          {{ title }}
+        </h1>
+        <p v-if="subtitle" class="mt-1 text-sm leading-6" :class="useLightText ? 'text-white/80' : 'text-[var(--color-text-muted)]'">
+          {{ subtitle }}
+        </p>
+      </div>
+      <NuxtLink
+        v-for="(link, index) in links"
+        :key="link.to"
+        :to="link.to"
+        class="inline-flex shrink-0 items-center justify-center rounded-md px-5 py-3 text-sm font-bold transition"
+        :class="buttonClass(index, useLightText)"
       >
-      <div
-        v-if="overlay"
-        class="absolute inset-0 -z-10 bg-black"
-        :style="{ opacity: Math.min(Math.max(overlayOpacity, 0), 100) / 100 }"
-      />
+        {{ link.label }}
+      </NuxtLink>
+    </div>
+  </div>
+
+  <!-- SIMPLE & ACTION: background-driven, centered/left text (Action has bold buttons) -->
+  <div
+    v-else
+    :class="bgWrapperClass"
+    :style="bgStyle"
+  >
+    <template v-if="background === 'image' && imageUrl">
+      <img :src="imageUrl" :alt="title" class="absolute inset-0 -z-20 h-full w-full object-cover">
+      <div v-if="overlay" class="absolute inset-0 -z-10 bg-black" :style="{ opacity: overlayValue }" />
     </template>
 
-    <UPageHero
-      :headline="eyebrow"
-      :title="title"
-      :description="subtitle"
-      :links="links"
-      :orientation="orientation"
-      :ui="heroUi"
-      :class="heroClass"
-    >
-      <div
-        v-if="showSideImage"
-        class="relative isolate min-h-72 overflow-hidden rounded-lg bg-[color:color-mix(in_srgb,var(--color-primary)_12%,white)]"
-      >
-        <img
-          :src="imageUrl"
-          :alt="title"
-          class="h-full min-h-72 w-full object-cover"
+    <div class="px-6 py-12 @xl:py-16" :class="centered ? 'text-center' : ''">
+      <div class="mx-auto flex max-w-3xl flex-col gap-5" :class="centered ? 'items-center' : 'items-start'">
+        <template v-if="variant === 'with-buttons'">
+          <span
+            v-if="eyebrow"
+            class="inline-flex w-fit items-center gap-2 rounded-md px-3 py-1.5 text-sm font-bold"
+            :class="useLightText ? 'bg-white/15 text-white' : 'bg-[color:color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-[var(--color-primary)]'"
+          >
+            {{ eyebrow }}
+          </span>
+        </template>
+        <p
+          v-else-if="eyebrow"
+          class="text-sm font-bold uppercase tracking-wide"
+          :class="useLightText ? 'text-white/80' : 'text-[var(--color-primary)]'"
         >
+          {{ eyebrow }}
+        </p>
+
+        <h1
+          class="tenant-heading text-4xl font-bold tracking-normal @md:text-5xl @xl:text-6xl"
+          :class="useLightText ? 'text-white' : 'text-[var(--color-text)]'"
+        >
+          {{ title }}
+        </h1>
+        <p
+          v-if="subtitle"
+          class="max-w-2xl text-lg leading-8"
+          :class="useLightText ? 'text-white/80' : 'text-[var(--color-text-muted)]'"
+        >
+          {{ subtitle }}
+        </p>
+
+        <div
+          v-if="links.length"
+          class="mt-2 flex flex-wrap gap-3"
+          :class="centered ? 'justify-center' : ''"
+        >
+          <NuxtLink
+            v-for="(link, index) in links"
+            :key="link.to"
+            :to="link.to"
+            class="inline-flex items-center justify-center rounded-md font-bold transition"
+            :class="[
+              variant === 'with-buttons' ? 'px-7 py-4 text-base' : 'px-5 py-3 text-sm',
+              buttonClass(index, useLightText)
+            ]"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </div>
       </div>
-    </UPageHero>
+    </div>
   </div>
 </template>

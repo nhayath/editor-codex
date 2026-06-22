@@ -17,6 +17,11 @@ export interface WidgetVariant {
   name: string
 }
 
+export interface WidgetShowWhen {
+  key: string
+  value: unknown | unknown[]
+}
+
 export interface WidgetPropSchema {
   key: string
   label: string
@@ -25,7 +30,7 @@ export interface WidgetPropSchema {
   default?: unknown
   required?: boolean
   options?: { label: string; value: unknown }[]
-  showWhen?: { key: string; value: unknown | unknown[] }
+  showWhen?: WidgetShowWhen | WidgetShowWhen[]
   placeholder?: string
 }
 
