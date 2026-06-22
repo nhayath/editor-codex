@@ -52,7 +52,7 @@ export const modernTemplate: TemplateDefinition = {
           {
             slot: 'side',
             widgetId: 'prayer-countdown',
-            defaultProps: { title: 'Next prayer', showIqamah: true, compact: true }
+            defaultProps: { title: 'Next prayer', showIqamah: true, variant: 'minimal' }
           }
         ]
       }

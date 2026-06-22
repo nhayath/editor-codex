@@ -1,80 +1,380 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
   title?: string
+  variant?: string
+  accent?: string
+  background?: string
+  align?: string
+  precision?: string
   showIqamah?: boolean
+  showIcon?: boolean
+  showDate?: boolean
+  showProgress?: boolean
+  /** @deprecated kept for backward-compat with saved configs; maps to the `minimal` variant. */
   compact?: boolean
   data?: Record<string, any>
 }>(), {
   title: 'Next prayer',
+  variant: 'card',
+  accent: 'primary',
+  background: 'solid',
+  align: 'left',
+  precision: 'minutes',
   showIqamah: true,
+  showIcon: true,
+  showDate: false,
+  showProgress: true,
   compact: false,
   data: () => ({})
 })
 
 const prayers = [
-  ['Fajr', 'fajr', 'fajrIqamah'],
-  ['Dhuhr', 'dhuhr', 'dhuhrIqamah'],
-  ['Asr', 'asr', 'asrIqamah'],
-  ['Maghrib', 'maghrib', 'maghribIqamah'],
-  ['Isha', 'isha', 'ishaIqamah']
+  ['Fajr', 'fajr', 'fajrIqamah', 'i-lucide-sunrise'],
+  ['Dhuhr', 'dhuhr', 'dhuhrIqamah', 'i-lucide-sun'],
+  ['Asr', 'asr', 'asrIqamah', 'i-lucide-cloud-sun'],
+  ['Maghrib', 'maghrib', 'maghribIqamah', 'i-lucide-sunset'],
+  ['Isha', 'isha', 'ishaIqamah', 'i-lucide-moon-star']
 ] as const
 
-const currentMinutes = ref<number | null>(null)
+// Effective variant: a legacy `compact` config (from older templates/tenants)
+// resolves to `minimal` unless an explicit non-default variant was chosen.
+const effectiveVariant = computed(() =>
+  props.variant === 'card' && props.compact ? 'minimal' : props.variant
+)
 
-function updateCurrentMinutes() {
-  const now = new Date()
-  currentMinutes.value = now.getHours() * 60 + now.getMinutes()
+// Live clock, refreshed every second so the countdown ticks.
+const now = ref<Date | null>(null)
+function tick() {
+  now.value = new Date()
 }
-
 onMounted(() => {
-  updateCurrentMinutes()
-  const interval = window.setInterval(updateCurrentMinutes, 60_000)
+  tick()
+  const interval = window.setInterval(tick, 1000)
   onBeforeUnmount(() => window.clearInterval(interval))
 })
 
-const nextPrayer = computed(() => {
-  const data = (props.data?.prayerTimes ?? {}) as Record<string, string | undefined>
-  const minutesNow = currentMinutes.value
+const secondsNow = computed(() => {
+  const d = now.value
+  if (!d) return null
+  return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds()
+})
 
-  for (const [name, adhanKey, iqamahKey] of prayers) {
+function toSeconds(value?: string) {
+  if (!value) return null
+  const parts = value.split(':').map(Number)
+  const hours = parts[0] ?? 0
+  const minutes = parts[1] ?? 0
+  return hours * 3600 + minutes * 60
+}
+
+const prayerData = computed(() => (props.data?.prayerTimes ?? {}) as Record<string, string | undefined>)
+
+const next = computed(() => {
+  const data = prayerData.value
+  const cur = secondsNow.value
+  let prevSec: number | null = null
+
+  for (const [name, adhanKey, iqamahKey, icon] of prayers) {
     const value = props.showIqamah ? data[iqamahKey] || data[adhanKey] : data[adhanKey]
-    if (!value) continue
-    const parts = value.split(':').map(Number)
-    const hours = parts[0] ?? 0
-    const minutes = parts[1] ?? 0
-    const total = hours * 60 + minutes
-    if (minutesNow === null || total >= minutesNow) {
-      return { name, time: value, minutes: minutesNow === null ? null : total - minutesNow }
+    const total = toSeconds(value)
+    if (total === null) continue
+    const isJamaah = props.showIqamah && !!data[iqamahKey]
+    if (cur === null || total >= cur) {
+      return { name, time: value ?? '--:--', icon, target: total, prevSec, isJamaah, wrapped: false }
     }
+    prevSec = total
   }
 
-  const first = prayers[0]
-  const time = data[first[2]] || data[first[1]] || '--:--'
-  return { name: first[0], time, minutes: currentMinutes.value === null ? null : 0 }
+  // All of today's prayers have passed → next is tomorrow's first prayer.
+  const [name, adhanKey, iqamahKey, icon] = prayers[0]
+  const value = (props.showIqamah ? data[iqamahKey] || data[adhanKey] : data[adhanKey]) ?? '--:--'
+  const isJamaah = props.showIqamah && !!data[iqamahKey]
+  return { name, time: value, icon, target: toSeconds(value), prevSec, isJamaah, wrapped: true }
+})
+
+// Seconds until the next prayer (handles the wrap past midnight).
+const remaining = computed(() => {
+  const cur = secondsNow.value
+  const target = next.value.target
+  if (cur === null || target === null) return null
+  let diff = target - cur
+  if (diff < 0) diff += 24 * 3600
+  return diff
+})
+
+const countdownLabel = computed(() => {
+  const r = remaining.value
+  if (r === null) return 'Today'
+  const h = Math.floor(r / 3600)
+  const m = Math.floor((r % 3600) / 60)
+  const s = r % 60
+  const pad = (n: number) => String(n).padStart(2, '0')
+  if (props.precision === 'seconds') {
+    return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`
+  }
+  if (r < 60) return 'Starting soon'
+  if (h > 0) return `${h}h ${m}m`
+  return `${m} min`
+})
+
+const contextLabel = computed(() => {
+  const verb = next.value.isJamaah ? 'Jamaah' : 'Adhan'
+  return `${verb} in`
+})
+
+// Progress between the previous prayer and the next one.
+const progress = computed(() => {
+  const cur = secondsNow.value
+  const target = next.value.target
+  const prev = next.value.prevSec
+  if (cur === null || target === null || prev === null || next.value.wrapped) return 0
+  const span = target - prev
+  if (span <= 0) return 0
+  return Math.min(100, Math.max(0, ((cur - prev) / span) * 100))
+})
+
+const dateLabel = computed(() => prayerData.value.date)
+
+// Accent + background system, mirrored from WidgetPrayerTimes for consistency.
+const accentVar = computed(() => {
+  switch (props.accent) {
+    case 'soft': return 'var(--color-secondary)'
+    case 'neutral': return 'var(--color-text)'
+    default: return 'var(--color-primary)'
+  }
+})
+
+// `solid`/`gradient` are filled (white text); `surface` is a light card (themed text).
+const isFilled = computed(() => props.background !== 'surface')
+
+const containerStyle = computed(() => {
+  if (props.background === 'surface') {
+    return {
+      background: 'var(--color-surface)',
+      boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)`
+    }
+  }
+  if (props.background === 'gradient') {
+    return {
+      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
+    }
+  }
+  return { background: accentVar.value }
+})
+
+const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
+const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.75)' : 'var(--color-text-muted)')
+const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
+const trackColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.25)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
+const barColor = computed(() => isFilled.value ? '#fff' : accentVar.value)
+const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
+
+// Remaining prayers list for the `split` variant.
+const upcoming = computed(() => {
+  const data = prayerData.value
+  const cur = secondsNow.value
+  return prayers.map(([name, adhanKey, iqamahKey, icon]) => {
+    const value = props.showIqamah ? data[iqamahKey] || data[adhanKey] : data[adhanKey]
+    const total = toSeconds(value)
+    return {
+      name,
+      icon,
+      time: value || '--:--',
+      isNext: name === next.value.name,
+      passed: cur !== null && total !== null && total < cur && name !== next.value.name
+    }
+  })
 })
 </script>
 
 <template>
-  <div class="h-full rounded-lg bg-[var(--color-primary)] p-6 text-white">
-    <div class="flex items-center justify-between gap-4">
-      <div>
-        <p class="text-sm font-medium text-white/75">
-          {{ title }}
+  <div
+    class="@container h-full overflow-hidden rounded-lg p-6"
+    :style="containerStyle"
+  >
+    <!-- Banner: centered hero strip -->
+    <template v-if="effectiveVariant === 'banner'">
+      <div class="text-center">
+        <p
+          v-if="showDate && dateLabel"
+          class="text-xs font-semibold uppercase tracking-wide"
+          :style="{ color: mutedColor }"
+        >
+          {{ dateLabel }}
         </p>
-        <h3 class="tenant-heading mt-2 text-4xl font-bold">
-          {{ nextPrayer.name }}
+        <div class="mt-1 flex items-center justify-center gap-2">
+          <IconGlyph
+            v-if="showIcon"
+            name="islamic-prayer-times"
+            class="size-6"
+            :style="{ color: accentTextColor }"
+          />
+          <p class="text-sm font-medium" :style="{ color: mutedColor }">
+            {{ contextLabel }}
+          </p>
+        </div>
+        <h3
+          class="tenant-heading mt-2 text-3xl font-bold @md:text-4xl"
+          :style="{ color: headingColor }"
+        >
+          {{ next.name }} · {{ next.time }}
         </h3>
+        <p
+          class="mt-3 font-bold tabular-nums"
+          :class="precision === 'seconds' ? 'text-4xl @md:text-5xl' : 'text-3xl @md:text-4xl'"
+          :style="{ color: headingColor }"
+        >
+          {{ countdownLabel }}
+        </p>
+        <div
+          v-if="showProgress"
+          class="mx-auto mt-4 h-1.5 max-w-md overflow-hidden rounded-full"
+          :style="{ background: trackColor }"
+        >
+          <div
+            class="h-full rounded-full transition-all duration-1000 ease-linear"
+            :style="{ width: `${progress}%`, background: barColor }"
+          />
+        </div>
       </div>
-      <IconGlyph name="islamic-prayer-times" class="size-10 text-[var(--color-secondary)]" />
-    </div>
+    </template>
 
-    <div :class="compact ? 'mt-5' : 'mt-8'">
-      <p class="text-5xl font-bold">
-        {{ nextPrayer.time }}
-      </p>
-      <p class="mt-2 text-sm text-white/75">
-        {{ nextPrayer.minutes === null ? 'Today' : nextPrayer.minutes > 0 ? `${nextPrayer.minutes} minutes remaining` : 'Starting soon' }}
-      </p>
-    </div>
+    <!-- Minimal: single inline row -->
+    <template v-else-if="effectiveVariant === 'minimal'">
+      <div class="flex items-center justify-between gap-3" :class="alignClass">
+        <div class="flex items-center gap-2.5">
+          <IconGlyph
+            v-if="showIcon"
+            :name="'islamic-prayer-times'"
+            class="size-5 shrink-0"
+            :style="{ color: accentTextColor }"
+          />
+          <div>
+            <p class="text-xs" :style="{ color: mutedColor }">
+              {{ contextLabel }}
+            </p>
+            <p class="text-base font-semibold leading-tight" :style="{ color: headingColor }">
+              {{ next.name }}
+            </p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-xl font-bold tabular-nums leading-none" :style="{ color: headingColor }">
+            {{ countdownLabel }}
+          </p>
+          <p class="mt-1 text-xs tabular-nums" :style="{ color: mutedColor }">
+            {{ next.time }}
+          </p>
+        </div>
+      </div>
+    </template>
+
+    <!-- Split: next prayer + remaining list -->
+    <template v-else-if="effectiveVariant === 'split'">
+      <div class="grid gap-6 @md:grid-cols-2 @md:items-center">
+        <div :class="alignClass">
+          <p
+            v-if="showDate && dateLabel"
+            class="text-xs font-semibold uppercase tracking-wide"
+            :style="{ color: mutedColor }"
+          >
+            {{ dateLabel }}
+          </p>
+          <p class="text-sm font-medium" :style="{ color: mutedColor }">
+            {{ contextLabel }}
+          </p>
+          <h3 class="tenant-heading mt-1 text-3xl font-bold" :style="{ color: headingColor }">
+            {{ next.name }}
+          </h3>
+          <p class="mt-2 text-4xl font-bold tabular-nums" :style="{ color: headingColor }">
+            {{ countdownLabel }}
+          </p>
+          <p class="mt-1 text-sm tabular-nums" :style="{ color: mutedColor }">
+            at {{ next.time }}
+          </p>
+          <div
+            v-if="showProgress"
+            class="mt-4 h-1.5 overflow-hidden rounded-full"
+            :style="{ background: trackColor }"
+          >
+            <div
+              class="h-full rounded-full transition-all duration-1000 ease-linear"
+              :style="{ width: `${progress}%`, background: barColor }"
+            />
+          </div>
+        </div>
+        <ul class="space-y-1">
+          <li
+            v-for="row in upcoming"
+            :key="row.name"
+            class="flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm"
+            :style="row.isNext
+              ? { background: isFilled ? 'rgba(255,255,255,0.15)' : `color-mix(in srgb, ${accentVar} 8%, var(--color-surface))` }
+              : {}"
+          >
+            <span class="flex items-center gap-2" :style="{ color: row.passed ? mutedColor : headingColor }">
+              <UIcon
+                v-if="showIcon"
+                :name="row.icon"
+                class="size-4 shrink-0"
+                :style="{ color: row.isNext ? accentTextColor : mutedColor }"
+              />
+              {{ row.name }}
+            </span>
+            <span class="tabular-nums" :style="{ color: row.passed ? mutedColor : headingColor }">
+              {{ row.time }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </template>
+
+    <!-- Card (default) -->
+    <template v-else>
+      <div class="flex items-center justify-between gap-4">
+        <div :class="alignClass">
+          <p
+            v-if="showDate && dateLabel"
+            class="text-xs font-semibold uppercase tracking-wide"
+            :style="{ color: mutedColor }"
+          >
+            {{ dateLabel }}
+          </p>
+          <p class="text-sm font-medium" :style="{ color: mutedColor }">
+            {{ title }}
+          </p>
+          <h3 class="tenant-heading mt-2 text-4xl font-bold" :style="{ color: headingColor }">
+            {{ next.name }}
+          </h3>
+        </div>
+        <IconGlyph
+          v-if="showIcon"
+          name="islamic-prayer-times"
+          class="size-10 shrink-0"
+          :style="{ color: accentTextColor }"
+        />
+      </div>
+
+      <div class="mt-8" :class="alignClass">
+        <p class="text-5xl font-bold tabular-nums" :style="{ color: headingColor }">
+          {{ next.time }}
+        </p>
+        <p class="mt-2 text-sm" :style="{ color: mutedColor }">
+          <template v-if="remaining === null">Today</template>
+          <template v-else-if="remaining < 60">Starting soon</template>
+          <template v-else>{{ contextLabel }} {{ countdownLabel }}</template>
+        </p>
+        <div
+          v-if="showProgress"
+          class="mt-4 h-1.5 overflow-hidden rounded-full"
+          :style="{ background: trackColor }"
+        >
+          <div
+            class="h-full rounded-full transition-all duration-1000 ease-linear"
+            :style="{ width: `${progress}%`, background: barColor }"
+          />
+        </div>
+      </div>
+    </template>
   </div>
 </template>

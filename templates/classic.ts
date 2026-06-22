@@ -63,7 +63,7 @@ export const classicTemplate: TemplateDefinition = {
           {
             slot: 'main',
             widgetId: 'prayer-countdown',
-            defaultProps: { title: 'Next prayer', showIqamah: true, compact: false }
+            defaultProps: { title: 'Next prayer', showIqamah: true, variant: 'card' }
           },
           {
             slot: 'side',
