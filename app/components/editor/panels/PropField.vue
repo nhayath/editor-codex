@@ -101,6 +101,7 @@ const visible = computed(() => {
       value-key="value"
       label-key="label"
       :placeholder="field.placeholder"
+      class="w-full"
     />
 
     <UColorPicker

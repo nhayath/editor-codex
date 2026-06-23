@@ -6,8 +6,10 @@ _Last updated: 2026-06-23_
 
 The user is upgrading the global widgets one at a time — adding multiple visual
 **styles (variants)**, more **admin-customisable props**, and live features —
-**without breaking the custom templates** that consume them. Three widgets are
-done; expect the next session to apply the **same pattern** to another widget.
+**without breaking the custom templates** that consume them. Five widgets are
+done (prayer-times, prayer-countdown, jummah-times, services, events);
+**announcements is next** — see the "Other candidate widgets" section below.
+Apply the **same pattern**.
 
 ### The reusable pattern (follow this for the next widget)
 
@@ -98,19 +100,43 @@ legacy look → **no template edits needed**. classic/sacred-modern have no
 services section. Verified all 5 variants + 390px on birmingham-central
 (temporarily switched to `modern` via non-destructive PUT); config restored.
 
+### 5. Events (`widgets/events.ts`, `WidgetEvents.vue`) — newest
+Variants: **grid(default) / list / cards / feature / agenda**. Props: `eyebrow`
+(default "Programmes", was hardcoded), `accent`, `background`, `columns`(2/3/4),
+`align`, `imageRatio`, `showImage`, `showCategory`, `showDate`, `showLocation`,
+`showDescription`. Kept `title` + `maxItems`. **Data-driven** (DB `events`, not a
+textarea) so `event.imageUrl` images need NO migration. `cards` = image-topped,
+`feature` = first event spotlighted + grid, `agenda` = horizontal rows with a
+day/month badge + thumbnail. Image variants fall back to a tinted calendar tile
+(cards/feature) or omit the thumbnail (agenda) when `imageUrl` absent.
+`endDate` renders as a range when present. Empty-state added. `surface` keeps the
+legacy transparent cards; `solid`/`gradient` fill white-text. **No template edits
+needed** — classic/modern already pin `variant: 'grid'`, noor/fattan pin
+`variant: 'list'` (group `main` slot), and the new defaults reproduce the legacy
+look. sacred-modern untouched (own `SacredModernEvents.vue`). Verified grid(390px),
+cards, feature(gradient), agenda, list on birmingham-central via non-destructive
+PUT with temp `imageUrl`s; config + dev.db restored (`git checkout prisma/dev.db`).
+
 ## State of the tree
-- Modified, uncommitted: `widgets/prayer-times.ts`, `widgets/prayer-countdown.ts`,
-  `widgets/jummah-times.ts`, `app/components/widgets/WidgetPrayerTimes.vue`,
-  `WidgetPrayerCountdown.vue`, `WidgetJummahTimes.vue`, and templates
-  `classic.ts` / `modern.ts` / `noor.ts` / `fattan.ts` (explicit variants).
-  Confirm with `git status` — branch is `widget/prayer-countdown`.
+- Modified, uncommitted (branch `widget/events`): the prayer trio + their
+  templates, `widgets/services.ts` + `WidgetServices.vue`, `widgets/events.ts` +
+  `WidgetEvents.vue`, and `handoff.md`. Confirm with `git status`.
 - Session server was `dev` (serves source live). If you switch to `preview`, run
   `npm run build` first.
 
-## Good candidate widgets for the same treatment next
-events, announcements, donation-cta, services, quick-links, about-mosque,
-contact, gallery, carousel — all currently single-style or minimal-prop. Apply
-the pattern above. (hero already has multiple styles.)
+---
+
+## NEXT UP: announcements widget
+
+The four remaining single-style widgets are below. announcements is the natural
+next one (it's a sibling of events, sits in noor/fattan's events group `side`
+slot). Apply the **exact same pattern** (see top of this file). Most are
+textarea/data-driven like services/events — check `dataDependencies` and whether
+each pulls from the DB or a prop before starting.
+
+## Other candidate widgets
+announcements, donation-cta, quick-links, about-mosque, contact, gallery,
+carousel — all single-style/minimal-prop. (hero already has multiple styles.)
 
 ## Don't re-learn these (see CLAUDE.md for detail)
 - Live editor = `SectionsTab.vue`; `SectionEditor.vue`/`GroupEditor.vue` are dead decoys.
