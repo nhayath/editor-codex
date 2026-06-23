@@ -5,6 +5,7 @@ import { prayerTimesWidget } from './prayer-times'
 import { prayerCountdownWidget } from './prayer-countdown'
 import { jummahTimesWidget } from './jummah-times'
 import { announcementsWidget } from './announcements'
+import { announcementBarWidget } from './announcement-bar'
 import { eventsWidget } from './events'
 import { donationCtaWidget } from './donation-cta'
 import { aboutMosqueWidget } from './about-mosque'
@@ -24,6 +25,7 @@ export const widgets: WidgetDefinition[] = [
   prayerCountdownWidget,
   jummahTimesWidget,
   announcementsWidget,
+  announcementBarWidget,
   eventsWidget,
   donationCtaWidget,
   aboutMosqueWidget,

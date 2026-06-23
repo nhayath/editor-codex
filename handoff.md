@@ -7,9 +7,9 @@ _Last updated: 2026-06-23_
 The user is upgrading the global widgets one at a time — adding multiple visual
 **styles (variants)**, more **admin-customisable props**, and live features —
 **without breaking the custom templates** that consume them. Five widgets are
-done (prayer-times, prayer-countdown, jummah-times, services, events);
-**announcements is next** — see the "Other candidate widgets" section below.
-Apply the **same pattern**.
+done (prayer-times, prayer-countdown, jummah-times, services, events,
+announcements); **donation-cta is the natural next** — see the "Other candidate
+widgets" section below. Apply the **same pattern**.
 
 ### The reusable pattern (follow this for the next widget)
 
@@ -117,6 +117,61 @@ look. sacred-modern untouched (own `SacredModernEvents.vue`). Verified grid(390p
 cards, feature(gradient), agenda, list on birmingham-central via non-destructive
 PUT with temp `imageUrl`s; config + dev.db restored (`git checkout prisma/dev.db`).
 
+### 6. Announcements + Announcement Bar — newest
+
+#### 6a. Announcements (`widgets/announcements.ts`, `WidgetAnnouncements.vue`)
+Variants: **cards(default) / list / feature / ticker / banner**. Props: `eyebrow`
+(default "Notices", was hardcoded), `accent`, `background`, `align`, `columns`
+(2/3, cards only), `showIcon`, `showPriorityBadge`, `showContent`. Kept `title`,
+`maxItems`, `showPinnedOnly`. **Data-driven** (DB `announcements`: title/content/
+priority/isPinned). `feature` = top notice spotlighted + the rest listed; `cards`
+and `list` reproduce the **exact legacy look** (single-col vs grid of surface ring
+cards) so noor/sacred-modern (`list`) and classic (`cards`) are visually
+unchanged. Empty-state added. Urgent → amber badge, pinned → neutral badge.
+- **No template edits needed** — classic pins `variant:'cards'`, noor (group
+  `side` slot) and sacred-modern pin `variant:'list'`; new defaults reproduce the
+  legacy look. fattan/modern ship no announcements section. Verified
+  banner/feature on birmingham-central via non-destructive PUT; cards baseline
+  screenshot confirms unchanged; config restored to `{}`.
+- **NOTE:** sticky was first prototyped as a prop on this widget, then **removed**
+  in favour of a dedicated widget (see #7) — the announcements widget no longer
+  has any sticky props.
+
+#### 6b. Announcement Bar (`widgets/announcement-bar.ts`, `WidgetAnnouncementBar.vue`) — NEW widget
+A **separate** widget (not a variant of announcements) for a custom message
+pinned to the top of the page. Built this way deliberately:
+- **Why a separate widget, rendered at page level:** every normal widget is
+  wrapped in a short `<section class="tenant-section">` (`padding: 4rem 0`). A
+  `position: sticky` element inside such a short box un-sticks the moment that
+  section scrolls past — so an in-section sticky can never pin across the page.
+  The fix: render the bar as a **direct child of `.tenant-site`** in
+  `app/pages/site/[slug].vue`, where its containing block spans the whole page →
+  it stays pinned the entire scroll.
+- **Page wiring (`app/pages/site/[slug].vue`):** `barSection` = the resolved
+  section whose `widgetId === 'announcement-bar'` (rendered once, before
+  `TenantChrome` header, via `<WidgetAnnouncementBar v-bind="resolvedProps">`);
+  `bodySections` = all sections **except** announcement-bar, fed to the normal
+  `SectionRenderer` loop so it isn't rendered twice.
+- **Availability:** it's a registry widget with **no template section**, so a
+  tenant adds it as a **custom section** (`sectionOverrides[id].customWidgetId =
+  'announcement-bar'`) — `resolveSections` already supports custom-widget
+  sections, so no template edits. In the **editor** preview it renders inline as
+  an editable section (the page-level sticky treatment is public-site only).
+- **Props:** `variant` single/rotating, `messages` (textarea, one per line,
+  `Text|Link label|URL`, link parts optional), `rotateSeconds` (rotating),
+  `sticky` (default true), `dismissible` (default true), `background`
+  (default `solid`), `accent`, `align` (default center), `icon`, `showIcon`.
+- **Component:** full-width bar (`w-full`) with an inner `.tenant-container`;
+  shared accent/background system; `sticky top-0 z-50 shadow-md` when sticky;
+  rotating cycles messages on a timer (`onBeforeUnmount` clear); dismiss is
+  client-only `localStorage` keyed by a hash of the message text (re-shows when
+  the wording changes), SSR-guarded.
+- **Verified** on birmingham-central via non-destructive custom-section PUT:
+  renders above the header, **stays pinned at `top:0` at scrollY 1400**, Register
+  link + dismiss work, dismiss persists across reload, no 390px overflow. Test
+  section fully removed afterwards (save **replaces** sectionOrder/overrides — no
+  merge — so stripping the id + override key cleans it).
+
 ## State of the tree
 - Modified, uncommitted (branch `widget/events`): the prayer trio + their
   templates, `widgets/services.ts` + `WidgetServices.vue`, `widgets/events.ts` +
@@ -126,17 +181,16 @@ PUT with temp `imageUrl`s; config + dev.db restored (`git checkout prisma/dev.db
 
 ---
 
-## NEXT UP: announcements widget
+## NEXT UP: donation-cta widget
 
-The four remaining single-style widgets are below. announcements is the natural
-next one (it's a sibling of events, sits in noor/fattan's events group `side`
-slot). Apply the **exact same pattern** (see top of this file). Most are
-textarea/data-driven like services/events — check `dataDependencies` and whether
-each pulls from the DB or a prop before starting.
+The remaining single-style widgets are below. Apply the **exact same pattern**
+(see top of this file). Most are textarea/data-driven like services/events —
+check `dataDependencies` and whether each pulls from the DB or a prop before
+starting.
 
 ## Other candidate widgets
-announcements, donation-cta, quick-links, about-mosque, contact, gallery,
-carousel — all single-style/minimal-prop. (hero already has multiple styles.)
+donation-cta, quick-links, about-mosque, contact, gallery, carousel — all
+single-style/minimal-prop. (hero already has multiple styles.)
 
 ## Don't re-learn these (see CLAUDE.md for detail)
 - Live editor = `SectionsTab.vue`; `SectionEditor.vue`/`GroupEditor.vue` are dead decoys.

@@ -16,6 +16,16 @@ useTheme(
   computed(() => data.value?.config.customColors)
 )
 
+// The announcement bar renders at page level (a direct child of .tenant-site) so
+// its `position: sticky` pins across the whole page rather than only within its
+// own short section. It's pulled out of the normal section flow below.
+const barSection = computed(() =>
+  data.value?.resolvedSections?.find(s => s.widgetId === 'announcement-bar' && s.enabled)
+)
+const bodySections = computed(() =>
+  data.value?.resolvedSections?.filter(s => s.widgetId !== 'announcement-bar') ?? []
+)
+
 const tenantName = computed(() => typeof data.value?.tenant?.name === 'string' ? data.value.tenant.name : 'Mosque site')
 const tenantSettings = computed(() => data.value?.tenant?.settings as { aboutText?: string } | undefined)
 
@@ -56,6 +66,11 @@ useHead(() => ({
     </UContainer>
 
     <template v-else-if="data">
+      <WidgetAnnouncementBar
+        v-if="barSection"
+        v-bind="barSection.resolvedProps"
+        :data="data.data"
+      />
       <TenantChrome
         area="header"
         :chrome="data.template.header"
@@ -63,7 +78,7 @@ useHead(() => ({
         :template-id="data.config.templateId"
       />
       <SectionRenderer
-        v-for="section in data.resolvedSections"
+        v-for="section in bodySections"
         :key="section.id"
         :section="section"
         :data="data.data"
