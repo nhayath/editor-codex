@@ -82,6 +82,22 @@ untouched (inline). All 4 variants verified on birmingham-central; config restor
   name / separate khutbah-start time were proposed as **Phase 2** (needs a Prisma
   migration) and deliberately NOT built.
 
+### 4. Services (`widgets/services.ts`, `WidgetServices.vue`) — newest
+Variants: **grid(default) / list / cards / feature / overlay**. Props: `eyebrow`,
+`accent`, `background`, `columns`(2/3/4), `align`, `imageRatio`, `showImage`,
+`showIcon`, `showDescription`, `showCta`. **Featured images:** the `items`
+textarea now parses **5 columns** — `Title|Description|Icon|Image URL|Link`
+(`parsePipeRows(items, 5)`). Backward-compatible: old 3-col rows → empty
+image/link → icon-tile fallback, no visual change. `cards` = image-topped cards,
+`feature` = first service spotlighted + grid, `overlay` = image-bg cards with
+scrim. `surface` background keeps the legacy transparent section (no card
+wrapper); `solid`/`gradient` fill the whole section white-text. Empty-state added.
+`showCta`+link renders a "Learn more →". Templates already pin variant
+(modern `grid`, fattan `grid`, noor `list`) and the new defaults reproduce the
+legacy look → **no template edits needed**. classic/sacred-modern have no
+services section. Verified all 5 variants + 390px on birmingham-central
+(temporarily switched to `modern` via non-destructive PUT); config restored.
+
 ## State of the tree
 - Modified, uncommitted: `widgets/prayer-times.ts`, `widgets/prayer-countdown.ts`,
   `widgets/jummah-times.ts`, `app/components/widgets/WidgetPrayerTimes.vue`,
