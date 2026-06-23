@@ -3,6 +3,13 @@ import { getThemeStyle } from '~/composables/useTheme'
 
 const editor = useHomepageEditor()
 const previewShell = ref<HTMLElement | null>(null)
+
+// Page-level announcement bar (configured in the Settings tab, stored on the
+// draft — not a section), rendered above the header just like the public site.
+const announcementBar = computed(() => {
+  const bar = editor.draft.value?.announcementBar
+  return bar?.enabled ? bar.props : null
+})
 let highlightTimer: ReturnType<typeof setTimeout> | undefined
 let editHighlightTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -147,6 +154,11 @@ onBeforeUnmount(() => {
         :data-template="editor.draft.value.templateId"
         :style="style"
       >
+        <WidgetAnnouncementBar
+          v-if="announcementBar"
+          v-bind="announcementBar"
+          :data="editor.siteData.value"
+        />
         <TenantChrome
           area="header"
           :chrome="editor.template.value?.header"

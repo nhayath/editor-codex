@@ -1,4 +1,4 @@
-import type { HomepageConfigDraft, ResolvedSection, SectionOverride, TemplateDefinition, TemplateSectionDef } from '~~/types/template'
+import type { AnnouncementBarConfig, HomepageConfigDraft, ResolvedSection, SectionOverride, TemplateDefinition, TemplateSectionDef } from '~~/types/template'
 import type { WidgetDefinition, WidgetPropSchema } from '~~/types/widget'
 import { getTemplateDefinition } from '~~/templates'
 import { getWidgetDefinition } from '~~/widgets'
@@ -108,7 +108,8 @@ export function normaliseDraft(template: TemplateDefinition, partial: Partial<Ho
     customColors: partial.customColors ?? null,
     sectionOrder,
     sectionsEnabled,
-    sectionOverrides
+    sectionOverrides,
+    announcementBar: partial.announcementBar ?? null
   }
 }
 
@@ -120,6 +121,7 @@ export function buildDraftFromDatabase(config?: {
   sectionOrder?: string
   sectionsEnabled?: string
   sectionOverrides?: string
+  announcementBar?: string | null
 } | null) {
   const template = getTemplateDefinition(config?.templateId ?? 'classic')
 
@@ -130,7 +132,8 @@ export function buildDraftFromDatabase(config?: {
     customColors: parseJsonField<Record<string, string> | null>(config?.customColors, null),
     sectionOrder: parseJsonField<string[]>(config?.sectionOrder, []),
     sectionsEnabled: parseJsonField<Record<string, boolean>>(config?.sectionsEnabled, {}),
-    sectionOverrides: parseJsonField<Record<string, SectionOverride>>(config?.sectionOverrides, {})
+    sectionOverrides: parseJsonField<Record<string, SectionOverride>>(config?.sectionOverrides, {}),
+    announcementBar: parseJsonField<AnnouncementBarConfig | null>(config?.announcementBar, null)
   })
 }
 
@@ -145,7 +148,8 @@ export function serialiseDraftForDatabase(draft: HomepageConfigDraft) {
     customColors: normalised.customColors ? stringifyJsonField(normalised.customColors) : null,
     sectionOrder: stringifyJsonField(normalised.sectionOrder),
     sectionsEnabled: stringifyJsonField(normalised.sectionsEnabled),
-    sectionOverrides: stringifyJsonField(normalised.sectionOverrides)
+    sectionOverrides: stringifyJsonField(normalised.sectionOverrides),
+    announcementBar: normalised.announcementBar ? stringifyJsonField(normalised.announcementBar) : null
   }
 }
 

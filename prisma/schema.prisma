@@ -89,6 +89,7 @@ model HomepageConfig {
   sectionOverrides String   @default("{}")
   sectionOrder     String   @default("[]")
   sectionsEnabled  String   @default("{}")
+  announcementBar  String?
   heroImageUrl     String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

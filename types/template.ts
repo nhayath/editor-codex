@@ -55,6 +55,14 @@ export interface HomepageConfigDraft {
   sectionOrder: string[]
   sectionsEnabled: Record<string, boolean>
   sectionOverrides: Record<string, SectionOverride>
+  // Page-level chrome, edited in the Settings tab (not a section). Renders as a
+  // sticky bar above the header when enabled.
+  announcementBar?: AnnouncementBarConfig | null
+}
+
+export interface AnnouncementBarConfig {
+  enabled: boolean
+  props: Record<string, unknown>
 }
 
 export interface SectionOverride {

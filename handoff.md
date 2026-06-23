@@ -137,40 +137,55 @@ unchanged. Empty-state added. Urgent → amber badge, pinned → neutral badge.
   in favour of a dedicated widget (see #7) — the announcements widget no longer
   has any sticky props.
 
-#### 6b. Announcement Bar (`widgets/announcement-bar.ts`, `WidgetAnnouncementBar.vue`) — NEW widget
-A **separate** widget (not a variant of announcements) for a custom message
-pinned to the top of the page. Built this way deliberately:
-- **Why a separate widget, rendered at page level:** every normal widget is
-  wrapped in a short `<section class="tenant-section">` (`padding: 4rem 0`). A
-  `position: sticky` element inside such a short box un-sticks the moment that
-  section scrolls past — so an in-section sticky can never pin across the page.
-  The fix: render the bar as a **direct child of `.tenant-site`** in
-  `app/pages/site/[slug].vue`, where its containing block spans the whole page →
-  it stays pinned the entire scroll.
-- **Page wiring (`app/pages/site/[slug].vue`):** `barSection` = the resolved
-  section whose `widgetId === 'announcement-bar'` (rendered once, before
-  `TenantChrome` header, via `<WidgetAnnouncementBar v-bind="resolvedProps">`);
-  `bodySections` = all sections **except** announcement-bar, fed to the normal
-  `SectionRenderer` loop so it isn't rendered twice.
-- **Availability:** it's a registry widget with **no template section**, so a
-  tenant adds it as a **custom section** (`sectionOverrides[id].customWidgetId =
-  'announcement-bar'`) — `resolveSections` already supports custom-widget
-  sections, so no template edits. In the **editor** preview it renders inline as
-  an editable section (the page-level sticky treatment is public-site only).
+#### 6b. Announcement Bar (`widgets/announcement-bar.ts`, `WidgetAnnouncementBar.vue`) — NEW, page-level chrome
+A custom message pinned to the top of the page. **It is NOT a section** — it's
+configured in the **Settings tab** (next to header/footer) and stored on the
+homepage draft. History: first prototyped as a sticky prop on the announcements
+widget, then as a draggable section widget — but a section is wrapped in a short
+`<section class="tenant-section">` (`padding: 4rem 0`), and (a) `position:sticky`
+inside such a short box un-sticks as soon as it scrolls past, and (b) since the
+public site renders the bar at page level, the leftover section showed as an
+**empty phantom box** in the flow + an extra row in the Sections list. Moving it
+to Settings + a page-level render fixed both.
+
+- **Storage:** `announcementBar?: { enabled, props } | null` on
+  `HomepageConfigDraft` (`types/template.ts`), persisted as a JSON-string column
+  `announcementBar String?` on `HomepageConfig` (Prisma) — mirrors `customColors`.
+  Wired through `normaliseDraft` / `buildDraftFromDatabase` /
+  `serialiseDraftForDatabase` in `utils/homepage.ts`. **A `db:push` is required**
+  (column was added); restart the dev server after so the in-memory Prisma Client
+  picks up the column (otherwise PUT /config 500s).
+- **Editing:** `app/components/editor/tabs/SettingsTab.vue` → new
+  `announcementBar` panel (root menu entry "Announcement bar"). An enable
+  `USwitch` + the shared **`PropFieldGroups`** renderer bound to the
+  `announcementBarWidget.propSchema`. Updates mutate
+  `editor.draft.value.announcementBar` directly → `configDirty` (full-draft
+  JSON compare) picks it up → saved via the existing `PUT /config`. Enabling for
+  the first time **seeds schema defaults** into `props` (the component's own prop
+  defaults are empty, so without seeding the bar would render blank).
+- **Rendering (page level, a direct child of `.tenant-site`):**
+  `app/pages/site/[slug].vue` and `app/components/editor/EditorPreview.vue` both
+  read `config.announcementBar` (resp. `editor.draft.value.announcementBar`) and
+  render `<WidgetAnnouncementBar v-bind="props">` above the header when
+  `enabled`. Page-level placement = containing block spans the whole page →
+  sticky pins across the entire scroll.
+- **NOT in the Add-widget picker:** `announcementBarWidget` is intentionally
+  **removed from `widgets/index.ts`** (the registry that feeds `/api/widgets`),
+  so it can't be added as a section. The def file still exports the widget so its
+  `propSchema` drives the Settings panel.
 - **Props:** `variant` single/rotating, `messages` (textarea, one per line,
-  `Text|Link label|URL`, link parts optional), `rotateSeconds` (rotating),
-  `sticky` (default true), `dismissible` (default true), `background`
-  (default `solid`), `accent`, `align` (default center), `icon`, `showIcon`.
+  `Text|Link label|URL`), `rotateSeconds` (rotating), `sticky` (default true),
+  `dismissible` (default true), `background` (default `solid`), `accent`,
+  `align` (default center), `icon`, `showIcon`.
 - **Component:** full-width bar (`w-full`) with an inner `.tenant-container`;
   shared accent/background system; `sticky top-0 z-50 shadow-md` when sticky;
-  rotating cycles messages on a timer (`onBeforeUnmount` clear); dismiss is
-  client-only `localStorage` keyed by a hash of the message text (re-shows when
-  the wording changes), SSR-guarded.
-- **Verified** on birmingham-central via non-destructive custom-section PUT:
-  renders above the header, **stays pinned at `top:0` at scrollY 1400**, Register
-  link + dismiss work, dismiss persists across reload, no 390px overflow. Test
-  section fully removed afterwards (save **replaces** sectionOrder/overrides — no
-  merge — so stripping the id + override key cleans it).
+  rotating cycles on a timer (`onBeforeUnmount` clear); dismiss is client-only
+  `localStorage` keyed by a hash of the message text, SSR-guarded.
+- **Verified** on birmingham-central: non-destructive `PUT /config` with
+  `announcementBar.enabled` renders the page-level sticky bar (gradient, link);
+  config restored to `null`. In the editor, Settings → Announcement bar → toggle
+  on renders the bar above the header in the preview with **no phantom section**
+  in the Sections list (screenshotted). Typecheck clean.
 
 ## State of the tree
 - Modified, uncommitted (branch `widget/events`): the prayer trio + their

@@ -1,11 +1,46 @@
 <script setup lang="ts">
 import type { TenantSettingsDraft } from '~/composables/useHomepageEditor'
+import { announcementBarWidget } from '~~/widgets/announcement-bar'
 
-type SettingsPanel = 'root' | 'header' | 'navigation' | 'domain' | 'footer' | 'footerDescription' | 'footerContact' | 'footerSocial' | 'footerLinks'
+type SettingsPanel = 'root' | 'header' | 'navigation' | 'domain' | 'footer' | 'footerDescription' | 'footerContact' | 'footerSocial' | 'footerLinks' | 'announcementBar'
 
 const editor = useHomepageEditor()
 
 const tenantId = computed(() => editor.tenant.value?.id as string | undefined)
+
+// Announcement bar — page-level chrome stored on the homepage draft (not a
+// section). Edited here via the shared PropFieldGroups renderer.
+const barSchema = announcementBarWidget.propSchema
+const barDefaults = Object.fromEntries(barSchema.map(field => [field.key, field.default]))
+
+const announcementBar = computed(() => editor.draft.value?.announcementBar ?? null)
+const barEnabled = computed({
+  get: () => announcementBar.value?.enabled ?? false,
+  set: (value) => {
+    // Seed schema defaults the first time it's switched on so the bar renders
+    // immediately (the component's own prop defaults are intentionally empty).
+    const existing = announcementBar.value?.props ?? {}
+    const props = value && !Object.keys(existing).length ? { ...barDefaults } : existing
+    setAnnouncementBar(value, props)
+  }
+})
+const barValues = computed(() => ({ ...barDefaults, ...(announcementBar.value?.props ?? {}) }))
+const barSummary = computed(() => {
+  if (!announcementBar.value?.enabled) return 'Off'
+  const first = String(announcementBar.value.props?.messages ?? barDefaults.messages ?? '').split('\n')[0]
+  return first || 'On'
+})
+
+function setAnnouncementBar(enabled: boolean, props: Record<string, unknown>) {
+  if (!editor.draft.value) return
+  editor.draft.value.announcementBar = { enabled, props }
+}
+function updateBarProp(key: string, value: unknown) {
+  setAnnouncementBar(announcementBar.value?.enabled ?? true, {
+    ...(announcementBar.value?.props ?? {}),
+    [key]: value
+  })
+}
 const panelStack = ref<SettingsPanel[]>(['root'])
 const transitionName = ref('settings-slide-forward')
 const activeNavIndex = ref(0)
@@ -22,7 +57,8 @@ const panelTitle = computed(() => {
     footerDescription: 'Description',
     footerContact: 'Contact details',
     footerSocial: 'Social links',
-    footerLinks: 'Footer links'
+    footerLinks: 'Footer links',
+    announcementBar: 'Announcement bar'
   }
 
   return titles[currentPanel.value]
@@ -236,6 +272,22 @@ watch(
         <button
           type="button"
           class="flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
+          @click="openPanel('announcementBar')"
+        >
+          <span class="i-lucide-megaphone size-4 shrink-0 text-muted" />
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm font-medium text-default">Announcement bar</span>
+            <span class="block truncate text-xs text-muted">{{ barSummary }}</span>
+          </span>
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-4 shrink-0 text-muted"
+          />
+        </button>
+
+        <button
+          type="button"
+          class="flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
           @click="openPanel('domain')"
         >
           <span class="i-lucide-globe size-4 shrink-0 text-muted" />
@@ -322,6 +374,35 @@ watch(
             class="size-4 shrink-0 text-muted"
           />
         </button>
+      </section>
+
+      <section
+        v-else-if="currentPanel === 'announcementBar'"
+        key="announcementBar"
+        class="grid gap-4"
+      >
+        <div class="flex items-center justify-between gap-3 rounded-md border border-muted bg-default p-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-default">
+              Show announcement bar
+            </p>
+            <p class="truncate text-xs text-muted">
+              A sticky message pinned above the header.
+            </p>
+          </div>
+          <USwitch
+            v-model="barEnabled"
+            aria-label="Show announcement bar"
+          />
+        </div>
+
+        <PropFieldGroups
+          v-if="barEnabled"
+          :schema="barSchema"
+          :values="barValues"
+          :tenant-id="tenantId"
+          @update="updateBarProp"
+        />
       </section>
 
       <section

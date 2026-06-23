@@ -5,7 +5,8 @@ import { prayerTimesWidget } from './prayer-times'
 import { prayerCountdownWidget } from './prayer-countdown'
 import { jummahTimesWidget } from './jummah-times'
 import { announcementsWidget } from './announcements'
-import { announcementBarWidget } from './announcement-bar'
+// announcement-bar is page-level chrome configured in Settings (not a section),
+// so it is intentionally NOT registered here / in the Add-widget picker.
 import { eventsWidget } from './events'
 import { donationCtaWidget } from './donation-cta'
 import { aboutMosqueWidget } from './about-mosque'
@@ -25,7 +26,6 @@ export const widgets: WidgetDefinition[] = [
   prayerCountdownWidget,
   jummahTimesWidget,
   announcementsWidget,
-  announcementBarWidget,
   eventsWidget,
   donationCtaWidget,
   aboutMosqueWidget,
