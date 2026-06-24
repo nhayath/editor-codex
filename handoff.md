@@ -368,17 +368,43 @@ gallery title plus image number.
   only the pre-existing EditorPreview, SectionsTab, WidgetAnnouncementBar, and
   WidgetServices errors; no gallery errors.
 
-## NEXT UP: carousel
+### 12. Carousel (`widgets/carousel.ts`, `WidgetCarousel.vue`) — newest
+Variants: **single-slide (hero, default/legacy) / multi-slide / cards / split /
+minimal**. Props: `eyebrow` (default "Featured", was hardcoded), `accent`,
+`background`, `align`, `slidesPerView` (1/2/3, gated to multi-slide+cards),
+`imageRatio`, `showCta`, `showArrows`, `showDots`, `loop`, `autoplaySpeed`
+(gated to autoplay on). Kept `title`, `subtitle`, `slides`, `variant`,
+`autoplay`. **Prop-driven** (no DB, no migration). Slide rows now parse **5
+columns** — `Title|Subtitle|Image URL|Link|Button label` (`parsePipeRows(slides,
+5)`); old 3-col rows stay valid (no link → no button). `showCta` + a link
+renders a per-slide CTA button across every variant.
+- **Backward-compat is exact:** `single-slide` AND `multi-slide` both fall to the
+  same hero-overlay `v-else` branch (the original full-bleed overlay `<article>`),
+  differing only by `:ui.item` basis — so neither consuming template shifts.
+  `cards`/`split`/`minimal` are the genuinely new looks. Adopted the shared
+  accent/background system (copied from `WidgetGallery.vue`) — **`background`
+  defaults to `surface`** (no wrapper; the overlay article keeps its own
+  bg-primary) so legacy is pixel-preserved; `solid`/`gradient` wrap the section
+  white-text.
+- **No template edits needed** — **modern** already pins `variant:'single-slide'`
+  and **fattan** pins `variant:'multi-slide'` (the only two consumers; both use
+  the GLOBAL widget, no component override). classic/noor/sacred-modern ship no
+  carousel section.
+- **Verified** on birmingham-central via non-destructive PUT (temp
+  `templateId:'modern'`, variants set via `sectionOverrides['carousel'].props`):
+  cards+gradient+3-per-view renders 3 cards with `See times`/`Enrol` CTAs (3rd
+  slide has no link → no button); split+solid renders image+text+CTA white-text;
+  single/multi/minimal all render; 390px no overflow (`scrollW==clientW==390`);
+  no console errors. Config restored to classic (no carousel override left).
+  Build + carousel-filtered typecheck clean.
 
-The remaining single-style widgets are below. Apply the **exact same pattern**
-(see top of this file). Most are textarea/data-driven like services/events —
-check `dataDependencies` and whether each pulls from the DB or a prop before
-starting.
+## NEXT UP: (none of the single-style queue remain)
 
-## Other candidate widgets
-carousel is the final single-style/minimal-prop widget. (hero already has
-multiple styles; donation-cta + quick-links + about-mosque + contact + gallery
-done.)
+All the global single-style widgets in this initiative are now upgraded
+(prayer-times, prayer-countdown, jummah-times, services, events, announcements,
+donation-cta, quick-links, about-mosque, contact, gallery, carousel) plus the
+page-level announcement-bar. hero already shipped with multiple styles. If
+picking up new work, apply the **exact same pattern** (see top of this file).
 
 ## Don't re-learn these (see CLAUDE.md for detail)
 - Live editor = `SectionsTab.vue`; `SectionEditor.vue`/`GroupEditor.vue` are dead decoys.
