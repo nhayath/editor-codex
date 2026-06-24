@@ -177,6 +177,7 @@ export const noorTemplate: TemplateDefinition = {
       removable: true,
       widgetId: 'about-mosque',
       defaultProps: {
+        variant: 'split',
         title: 'Faith, service, and belonging',
         body: '<p>Use this section for a message from the imam, a Ramadan notice, or a short welcome for first-time visitors.</p>',
         imageUrl: '/templates/mosque-hero-1.svg',

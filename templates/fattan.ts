@@ -133,6 +133,7 @@ export const fattanTemplate: TemplateDefinition = {
       removable: true,
       widgetId: 'about-mosque',
       defaultProps: {
+        variant: 'split',
         title: 'A welcoming center for worship, learning, and service.',
         body: '<p>Our mosque serves families, students, new Muslims, elders, and neighbours through daily prayers, weekly learning circles, charitable care, and community gatherings.</p><p>Use this section for the imam message, visitor welcome, or your mosque story.</p>',
         imageUrl: '/templates/mosque-hero-2.svg',

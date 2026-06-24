@@ -262,7 +262,43 @@ translucent panels/badges. Empty-state added.
   with no overflow (`scrollWidth == clientWidth == 390`). Config restored to classic.
   Typecheck clean.
 
-## NEXT UP: about-mosque / contact / gallery / carousel
+### 9. About Mosque (`widgets/about-mosque.ts`, `WidgetAboutMosque.vue`) — newest
+Variants: **split(default/legacy) / stacked / overlay / statement / feature**.
+Props: `eyebrow` (default "About", was hardcoded), `accent`, `background`
+(`surface` = legacy transparent section / `solid` / `gradient` filled white-text),
+`align`, `imageRatio` (landscape/square/portrait), `showImage`. Kept `title`,
+`body` (richtext), `imageUrl`, `imagePosition` (now gated `showWhen` variant ∈
+split/feature). **Prop-driven** (no DB, no migration). `stacked` = centered text
+over a full-width image; `overlay` = image bg + scrim + text card; `statement` =
+large text-only mission statement (image hidden); `feature` = split + stats/CTA
+spotlighted; `split` is the `v-else` legacy look (text + image-in-ring card),
+pixel-preserved. Adopted the shared accent/background system — **`background`
+defaults to `surface` (transparent, no card wrapper) so the legacy two-column
+look is unchanged**; `solid`/`gradient` wrap the section in a filled white-text
+card (`rounded-lg p-6`).
+- **NEW headline feature — highlight stats** (opt-in, `showStats` default
+  **false** so existing tenants unchanged): `stats` textarea parsed `Value|Label`
+  per line (`parsePipeRows(stats, 2)`), rendered as a small stat row/grid styled
+  to the filled/surface scheme. Optional `ctaLabel` + `ctaUrl` button. Both live
+  in a `group: 'Highlights'` accordion.
+- **No component overrides anywhere** — all four templates (classic, noor,
+  fattan, sacred-modern) use the GLOBAL widget via `defaultProps`; none ship a
+  `widgets:` record or template component for about-mosque. Added explicit
+  `variant: 'split'` to each of the four `defaultProps` to pin the look.
+- **Verified** on birmingham-central (classic) via non-destructive PUT to
+  `sectionOverrides['about-mosque'].props`: feature+gradient+stats+CTA renders
+  (white heading, gold stat values, white CTA); overlay+center renders scrim +
+  white stats/CTA; legacy `split` confirmed unchanged + stacks at 390px
+  (`scrollW == clientW == 390`, no overflow). Override removed after; the other
+  three overrides (prayer-times, prayer-and-jummah, custom-services) preserved.
+  Build + typecheck clean.
+- **GOTCHA (mine):** the `Write` tool call leaked its literal closing
+  `</content></invoke>` tags into the bottom of `widgets/about-mosque.ts`,
+  which only surfaced as an "Unterminated regular expression" at **build** time
+  (typecheck/grep didn't catch it) — check the tail of a freshly-Written file if
+  a build fails oddly right after.
+
+## NEXT UP: contact / gallery / carousel
 
 The remaining single-style widgets are below. Apply the **exact same pattern**
 (see top of this file). Most are textarea/data-driven like services/events —
@@ -270,9 +306,9 @@ check `dataDependencies` and whether each pulls from the DB or a prop before
 starting.
 
 ## Other candidate widgets
-about-mosque, contact, gallery, carousel — all
+contact, gallery, carousel — all
 single-style/minimal-prop. (hero already has multiple styles; donation-cta +
-quick-links done.)
+quick-links + about-mosque done.)
 
 ## Don't re-learn these (see CLAUDE.md for detail)
 - Live editor = `SectionsTab.vue`; `SectionEditor.vue`/`GroupEditor.vue` are dead decoys.

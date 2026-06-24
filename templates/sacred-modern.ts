@@ -239,6 +239,7 @@ export const sacredModernTemplate: TemplateDefinition = {
       removable: true,
       widgetId: 'about-mosque',
       defaultProps: {
+        variant: 'split',
         title: 'A welcoming centre for worship, learning, and service.',
         body: '<p>Share the story of your mosque, the imam message, and practical guidance for first-time visitors.</p><p>Keep this section warm, concise, and community-focused.</p>',
         imageUrl: '/templates/mosque-hero-3.svg',

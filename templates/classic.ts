@@ -108,6 +108,7 @@ export const classicTemplate: TemplateDefinition = {
       removable: true,
       widgetId: 'about-mosque',
       defaultProps: {
+        variant: 'split',
         title: 'About our mosque',
         imageUrl: '/templates/mosque-hero-2.svg',
         imagePosition: 'right'
