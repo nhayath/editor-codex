@@ -56,6 +56,7 @@ export const noorTemplate: TemplateDefinition = {
             slot: 'main',
             widgetId: 'quick-links',
             defaultProps: {
+              variant: 'tiles',
               title: 'Start here',
               eyebrow: 'Community shortcuts',
               featuredIcon: 'islamic-mosque',

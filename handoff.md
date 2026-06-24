@@ -238,7 +238,31 @@ restored. Typecheck clean.
 
 ---
 
-## NEXT UP: quick-links widget
+### 8. Quick Links (`widgets/quick-links.ts`, `WidgetQuickLinks.vue`) — newest
+Variants: **tiles(default) / rail / list / buttons / featured**. Props: `accent`,
+`background`, `align`, `columns`(2/3, tiles grid), `showHeaderIcon`, `showIcon`
+(per-link), `showDescription`, `showArrow`. Kept `title`, `eyebrow`, `items`
+(textarea, still `Title|Description|URL|Icon` via `parsePipeRows(items, 4)`),
+`featuredIcon` (now the header badge, gated by `showHeaderIcon`). **Prop-driven**
+(no DB, no migration). `list` = compact hairline-divided rows; `buttons` = pill
+chips, title-only-ish (icon + title + arrow); `featured` = first link spotlighted
+large + the rest in a grid; `tiles`/`rail` are the `v-else` legacy bordered cards
+(rail = single-col). Adopted the shared accent/background system — **`background`
+defaults to `surface` so the legacy light card (ring, solid-primary icon badges,
+white-on-primary) is pixel-preserved**; `solid`/`gradient` fill white-text with
+translucent panels/badges. Empty-state added.
+- **Templates:** noor uses the **global** widget in its `community-actions` group
+  `main` slot — added explicit `variant: 'tiles'` to lock the look. sacred-modern
+  overrides quick-links with its own **`SacredModernSupportLinks`** (`support-card`)
+  → untouched. classic/modern/fattan ship no quick-links section.
+- **Verified** on birmingham-central via non-destructive PUT (temporarily switched
+  to `templateId: 'noor'` so the global widget renders, variants set via
+  `sectionOverrides['community-actions'].widgets.main.props`): tiles(default legacy
+  surface), featured+gradient, list, buttons+solid+center all render; 390px stacks
+  with no overflow (`scrollWidth == clientWidth == 390`). Config restored to classic.
+  Typecheck clean.
+
+## NEXT UP: about-mosque / contact / gallery / carousel
 
 The remaining single-style widgets are below. Apply the **exact same pattern**
 (see top of this file). Most are textarea/data-driven like services/events —
@@ -246,8 +270,9 @@ check `dataDependencies` and whether each pulls from the DB or a prop before
 starting.
 
 ## Other candidate widgets
-quick-links, about-mosque, contact, gallery, carousel — all
-single-style/minimal-prop. (hero already has multiple styles; donation-cta done.)
+about-mosque, contact, gallery, carousel — all
+single-style/minimal-prop. (hero already has multiple styles; donation-cta +
+quick-links done.)
 
 ## Don't re-learn these (see CLAUDE.md for detail)
 - Live editor = `SectionsTab.vue`; `SectionEditor.vue`/`GroupEditor.vue` are dead decoys.
