@@ -94,6 +94,10 @@ function donateUrl(campaign?: Campaign) {
   return url
 }
 
+function hasPay(campaign?: Campaign) {
+  return Boolean(campaign?.paymentUrl)
+}
+
 function pct(campaign?: Campaign) {
   if (!campaign?.goal) return 0
   return Math.min(100, Math.round(((campaign.raised ?? 0) / campaign.goal) * 100))
@@ -211,6 +215,8 @@ const pickerColors = computed(() => ({
           <UButton
             :to="donateUrl(campaign)"
             target="_blank"
+            rel="noopener noreferrer"
+            :disabled="!hasPay(campaign)"
             class="mt-4"
             :color="buttonColor"
             size="sm"
@@ -256,6 +262,8 @@ const pickerColors = computed(() => ({
         <UButton
           :to="donateUrl(featured)"
           target="_blank"
+          rel="noopener noreferrer"
+          :disabled="!hasPay(featured)"
           class="mt-5"
           :color="buttonColor"
           :label="buttonLabel"
@@ -310,6 +318,8 @@ const pickerColors = computed(() => ({
       <UButton
         :to="donateUrl(featured)"
         target="_blank"
+        rel="noopener noreferrer"
+        :disabled="!hasPay(featured)"
         class="mt-3"
         :color="buttonColor"
         size="sm"
@@ -355,6 +365,8 @@ const pickerColors = computed(() => ({
         <UButton
           :to="donateUrl(featured)"
           target="_blank"
+          rel="noopener noreferrer"
+          :disabled="!hasPay(featured)"
           :color="buttonColor"
           :label="buttonLabel"
         >

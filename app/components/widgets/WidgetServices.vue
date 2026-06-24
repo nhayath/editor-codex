@@ -91,6 +91,12 @@ const iconTileStyle = computed(() => isFilled.value
   ? { background: 'rgba(255,255,255,0.16)', color: '#fff' }
   : { background: 'color-mix(in srgb, var(--color-primary) 12%, white)', color: accentVar.value })
 
+// Overlay cards always render white text, so an image-less card needs a dark
+// enough fill for that text to stay legible (a light icon tile would not).
+const overlayFallbackStyle = computed(() => isFilled.value
+  ? { background: 'rgba(255,255,255,0.12)' }
+  : { background: accentVar.value })
+
 const headerAlignClass = computed(() => props.align === 'center' ? 'text-center' : '')
 
 const gridColsClass = computed(() => {
@@ -305,7 +311,7 @@ const rest = computed(() => services.value.slice(1))
         :key="service.title"
         class="relative flex flex-col justify-end overflow-hidden rounded-xl"
         :class="imageRatioClass"
-        :style="hasImage(service) ? {} : iconTileStyle"
+        :style="hasImage(service) ? {} : overlayFallbackStyle"
       >
         <img
           v-if="hasImage(service)"

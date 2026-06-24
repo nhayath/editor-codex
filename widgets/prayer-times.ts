@@ -20,10 +20,19 @@ export const prayerTimesWidget: WidgetDefinition = {
       { label: 'Compact', value: 'compact' }
     ] },
     { key: 'title', label: 'Title', type: 'text', default: 'Today Prayer Times' },
-    { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', options: [
+    { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', span: 'half', options: [
       { label: 'Primary', value: 'primary' },
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
+    ] },
+    { key: 'background', label: 'Background', type: 'select', default: 'surface', group: 'Display', span: 'half', options: [
+      { label: 'Surface', value: 'surface' },
+      { label: 'Solid', value: 'solid' },
+      { label: 'Gradient', value: 'gradient' }
+    ] },
+    { key: 'align', label: 'Alignment', type: 'select', default: 'left', group: 'Display', span: 'half', options: [
+      { label: 'Left', value: 'left' },
+      { label: 'Center', value: 'center' }
     ] },
     { key: 'showIcons', label: 'Show icons', type: 'toggle', default: true, group: 'Display', span: 'half' },
     { key: 'highlightNext', label: 'Highlight next prayer', type: 'toggle', default: true, group: 'Display', span: 'half' },

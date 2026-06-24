@@ -7,6 +7,8 @@ const props = withDefaults(defineProps<{
   showIcons?: boolean
   highlightNext?: boolean
   accent?: string
+  background?: string
+  align?: string
   data?: Record<string, any>
 }>(), {
   title: 'Today Prayer Times',
@@ -16,6 +18,8 @@ const props = withDefaults(defineProps<{
   showIcons: true,
   highlightNext: true,
   accent: 'primary',
+  background: 'surface',
+  align: 'left',
   data: () => ({})
 })
 
@@ -82,7 +86,9 @@ function isActive(name: string) {
   return name === nextName.value
 }
 
-// Accent maps to a single themed colour used for icons + the active highlight.
+// Accent + background system, mirrored from the sibling prayer widgets so the
+// three read as one family. `solid`/`gradient` are filled (white text);
+// `surface` is the legacy light themed card.
 const accentVar = computed(() => {
   switch (props.accent) {
     case 'soft': return 'var(--color-secondary)'
@@ -90,35 +96,66 @@ const accentVar = computed(() => {
     default: return 'var(--color-primary)'
   }
 })
-const activeTint = computed(() => `color-mix(in srgb, ${accentVar.value} 8%, var(--color-surface))`)
-const hairline = 'color-mix(in srgb, var(--color-text) 12%, transparent)'
 
-const containerClass = computed(() =>
-  props.accent === 'soft'
-    ? 'bg-[color:color-mix(in_srgb,var(--color-secondary)_6%,var(--color-surface))]'
-    : 'bg-[var(--color-surface)]'
-)
+const isFilled = computed(() => props.background !== 'surface')
+
+const containerStyle = computed(() => {
+  if (props.background === 'gradient') {
+    return {
+      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
+    }
+  }
+  if (props.background === 'solid') {
+    return { background: accentVar.value }
+  }
+  // surface = legacy light card (a faint accent tint when accent === 'soft').
+  return {
+    background: props.accent === 'soft'
+      ? 'color-mix(in srgb, var(--color-secondary) 6%, var(--color-surface))'
+      : 'var(--color-surface)',
+    boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)'
+  }
+})
+
+const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
+const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.75)' : 'var(--color-text-muted)')
+const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
+const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
+const zebraColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.06)' : 'color-mix(in srgb, var(--color-text) 3%, transparent)')
+
+// Highlight styling for the next prayer.
+const activeBg = computed(() => isFilled.value
+  ? 'rgba(255,255,255,0.16)'
+  : `color-mix(in srgb, ${accentVar.value} 8%, var(--color-surface))`)
+const activeBorder = computed(() => isFilled.value ? 'rgba(255,255,255,0.55)' : accentVar.value)
+// "Next" pill: inverted so it stands out on either scheme.
+const nextBadgeStyle = computed(() => isFilled.value
+  ? { background: '#fff', color: accentVar.value }
+  : { background: accentVar.value, color: '#fff' })
+
+const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 </script>
 
 <template>
   <div
-    class="@container rounded-lg p-6 ring-1"
-    :class="containerClass"
-    :style="{ '--hairline': hairline, '--accent': accentVar, '--active-tint': activeTint, boxShadow: 'none' }"
-    style="--tw-ring-color: var(--hairline)"
+    class="@container h-full overflow-hidden rounded-lg p-6"
+    :style="containerStyle"
   >
-    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <p class="text-sm font-semibold" :style="{ color: 'var(--accent)' }">
+    <div class="mb-5 flex flex-wrap items-start justify-between gap-3" :class="alignClass">
+      <div :class="{ 'mx-auto': align === 'center' }">
+        <p class="text-sm font-semibold" :style="{ color: accentTextColor }">
           {{ prayerTimes?.date }}
         </p>
-        <h2 class="tenant-heading text-3xl font-bold text-[var(--color-text)]">
+        <h2 class="tenant-heading text-3xl font-bold" :style="{ color: headingColor }">
           {{ title }}
         </h2>
       </div>
-      <UBadge color="primary" variant="soft">
+      <span
+        class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide"
+        :style="{ background: hairlineColor, color: headingColor }"
+      >
         Today
-      </UBadge>
+      </span>
     </div>
 
     <!-- Cards -->
@@ -131,34 +168,34 @@ const containerClass = computed(() =>
         :key="row.name"
         class="relative rounded-md border p-4 transition-colors"
         :style="isActive(row.name)
-          ? { borderColor: 'var(--accent)', background: 'var(--active-tint)', boxShadow: 'inset 0 0 0 1px var(--accent)' }
-          : { borderColor: 'var(--hairline)' }"
+          ? { borderColor: activeBorder, background: activeBg }
+          : { borderColor: hairlineColor }"
       >
         <div class="flex items-center justify-between">
-          <p class="text-sm text-[var(--color-text-muted)]">
+          <p class="text-sm" :style="{ color: mutedColor }">
             {{ row.name }}
           </p>
           <UIcon
             v-if="showIcons"
             :name="row.icon"
             class="size-5 shrink-0"
-            :style="{ color: isActive(row.name) ? 'var(--accent)' : 'var(--color-text-muted)' }"
+            :style="{ color: isActive(row.name) ? accentTextColor : mutedColor }"
           />
         </div>
-        <p class="mt-2 text-2xl font-semibold text-[var(--color-text)]">
+        <p class="mt-2 text-2xl font-semibold" :style="{ color: headingColor }">
           {{ row.time || '--:--' }}
         </p>
         <p
           v-if="showIqamah && row.iqamah"
           class="mt-1 text-xs"
-          :style="{ color: 'var(--accent)' }"
+          :style="{ color: accentTextColor }"
         >
           Iqamah {{ row.iqamah }}
         </p>
         <span
           v-if="isActive(row.name)"
-          class="absolute right-3 top-3 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white"
-          :style="{ background: 'var(--accent)' }"
+          class="absolute right-3 top-3 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+          :style="nextBadgeStyle"
         >
           Next
         </span>
@@ -172,8 +209,8 @@ const containerClass = computed(() =>
     >
       <thead>
         <tr
-          class="text-left text-xs uppercase tracking-wide text-[var(--color-text-muted)]"
-          style="border-bottom: 1px solid var(--hairline)"
+          class="text-left text-xs uppercase tracking-wide"
+          :style="{ color: mutedColor, borderBottom: `1px solid ${hairlineColor}` }"
         >
           <th class="py-2 font-semibold">
             Prayer
@@ -194,33 +231,34 @@ const containerClass = computed(() =>
           v-for="(row, i) in rows"
           :key="row.name"
           :style="isActive(row.name)
-            ? { background: 'var(--active-tint)', boxShadow: 'inset 3px 0 0 var(--accent)' }
-            : (i % 2 === 1 ? { background: 'color-mix(in srgb, var(--color-text) 3%, transparent)' } : {})"
+            ? { background: activeBg, boxShadow: `inset 3px 0 0 ${activeBorder}` }
+            : (i % 2 === 1 ? { background: zebraColor } : {})"
         >
           <td class="py-3 pl-3 pr-2">
-            <span class="flex items-center gap-2.5 font-medium text-[var(--color-text)]">
+            <span class="flex items-center gap-2.5 font-medium" :style="{ color: headingColor }">
               <UIcon
                 v-if="showIcons"
                 :name="row.icon"
                 class="size-4 shrink-0"
-                :style="{ color: isActive(row.name) ? 'var(--accent)' : 'var(--color-text-muted)' }"
+                :style="{ color: isActive(row.name) ? accentTextColor : mutedColor }"
               />
               {{ row.name }}
               <span
                 v-if="isActive(row.name)"
-                class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white"
-                :style="{ background: 'var(--accent)' }"
+                class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase"
+                :style="nextBadgeStyle"
               >
                 Next
               </span>
             </span>
           </td>
-          <td class="py-3 pr-2 text-right tabular-nums text-[var(--color-text)]">
+          <td class="py-3 pr-2 text-right tabular-nums" :style="{ color: headingColor }">
             {{ row.time || '--:--' }}
           </td>
           <td
             v-if="showIqamah"
-            class="py-3 pr-3 text-right tabular-nums text-[var(--color-text-muted)]"
+            class="py-3 pr-3 text-right tabular-nums"
+            :style="{ color: mutedColor }"
           >
             {{ row.iqamah || '—' }}
           </td>
@@ -238,21 +276,21 @@ const containerClass = computed(() =>
         :key="row.name"
         class="flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm"
         :style="isActive(row.name)
-          ? { borderColor: 'var(--accent)', background: 'var(--active-tint)' }
-          : { borderColor: 'var(--hairline)' }"
+          ? { borderColor: activeBorder, background: activeBg }
+          : { borderColor: hairlineColor }"
       >
         <UIcon
           v-if="showIcons"
           :name="row.icon"
           class="size-4 shrink-0"
-          :style="{ color: isActive(row.name) ? 'var(--accent)' : 'var(--color-text-muted)' }"
+          :style="{ color: isActive(row.name) ? accentTextColor : mutedColor }"
         />
-        <span class="font-medium text-[var(--color-text)]">{{ row.name }}</span>
-        <span class="tabular-nums text-[var(--color-text-muted)]">{{ row.time || '--:--' }}</span>
+        <span class="font-medium" :style="{ color: headingColor }">{{ row.name }}</span>
+        <span class="tabular-nums" :style="{ color: mutedColor }">{{ row.time || '--:--' }}</span>
         <span
           v-if="showIqamah && row.iqamah"
           class="tabular-nums text-xs"
-          :style="{ color: 'var(--accent)' }"
+          :style="{ color: accentTextColor }"
         >· {{ row.iqamah }}</span>
       </div>
     </div>
@@ -261,36 +299,37 @@ const containerClass = computed(() =>
     <div
       v-else
       class="divide-y"
-      style="border-color: var(--hairline)"
+      :style="{ borderColor: hairlineColor }"
     >
       <div
         v-for="row in rows"
         :key="row.name"
         class="grid grid-cols-[1fr_auto_auto] items-center gap-4 px-3 py-3 text-sm"
         :style="isActive(row.name)
-          ? { background: 'var(--active-tint)', boxShadow: 'inset 3px 0 0 var(--accent)' }
+          ? { background: activeBg, boxShadow: `inset 3px 0 0 ${activeBorder}` }
           : {}"
       >
-        <span class="flex items-center gap-2.5 font-medium text-[var(--color-text)]">
+        <span class="flex items-center gap-2.5 font-medium" :style="{ color: headingColor }">
           <UIcon
             v-if="showIcons"
             :name="row.icon"
             class="size-4 shrink-0"
-            :style="{ color: isActive(row.name) ? 'var(--accent)' : 'var(--color-text-muted)' }"
+            :style="{ color: isActive(row.name) ? accentTextColor : mutedColor }"
           />
           {{ row.name }}
           <span
             v-if="isActive(row.name)"
-            class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white"
-            :style="{ background: 'var(--accent)' }"
+            class="rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase"
+            :style="nextBadgeStyle"
           >
             Next
           </span>
         </span>
-        <span class="tabular-nums text-[var(--color-text)]">{{ row.time || '--:--' }}</span>
+        <span class="tabular-nums" :style="{ color: headingColor }">{{ row.time || '--:--' }}</span>
         <span
           v-if="showIqamah"
-          class="tabular-nums text-[var(--color-text-muted)]"
+          class="tabular-nums"
+          :style="{ color: mutedColor }"
         >
           {{ row.iqamah || '' }}
         </span>
