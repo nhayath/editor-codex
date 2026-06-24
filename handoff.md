@@ -187,6 +187,48 @@ to Settings + a page-level render fixed both.
   on renders the bar above the header in the preview with **no phantom section**
   in the Sections list (screenshotted). Typecheck clean.
 
+### 7. Donation CTA (`widgets/donation-cta.ts`, `WidgetDonationCta.vue`) — newest
+Variants: **banner(default) / cards / featured / compact**. Props: `eyebrow`
+(default "Giving", was hardcoded), `accent`, `background`, `align`,
+`showProgress`, `showRaised`. Kept `title`, `subtitle`, `buttonLabel`.
+**Data-driven** (DB `donation_campaigns`: title/description/goal/raised/
+paymentUrl/isFeatured). `featured` = top campaign spotlighted with the amount
+selector + the rest listed; `compact` = slim sidebar CTA; `cards` reproduces the
+legacy grid; `banner` is the `v-else` legacy fallback. Replaced the old
+hardcoded `bg-primary text-white` with the shared accent/background system —
+**`banner` defaults to `background: 'solid'` + `accent: 'primary'` so the legacy
+white-on-primary look is pixel-preserved.** `UProgress` swapped for a
+`trackColor`/`barColor` bar. Empty-state added.
+
+**NEW headline feature — donation amount selector** (opt-in, `showAmounts`
+default **false** so existing tenants are unchanged): preset chips
+(`presetAmounts`, default `10,25,50,100`) + an optional custom amount input
+(`allowCustomAmount`) + an optional one-off/monthly toggle (`frequencyToggle`),
+prefixed by `currencySymbol` (`£`). Selecting an amount appends
+`?{amountQueryParam}={amount}` (default param `amount`) to the campaign's
+`paymentUrl` (and `&frequency=monthly` when monthly) — the convention
+JustGiving/LaunchGood/Donorbox/Stripe accept. **No Prisma migration** (prop-driven).
+No amount selected → bare `paymentUrl` (current behaviour). Markup lives in a new
+**`app/components/widgets/DonationAmountPicker.vue`** (auto-imported,
+`pathPrefix:false`) shared across all variants; parent owns selection state +
+URL building, passes a `colors` object so the picker matches the filled/surface
+scheme.
+
+**No template edits needed** — classic/fattan already pin `variant:'banner'`,
+modern/noor pin `variant:'cards'` (noor via group `main` slot), and the new
+defaults reproduce the legacy look. sacred-modern untouched (own
+`SacredModernDonationCta.vue`, separate `split-card` override). Verified on
+birmingham-central via non-destructive PUT: featured+gradient+amounts renders;
+clicking £50 → `?amount=50`, Monthly → `&frequency=monthly`, custom £77 →
+`?amount=77&frequency=monthly`; 390px stacks/wraps with no overflow; default
+banner confirmed unchanged (solid primary, white text, no chips); config + dev.db
+restored. Typecheck clean.
+- **GOTCHA:** the new `DonationAmountPicker.vue` was added while `nuxt dev` was
+  running → client bundle failed to auto-resolve it ("Failed to resolve
+  component" + hydration mismatch); **restart the dev server** after adding a
+  brand-new auto-imported component file. SSR found it fine; only the client
+  manifest was stale.
+
 ## State of the tree
 - Modified, uncommitted (branch `widget/events`): the prayer trio + their
   templates, `widgets/services.ts` + `WidgetServices.vue`, `widgets/events.ts` +
@@ -196,7 +238,7 @@ to Settings + a page-level render fixed both.
 
 ---
 
-## NEXT UP: donation-cta widget
+## NEXT UP: quick-links widget
 
 The remaining single-style widgets are below. Apply the **exact same pattern**
 (see top of this file). Most are textarea/data-driven like services/events —
@@ -204,8 +246,8 @@ check `dataDependencies` and whether each pulls from the DB or a prop before
 starting.
 
 ## Other candidate widgets
-donation-cta, quick-links, about-mosque, contact, gallery, carousel — all
-single-style/minimal-prop. (hero already has multiple styles.)
+quick-links, about-mosque, contact, gallery, carousel — all
+single-style/minimal-prop. (hero already has multiple styles; donation-cta done.)
 
 ## Don't re-learn these (see CLAUDE.md for detail)
 - Live editor = `SectionsTab.vue`; `SectionEditor.vue`/`GroupEditor.vue` are dead decoys.
