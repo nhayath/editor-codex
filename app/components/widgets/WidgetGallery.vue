@@ -222,11 +222,12 @@ onBeforeUnmount(() => {
           <img :src="image.src" :alt="image.alt" class="size-full object-cover transition duration-300 group-hover:scale-[1.02]">
         </button>
         <img v-else :src="image.src" :alt="image.alt" class="absolute inset-0 size-full object-cover">
-        <div v-if="showCaptions && image.caption" class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-10">
-          <figcaption class="text-sm font-medium text-white">
-            {{ image.caption }}
-          </figcaption>
-        </div>
+        <figcaption
+          v-if="showCaptions && image.caption"
+          class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-10 text-sm font-medium text-white"
+        >
+          {{ image.caption }}
+        </figcaption>
       </figure>
     </div>
 
@@ -243,11 +244,12 @@ onBeforeUnmount(() => {
           <img :src="featuredImage.src" :alt="featuredImage.alt" class="size-full object-cover transition duration-300 group-hover:scale-[1.02]">
         </button>
         <img v-else :src="featuredImage.src" :alt="featuredImage.alt" class="absolute inset-0 size-full object-cover">
-        <div v-if="showCaptions && featuredImage.caption" class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-16">
-          <figcaption class="text-base font-semibold text-white">
-            {{ featuredImage.caption }}
-          </figcaption>
-        </div>
+        <figcaption
+          v-if="showCaptions && featuredImage.caption"
+          class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-16 text-base font-semibold text-white"
+        >
+          {{ featuredImage.caption }}
+        </figcaption>
       </figure>
       <div v-if="supportingImages.length" class="grid grid-cols-2 gap-4">
         <figure
@@ -265,11 +267,12 @@ onBeforeUnmount(() => {
             <img :src="image.src" :alt="image.alt" class="size-full object-cover transition duration-300 group-hover:scale-[1.02]">
           </button>
           <img v-else :src="image.src" :alt="image.alt" class="absolute inset-0 size-full object-cover">
-          <div v-if="showCaptions && image.caption" class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
-            <figcaption class="text-xs font-medium text-white">
-              {{ image.caption }}
-            </figcaption>
-          </div>
+          <figcaption
+            v-if="showCaptions && image.caption"
+            class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8 text-xs font-medium text-white"
+          >
+            {{ image.caption }}
+          </figcaption>
         </figure>
       </div>
     </div>

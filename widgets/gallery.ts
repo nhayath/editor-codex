@@ -15,19 +15,20 @@ export const galleryWidget: WidgetDefinition = {
   ],
   component: 'WidgetGallery',
   propSchema: [
-    { key: 'variant', label: 'Style', type: 'select', default: 'grid', options: [
+    { key: 'imageUrls', label: 'Images', type: 'images', default: '/templates/mosque-hero-1.svg\n/templates/mosque-hero-2.svg\n/templates/mosque-hero-3.svg' },
+    { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Moments', span: 'half' },
+    { key: 'title', label: 'Title', type: 'text', default: 'Gallery', span: 'half' },
+    { key: 'intro', label: 'Intro', type: 'textarea', default: '' },
+
+    { key: 'variant', label: 'Gallery style', type: 'select', group: 'Style', groupDefaultOpen: false, default: 'grid', options: [
       { label: 'Grid', value: 'grid' },
       { label: 'Masonry', value: 'masonry' },
       { label: 'Mosaic', value: 'mosaic' },
       { label: 'Featured', value: 'featured' },
       { label: 'Filmstrip', value: 'filmstrip' }
     ] },
-    { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Moments', span: 'half' },
-    { key: 'title', label: 'Title', type: 'text', default: 'Gallery', span: 'half' },
-    { key: 'intro', label: 'Intro', type: 'textarea', default: '' },
-    { key: 'imageUrls', label: 'Images', type: 'textarea', default: '/templates/mosque-hero-1.svg\n/templates/mosque-hero-2.svg\n/templates/mosque-hero-3.svg', placeholder: 'Image URL|Alt text|Caption, one image per line' },
 
-    { key: 'accent', label: 'Accent', type: 'select', group: 'Display', span: 'half', default: 'primary', options: [
+    { key: 'accent', label: 'Accent', type: 'select', group: 'Display', groupDefaultOpen: false, span: 'half', default: 'primary', options: [
       { label: 'Primary', value: 'primary' },
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }

@@ -151,6 +151,12 @@ const richtextBubble = [
       :tenant-id="tenantId"
     />
 
+    <GalleryImagePicker
+      v-else-if="field.type === 'images'"
+      v-model="stringValue"
+      :tenant-id="tenantId"
+    />
+
     <UInput
       v-else
       v-model="stringValue"

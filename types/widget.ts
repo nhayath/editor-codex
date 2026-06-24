@@ -9,6 +9,7 @@ export type WidgetPropType =
   | 'select'
   | 'color'
   | 'image'
+  | 'images'
   | 'url'
   | 'icon'
 
@@ -27,6 +28,7 @@ export interface WidgetPropSchema {
   label: string
   type: WidgetPropType
   group?: string
+  groupDefaultOpen?: boolean
   span?: 'full' | 'half'
   default?: unknown
   required?: boolean

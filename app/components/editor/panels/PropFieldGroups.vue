@@ -47,15 +47,18 @@ const groups = computed(() => {
     .filter(group => group.fields.some(isVisible))
 })
 
-// First group open by default; the rest collapsed. User toggles persist.
+// First group open by default unless its schema explicitly opts into another
+// initial state. User toggles persist while the panel remains mounted.
 const toggled = ref<Record<string, boolean>>({})
 
-function isOpen(name: string, index: number) {
-  return name in toggled.value ? toggled.value[name]! : index === 0
+function isOpen(group: { name: string, fields: WidgetPropSchema[] }, index: number) {
+  if (group.name in toggled.value) return toggled.value[group.name]!
+  const configured = group.fields.find(field => field.groupDefaultOpen !== undefined)?.groupDefaultOpen
+  return configured ?? index === 0
 }
 
-function toggle(name: string, index: number) {
-  toggled.value = { ...toggled.value, [name]: !isOpen(name, index) }
+function toggle(group: { name: string, fields: WidgetPropSchema[] }, index: number) {
+  toggled.value = { ...toggled.value, [group.name]: !isOpen(group, index) }
 }
 
 function spanClass(field: WidgetPropSchema) {
@@ -89,16 +92,16 @@ function spanClass(field: WidgetPropSchema) {
       <button
         type="button"
         class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-medium text-default transition-colors hover:bg-elevated/50"
-        @click="toggle(group.name, index)"
+        @click="toggle(group, index)"
       >
         {{ group.name }}
         <UIcon
-          :name="isOpen(group.name, index) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+          :name="isOpen(group, index) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
           class="size-4 text-muted"
         />
       </button>
       <div
-        v-show="isOpen(group.name, index)"
+        v-show="isOpen(group, index)"
         class="grid grid-cols-2 gap-x-3 gap-y-4 px-3 pb-3"
       >
         <PropField
