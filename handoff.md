@@ -344,7 +344,31 @@ parts, and a settings-guided empty state replaces blank rows.
   pre-existing errors in EditorPreview, SectionsTab, WidgetAnnouncementBar, and
   WidgetServices; no contact errors were reported.
 
-## NEXT UP: gallery / carousel
+### 11. Gallery (`widgets/gallery.ts`, `WidgetGallery.vue`) — newest
+Variants: **grid(default/legacy) / masonry / mosaic / featured / filmstrip**.
+Props: `eyebrow`, `intro`, `accent`, `background`, `align`, `columns`,
+`imageRatio`, `showCaptions`, and `showLightbox`. Kept `title`, `imageUrls`, and
+`variant`. Image rows now accept **`Image URL|Alt text|Caption`** while old
+URL-only rows remain valid. Missing alt text falls back to caption, then the
+gallery title plus image number.
+- **Lightbox:** optional click-to-enlarge viewer with previous/next controls,
+  Escape and arrow-key navigation, body scroll locking, accessible labels, and
+  captions.
+- **Backward-compatible:** `grid` is the final `v-else`; `masonry` remains a
+  distinct branch; `surface`, three columns, landscape ratio, and hidden
+  captions preserve the resting legacy appearance. Modern remains explicitly
+  pinned to `variant:'masonry'`; no other template ships the gallery.
+- **No migration/backend:** images remain prop-driven URLs. Empty image content
+  produces a guided empty state rather than broken media.
+- **Verified** on east-london-ic via temporary Modern overrides: all five
+  variants, URL-only and captioned rows, alt fallback, empty/malformed rows,
+  captions, disabled lightbox, keyboard navigation/focus, surface/solid/gradient
+  backgrounds, and 390px filmstrip scrolling with no page overflow. Config and
+  dev.db restored. Production build clean. Repo-wide typecheck still reports
+  only the pre-existing EditorPreview, SectionsTab, WidgetAnnouncementBar, and
+  WidgetServices errors; no gallery errors.
+
+## NEXT UP: carousel
 
 The remaining single-style widgets are below. Apply the **exact same pattern**
 (see top of this file). Most are textarea/data-driven like services/events —
@@ -352,8 +376,9 @@ check `dataDependencies` and whether each pulls from the DB or a prop before
 starting.
 
 ## Other candidate widgets
-gallery, carousel — both single-style/minimal-prop. (hero already has multiple
-styles; donation-cta + quick-links + about-mosque + contact done.)
+carousel is the final single-style/minimal-prop widget. (hero already has
+multiple styles; donation-cta + quick-links + about-mosque + contact + gallery
+done.)
 
 ## Don't re-learn these (see CLAUDE.md for detail)
 - Live editor = `SectionsTab.vue`; `SectionEditor.vue`/`GroupEditor.vue` are dead decoys.
