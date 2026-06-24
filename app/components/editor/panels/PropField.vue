@@ -51,6 +51,36 @@ const visible = computed(() => {
   // Array of conditions = OR (visible if any match).
   return Array.isArray(showWhen) ? showWhen.some(matchesCondition) : matchesCondition(showWhen)
 })
+
+// Rich-text editor (UEditor) — a curated, non-technical button set. Grouped
+// arrays render with separators between them. Kept intentionally small so a
+// non-techie editing a short blurb isn't overwhelmed.
+const richtextToolbar = [
+  [
+    { kind: 'heading', level: 2, icon: 'i-lucide-heading-2', tooltip: { text: 'Heading' } },
+    { kind: 'heading', level: 3, icon: 'i-lucide-heading-3', tooltip: { text: 'Subheading' } }
+  ],
+  [
+    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: 'Bold' } },
+    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: 'Italic' } }
+  ],
+  [
+    { kind: 'bulletList', icon: 'i-lucide-list', tooltip: { text: 'Bullet list' } },
+    { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: { text: 'Numbered list' } }
+  ],
+  [
+    { kind: 'link', icon: 'i-lucide-link', tooltip: { text: 'Link' } },
+    { kind: 'blockquote', icon: 'i-lucide-quote', tooltip: { text: 'Quote' } },
+    { kind: 'clearFormatting', icon: 'i-lucide-remove-formatting', tooltip: { text: 'Clear formatting' } }
+  ]
+]
+
+// Bubble menu — appears on text selection. Inline marks + link only.
+const richtextBubble = [
+  { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: 'Bold' } },
+  { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: 'Italic' } },
+  { kind: 'link', icon: 'i-lucide-link', tooltip: { text: 'Link' } }
+]
 </script>
 
 <template>
@@ -78,7 +108,13 @@ const visible = computed(() => {
     >
       <UEditorToolbar
         :editor="editor"
+        :items="richtextToolbar"
         class="border-b border-muted"
+      />
+      <UEditorToolbar
+        :editor="editor"
+        :items="richtextBubble"
+        layout="bubble"
       />
     </UEditor>
 

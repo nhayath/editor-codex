@@ -298,6 +298,32 @@ card (`rounded-lg p-6`).
   (typecheck/grep didn't catch it) — check the tail of a freshly-Written file if
   a build fails oddly right after.
 
+### 9b. Rich-text editor UX (`PropField.vue`) — editor-wide, NOT just about-mosque
+The `richtext` prop type renders Nuxt UI v4's `UEditor` (Tiptap WYSIWYG, HTML
+output) — it was **never** Markdown. But `UEditorToolbar` renders **nothing**
+unless you pass an explicit `items` prop (empty `items` → empty toolbar), so the
+field looked like a bare text box. Fixed in `app/components/editor/panels/
+PropField.vue`:
+- Added a **curated fixed toolbar** (`richtextToolbar`, grouped array-of-arrays
+  → separators): H2/H3 · Bold/Italic · Bullet/Numbered list · Link/Quote/Clear
+  formatting. Intentionally small for non-technical mosque admins (no tables/
+  code/etc.). Item shape: `{ kind, ... , icon, tooltip: { text } }` where `kind`
+  ∈ the handlers in `@nuxt/ui .../utils/editor.js createHandlers()` (`mark` +
+  `mark:'bold'|'italic'`, `heading` + `level`, `bulletList`, `orderedList`,
+  `link`, `blockquote`, `clearFormatting`, …).
+- Added a **bubble menu** — a second `<UEditorToolbar layout="bubble">` (same
+  component, `layout` ∈ fixed/bubble/floating) with `richtextBubble` =
+  Bold/Italic/Link, appears on text selection.
+- **Applies to EVERY widget's richtext prop** (one shared branch in
+  PropField.vue), e.g. about-mosque `body`, rich-text widget, etc. — by design,
+  for consistency.
+- StarterKit (bold/italic/headings/lists/link/blockquote) is on by default in
+  UEditor, so all buttons are live; no extra extensions needed.
+- **Verified** in the live editor (birmingham-central → Sections → About): fixed
+  toolbar renders 9 buttons; selecting text pops the bubble (B/I/link); clicking
+  bubble Bold wraps `<strong>`, toggling off restores. No console errors,
+  typecheck clean, config not dirtied (override check came back clean).
+
 ## NEXT UP: contact / gallery / carousel
 
 The remaining single-style widgets are below. Apply the **exact same pattern**
