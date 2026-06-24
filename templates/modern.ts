@@ -111,7 +111,7 @@ export const modernTemplate: TemplateDefinition = {
       required: false,
       removable: true,
       widgetId: 'contact',
-      defaultProps: { title: 'Visit us', showSocials: true }
+      defaultProps: { variant: 'split', title: 'Visit us', showSocials: true }
     }
   ]
 }

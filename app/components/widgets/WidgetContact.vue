@@ -1,77 +1,398 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
+  variant?: string
+  eyebrow?: string
   title?: string
   intro?: string
+  accent?: string
+  background?: string
+  align?: string
+  showIcons?: boolean
+  showAddress?: boolean
+  showPhone?: boolean
+  showEmail?: boolean
   showSocials?: boolean
+  showDirections?: boolean
   data?: Record<string, any>
 }>(), {
+  variant: 'split',
+  eyebrow: 'Contact',
   title: 'Contact us',
   intro: 'Get in touch with the mosque office.',
+  accent: 'primary',
+  background: 'surface',
+  align: 'left',
+  showIcons: true,
+  showAddress: true,
+  showPhone: true,
+  showEmail: true,
   showSocials: true,
+  showDirections: false,
   data: () => ({})
 })
+
+const settings = computed(() => props.data?.settings ?? {})
+const address = computed(() => {
+  const street = String(settings.value.address || '').trim()
+  const locality = [settings.value.city, settings.value.postcode]
+    .map(value => String(value || '').trim())
+    .filter(Boolean)
+    .join(' ')
+
+  return [street, locality].filter(Boolean).join(', ')
+})
+
+const directionsUrl = computed(() =>
+  address.value
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address.value)}`
+    : ''
+)
+
+const contactItems = computed(() => [
+  {
+    id: 'address',
+    label: 'Visit us',
+    value: address.value,
+    icon: 'i-lucide-map-pin',
+    href: props.showDirections ? directionsUrl.value : '',
+    external: props.showDirections
+  },
+  {
+    id: 'phone',
+    label: 'Call us',
+    value: String(settings.value.phone || '').trim(),
+    icon: 'i-lucide-phone',
+    href: settings.value.phone ? `tel:${String(settings.value.phone).replace(/\s+/g, '')}` : '',
+    external: false
+  },
+  {
+    id: 'email',
+    label: 'Email us',
+    value: String(settings.value.email || '').trim(),
+    icon: 'i-lucide-mail',
+    href: settings.value.email ? `mailto:${String(settings.value.email).trim()}` : '',
+    external: false
+  }
+].filter((item) => {
+  if (!item.value) return false
+  if (item.id === 'address') return props.showAddress
+  if (item.id === 'phone') return props.showPhone
+  return props.showEmail
+}))
+
+const socialItems = computed(() => [
+  { label: 'Facebook', href: settings.value.facebook, icon: 'i-lucide-facebook' },
+  { label: 'Instagram', href: settings.value.instagram, icon: 'i-lucide-instagram' },
+  { label: 'YouTube', href: settings.value.youtube, icon: 'i-lucide-youtube' }
+].filter(item => props.showSocials && item.href))
+
+const hasContent = computed(() => contactItems.value.length > 0 || socialItems.value.length > 0)
+
+// ----- Shared accent / background system --------------------------------
+const accentVar = computed(() => {
+  switch (props.accent) {
+    case 'soft': return 'var(--color-secondary)'
+    case 'neutral': return 'var(--color-text)'
+    default: return 'var(--color-primary)'
+  }
+})
+
+const isFilled = computed(() => props.background !== 'surface')
+
+const containerStyle = computed(() => {
+  if (props.background === 'surface') {
+    return {
+      background: 'var(--color-surface)',
+      boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)'
+    }
+  }
+  if (props.background === 'gradient') {
+    return {
+      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
+    }
+  }
+  return { background: accentVar.value }
+})
+
+const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
+const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.78)' : 'var(--color-text-muted)')
+const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
+const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
+const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
+
+const panelStyle = computed(() =>
+  isFilled.value
+    ? { background: 'rgba(255,255,255,0.1)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)' }
+    : {
+        background: 'color-mix(in srgb, var(--color-surface) 92%, white)',
+        boxShadow: `inset 0 0 0 1px ${hairlineColor.value}`
+      }
+)
+
+const iconStyle = computed(() =>
+  isFilled.value
+    ? { background: 'rgba(255,255,255,0.14)', color: '#fff' }
+    : { background: `color-mix(in srgb, ${accentVar.value} 12%, white)`, color: accentVar.value }
+)
+
+const primaryActionStyle = computed(() =>
+  isFilled.value
+    ? { background: '#fff', color: accentVar.value }
+    : { background: accentVar.value, color: '#fff' }
+)
 </script>
 
 <template>
-  <div class="@container grid gap-6 rounded-lg bg-[var(--color-surface)] p-6 ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)] @xl:grid-cols-[1fr_1fr]">
-    <div>
-      <p class="text-sm font-semibold text-[var(--color-primary)]">
-        Contact
-      </p>
-      <h2 class="tenant-heading mt-2 text-3xl font-bold text-[var(--color-text)]">
-        {{ title }}
-      </h2>
-      <p class="mt-3 text-[var(--color-text-muted)]">
-        {{ intro }}
-      </p>
-    </div>
-
-    <div class="grid gap-3 text-sm text-[var(--color-text-muted)]">
-      <span class="flex items-center gap-2">
-        <UIcon name="i-lucide-map-pin" class="size-4 text-[var(--color-primary)]" />
-        {{ data?.settings?.address }}, {{ data?.settings?.city }} {{ data?.settings?.postcode }}
-      </span>
-      <span class="flex items-center gap-2">
-        <UIcon name="i-lucide-phone" class="size-4 text-[var(--color-primary)]" />
-        {{ data?.settings?.phone }}
-      </span>
-      <span class="flex items-center gap-2">
-        <UIcon name="i-lucide-mail" class="size-4 text-[var(--color-primary)]" />
-        {{ data?.settings?.email }}
-      </span>
-
-      <div
-        v-if="showSocials"
-        class="mt-2 flex items-center gap-2"
-      >
-        <UButton
-          v-if="data?.settings?.facebook"
-          :to="data.settings.facebook"
-          target="_blank"
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-facebook"
-          aria-label="Facebook"
-        />
-        <UButton
-          v-if="data?.settings?.instagram"
-          :to="data.settings.instagram"
-          target="_blank"
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-instagram"
-          aria-label="Instagram"
-        />
-        <UButton
-          v-if="data?.settings?.youtube"
-          :to="data.settings.youtube"
-          target="_blank"
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-youtube"
-          aria-label="YouTube"
-        />
+  <div class="@container h-full overflow-hidden rounded-lg p-6" :style="containerStyle">
+    <!-- ===== CARDS ===== -->
+    <template v-if="variant === 'cards'">
+      <div :class="alignClass">
+        <p class="text-sm font-semibold" :style="{ color: accentTextColor }">
+          {{ eyebrow }}
+        </p>
+        <h2 class="tenant-heading mt-2 text-3xl font-bold" :style="{ color: headingColor }">
+          {{ title }}
+        </h2>
+        <p class="mt-3" :style="{ color: mutedColor }">
+          {{ intro }}
+        </p>
       </div>
-    </div>
+
+      <div v-if="hasContent" class="mt-6 grid gap-3 @lg:grid-cols-2 @2xl:grid-cols-3">
+        <component
+          :is="item.href ? 'a' : 'div'"
+          v-for="item in contactItems"
+          :key="item.id"
+          :href="item.href || undefined"
+          :target="item.external ? '_blank' : undefined"
+          :rel="item.external ? 'noopener noreferrer' : undefined"
+          class="group flex min-w-0 items-start gap-3 rounded-md p-4 transition"
+          :class="item.href ? 'hover:-translate-y-0.5' : ''"
+          :style="panelStyle"
+        >
+          <span v-if="showIcons" class="grid size-10 shrink-0 place-items-center rounded-md" :style="iconStyle">
+            <UIcon :name="item.icon" class="size-5" />
+          </span>
+          <span class="min-w-0">
+            <span class="block text-xs font-semibold uppercase tracking-wide" :style="{ color: accentTextColor }">{{ item.label }}</span>
+            <span class="mt-1 block break-words text-sm font-medium" :style="{ color: headingColor }">{{ item.value }}</span>
+          </span>
+        </component>
+      </div>
+
+      <div v-if="socialItems.length" class="mt-4 flex flex-wrap gap-2" :class="align === 'center' ? 'justify-center' : ''">
+        <a
+          v-for="social in socialItems"
+          :key="social.label"
+          :href="social.href"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="grid size-9 place-items-center rounded-md transition hover:-translate-y-0.5"
+          :style="panelStyle"
+          :aria-label="social.label"
+        >
+          <UIcon :name="social.icon" class="size-4.5" :style="{ color: headingColor }" />
+        </a>
+      </div>
+    </template>
+
+    <!-- ===== FEATURE ===== -->
+    <template v-else-if="variant === 'feature'">
+      <div class="grid gap-6 @xl:grid-cols-[1.15fr_0.85fr] @xl:items-center">
+        <div :class="alignClass">
+          <p class="text-sm font-semibold" :style="{ color: accentTextColor }">
+            {{ eyebrow }}
+          </p>
+          <h2 class="tenant-heading mt-2 text-3xl font-bold @xl:text-4xl" :style="{ color: headingColor }">
+            {{ title }}
+          </h2>
+          <p class="mt-3 max-w-xl" :class="align === 'center' ? 'mx-auto' : ''" :style="{ color: mutedColor }">
+            {{ intro }}
+          </p>
+          <div v-if="contactItems.length" class="mt-6 flex flex-wrap gap-3" :class="align === 'center' ? 'justify-center' : ''">
+            <a
+              v-for="item in contactItems.filter(item => item.href)"
+              :key="item.id"
+              :href="item.href"
+              :target="item.external ? '_blank' : undefined"
+              :rel="item.external ? 'noopener noreferrer' : undefined"
+              class="inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5"
+              :style="primaryActionStyle"
+            >
+              <UIcon v-if="showIcons" :name="item.icon" class="size-4" />
+              {{ item.label }}
+            </a>
+          </div>
+        </div>
+
+        <div v-if="hasContent" class="grid gap-3 rounded-md p-5" :style="panelStyle">
+          <component
+            :is="item.href ? 'a' : 'div'"
+            v-for="item in contactItems"
+            :key="item.id"
+            :href="item.href || undefined"
+            :target="item.external ? '_blank' : undefined"
+            :rel="item.external ? 'noopener noreferrer' : undefined"
+            class="flex min-w-0 items-start gap-3"
+          >
+            <UIcon v-if="showIcons" :name="item.icon" class="mt-0.5 size-4 shrink-0" :style="{ color: accentTextColor }" />
+            <span class="min-w-0 break-words text-sm" :style="{ color: mutedColor }">{{ item.value }}</span>
+          </component>
+          <div v-if="socialItems.length" class="flex flex-wrap gap-2 pt-1">
+            <a
+              v-for="social in socialItems"
+              :key="social.label"
+              :href="social.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="grid size-8 place-items-center rounded-md"
+              :style="iconStyle"
+              :aria-label="social.label"
+            >
+              <UIcon :name="social.icon" class="size-4" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ===== COMPACT ===== -->
+    <template v-else-if="variant === 'compact'">
+      <div class="flex flex-col gap-5 @xl:flex-row @xl:items-center @xl:justify-between">
+        <div :class="alignClass">
+          <p class="text-sm font-semibold" :style="{ color: accentTextColor }">
+            {{ eyebrow }}
+          </p>
+          <h2 class="tenant-heading mt-1 text-2xl font-bold" :style="{ color: headingColor }">
+            {{ title }}
+          </h2>
+        </div>
+        <div v-if="hasContent" class="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-3" :class="align === 'center' ? 'justify-center' : ''">
+          <component
+            :is="item.href ? 'a' : 'span'"
+            v-for="item in contactItems"
+            :key="item.id"
+            :href="item.href || undefined"
+            :target="item.external ? '_blank' : undefined"
+            :rel="item.external ? 'noopener noreferrer' : undefined"
+            class="inline-flex min-w-0 items-center gap-2 text-sm"
+            :style="{ color: mutedColor }"
+          >
+            <UIcon v-if="showIcons" :name="item.icon" class="size-4 shrink-0" :style="{ color: accentTextColor }" />
+            <span class="break-words">{{ item.value }}</span>
+          </component>
+          <a
+            v-for="social in socialItems"
+            :key="social.label"
+            :href="social.href"
+            target="_blank"
+            rel="noopener noreferrer"
+            :aria-label="social.label"
+          >
+            <UIcon :name="social.icon" class="size-4.5" :style="{ color: accentTextColor }" />
+          </a>
+        </div>
+      </div>
+    </template>
+
+    <!-- ===== DIRECTORY ===== -->
+    <template v-else-if="variant === 'directory'">
+      <div :class="alignClass">
+        <p class="text-sm font-semibold" :style="{ color: accentTextColor }">
+          {{ eyebrow }}
+        </p>
+        <h2 class="tenant-heading mt-2 text-3xl font-bold" :style="{ color: headingColor }">
+          {{ title }}
+        </h2>
+        <p class="mt-3" :style="{ color: mutedColor }">
+          {{ intro }}
+        </p>
+      </div>
+      <div v-if="hasContent" class="mt-6 divide-y" :style="{ borderColor: hairlineColor }">
+        <component
+          :is="item.href ? 'a' : 'div'"
+          v-for="item in contactItems"
+          :key="item.id"
+          :href="item.href || undefined"
+          :target="item.external ? '_blank' : undefined"
+          :rel="item.external ? 'noopener noreferrer' : undefined"
+          class="grid min-w-0 gap-1 py-4 @md:grid-cols-[10rem_1fr_auto] @md:items-center @md:gap-4"
+          :style="{ borderColor: hairlineColor }"
+        >
+          <span class="flex items-center gap-2 text-sm font-semibold" :style="{ color: headingColor }">
+            <UIcon v-if="showIcons" :name="item.icon" class="size-4" :style="{ color: accentTextColor }" />
+            {{ item.label }}
+          </span>
+          <span class="min-w-0 break-words text-sm" :style="{ color: mutedColor }">{{ item.value }}</span>
+          <UIcon v-if="item.href" name="i-lucide-arrow-up-right" class="hidden size-4 @md:block" :style="{ color: accentTextColor }" />
+        </component>
+        <div v-if="socialItems.length" class="flex flex-wrap items-center gap-3 py-4">
+          <span class="text-sm font-semibold" :style="{ color: headingColor }">Follow us</span>
+          <a
+            v-for="social in socialItems"
+            :key="social.label"
+            :href="social.href"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 text-sm"
+            :style="{ color: accentTextColor }"
+          >
+            <UIcon :name="social.icon" class="size-4" />
+            {{ social.label }}
+          </a>
+        </div>
+      </div>
+    </template>
+
+    <!-- ===== SPLIT (default / legacy fallback) ===== -->
+    <template v-else>
+      <div class="grid gap-6 @xl:grid-cols-[1fr_1fr]">
+        <div :class="alignClass">
+          <p class="text-sm font-semibold" :style="{ color: accentTextColor }">
+            {{ eyebrow }}
+          </p>
+          <h2 class="tenant-heading mt-2 text-3xl font-bold" :style="{ color: headingColor }">
+            {{ title }}
+          </h2>
+          <p class="mt-3" :style="{ color: mutedColor }">
+            {{ intro }}
+          </p>
+        </div>
+
+        <div v-if="hasContent" class="grid gap-3 text-sm" :style="{ color: mutedColor }">
+          <component
+            :is="item.href ? 'a' : 'span'"
+            v-for="item in contactItems"
+            :key="item.id"
+            :href="item.href || undefined"
+            :target="item.external ? '_blank' : undefined"
+            :rel="item.external ? 'noopener noreferrer' : undefined"
+            class="flex min-w-0 items-start gap-2"
+          >
+            <UIcon v-if="showIcons" :name="item.icon" class="mt-0.5 size-4 shrink-0" :style="{ color: accentVar }" />
+            <span class="break-words">{{ item.value }}</span>
+          </component>
+
+          <div v-if="socialItems.length" class="mt-2 flex items-center gap-2">
+            <a
+              v-for="social in socialItems"
+              :key="social.label"
+              :href="social.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="grid size-8 place-items-center rounded-md ring-1 ring-inset transition hover:bg-[var(--color-background)]"
+              :style="{ color: headingColor, '--tw-ring-color': hairlineColor }"
+              :aria-label="social.label"
+            >
+              <UIcon :name="social.icon" class="size-5" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <p v-if="!hasContent" class="mt-6 text-sm" :class="alignClass" :style="{ color: mutedColor }">
+      Contact details will appear here once they are added in Settings.
+    </p>
   </div>
 </template>

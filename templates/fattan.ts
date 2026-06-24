@@ -163,6 +163,7 @@ export const fattanTemplate: TemplateDefinition = {
       removable: true,
       widgetId: 'contact',
       defaultProps: {
+        variant: 'split',
         title: 'Stay connected',
         intro: 'Receive lectures, prayer updates, and community notices.',
         showSocials: true

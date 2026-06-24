@@ -121,7 +121,7 @@ export const classicTemplate: TemplateDefinition = {
       required: false,
       removable: true,
       widgetId: 'contact',
-      defaultProps: { title: 'Contact us', showSocials: true }
+      defaultProps: { variant: 'split', title: 'Contact us', showSocials: true }
     }
   ]
 }

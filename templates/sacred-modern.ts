@@ -268,6 +268,7 @@ export const sacredModernTemplate: TemplateDefinition = {
       removable: true,
       widgetId: 'contact',
       defaultProps: {
+        variant: 'split',
         title: 'Plan your visit',
         intro: 'Find the mosque, contact the office, and stay connected with community updates.',
         showSocials: true

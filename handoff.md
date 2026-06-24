@@ -324,7 +324,27 @@ PropField.vue`:
   bubble Bold wraps `<strong>`, toggling off restores. No console errors,
   typecheck clean, config not dirtied (override check came back clean).
 
-## NEXT UP: contact / gallery / carousel
+### 10. Contact (`widgets/contact.ts`, `WidgetContact.vue`) — newest
+Variants: **split(default/legacy) / cards / feature / compact / directory**.
+Props: `eyebrow`, `accent`, `background`, `align`, `showIcons`, `showAddress`,
+`showPhone`, `showEmail`, `showSocials`, `showDirections`. Kept `title`, `intro`,
+and the settings data dependency. **Action-first details:** phone and email now
+use `tel:` / `mailto:` links; optional directions opens an encoded Google Maps
+search; social links use secure external targets. Address formatting omits empty
+parts, and a settings-guided empty state replaces blank rows.
+- **Backward-compatible:** `split` is the final `v-else`, `surface` preserves the
+  legacy card, and `showDirections` defaults false so existing sites gain no new
+  row. All five templates pin `variant:'split'`.
+- **No migration/backend:** still reads TenantSettings address/city/postcode,
+  phone, email, Facebook, Instagram, and YouTube.
+- **Verified** on east-london-ic: all five variants, all 9 accent/background
+  combinations, actionable URLs, visibility toggles, partial/missing settings,
+  empty state, desktop and 390px with no overflow. Tenant settings + config
+  restored. Production build clean. Repo-wide typecheck remains blocked by
+  pre-existing errors in EditorPreview, SectionsTab, WidgetAnnouncementBar, and
+  WidgetServices; no contact errors were reported.
+
+## NEXT UP: gallery / carousel
 
 The remaining single-style widgets are below. Apply the **exact same pattern**
 (see top of this file). Most are textarea/data-driven like services/events —
@@ -332,9 +352,8 @@ check `dataDependencies` and whether each pulls from the DB or a prop before
 starting.
 
 ## Other candidate widgets
-contact, gallery, carousel — all
-single-style/minimal-prop. (hero already has multiple styles; donation-cta +
-quick-links + about-mosque done.)
+gallery, carousel — both single-style/minimal-prop. (hero already has multiple
+styles; donation-cta + quick-links + about-mosque + contact done.)
 
 ## Don't re-learn these (see CLAUDE.md for detail)
 - Live editor = `SectionsTab.vue`; `SectionEditor.vue`/`GroupEditor.vue` are dead decoys.
