@@ -157,6 +157,12 @@ const richtextBubble = [
       :tenant-id="tenantId"
     />
 
+    <CarouselSlidePicker
+      v-else-if="field.type === 'slides'"
+      v-model="stringValue"
+      :tenant-id="tenantId"
+    />
+
     <UInput
       v-else
       v-model="stringValue"

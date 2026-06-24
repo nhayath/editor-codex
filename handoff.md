@@ -398,6 +398,48 @@ renders a per-slide CTA button across every variant.
   no console errors. Config restored to classic (no carousel override left).
   Build + carousel-filtered typecheck clean.
 
+### 12b. Carousel — structured slide editor (editor-side, no widget render change)
+Replaced the carousel's plain `slides` **textarea** with a Gallery-style
+structured picker so non-technical admins manage slides as a stack instead of
+editing pipe-delimited text.
+- **New prop type `'slides'`** (`types/widget.ts`), wired in `PropField.vue`
+  (`v-else-if field.type === 'slides'` → `CarouselSlidePicker`), exactly mirroring
+  the existing `'images'` → `GalleryImagePicker` branch.
+- **`app/components/editor/shared/CarouselSlidePicker.vue`** (NEW, auto-imported
+  `pathPrefix:false`): a `vuedraggable` **vertical stack** — one row per slide
+  (thumbnail + title + subtitle + drag-grip + edit pencil). `defineModel<string>`
+  ⇄ the **5-column pipe string** `Title|Subtitle|Image URL|Link|Button label`
+  (`parsePipeRows(model, 5)`), so it reads/writes the exact format
+  `WidgetCarousel.vue` already parses — **the widget render is unchanged**.
+  - **Click a row → Edit modal:** Title (required), Subtitle, Link, Button label,
+    current image + a **Replace image** `UFileUpload` (uploads on save), and a
+    **Remove** button.
+  - **"Add a slide" → Add modal:** **Upload** + **Media library** tabs (same
+    plumbing as Gallery), then Title/Subtitle/Link/Button fields. **Image is
+    required** and **Title is required**; the slide title doubles as the image
+    `alt` (no separate alt field — the renderer already does `:alt="item.title"`).
+  - Uploads POST to the existing `/api/media/upload` with `tenantId` →
+    `saveUploadBuffer` stores under `public/uploads/<tenantId>/…` (**tenant
+    folder**) and registers a `MediaAsset`. **No backend/endpoint/migration
+    change.**
+- **`widgets/carousel.ts`:** `slides` prop type `textarea` → **`slides`**;
+  `variant` moved into **`group: 'Style'`** and the Display block's first field
+  carries **`groupDefaultOpen: false`** — so **Style and Display both start
+  folded** (same accordion mechanism Gallery uses via `PropFieldGroups.vue`).
+- **GOTCHA confirmed again:** adding the brand-new auto-imported
+  `CarouselSlidePicker.vue` while `nuxt dev` was running needs a **dev-server
+  restart** for the client manifest to resolve it (handoff #7).
+- **Verified** in the live editor on birmingham-central (temp-switched to
+  `modern` so the carousel section renders): slides show as a draggable stack;
+  edit modal pre-fills + saves (title edit reflected in the row + live preview);
+  "Add a slide" via the **Media library** tab appends a slide that renders in the
+  preview; a real upload lands at `/uploads/<tenantId>/…`, is served 200, and
+  appears in the library; Style + Display start collapsed (`chevron-right`); no
+  console errors. **Cleanup:** config restored to classic, `prisma/dev.db`
+  restored (`git checkout`) + dev server restarted so the test `MediaAsset`/file
+  are gone (media count back to 0), test upload file deleted. Build + typecheck
+  clean.
+
 ## NEXT UP: (none of the single-style queue remain)
 
 All the global single-style widgets in this initiative are now upgraded

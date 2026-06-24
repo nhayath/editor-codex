@@ -10,6 +10,7 @@ export type WidgetPropType =
   | 'color'
   | 'image'
   | 'images'
+  | 'slides'
   | 'url'
   | 'icon'
 

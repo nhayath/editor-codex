@@ -15,19 +15,20 @@ export const carouselWidget: WidgetDefinition = {
   ],
   component: 'WidgetCarousel',
   propSchema: [
-    { key: 'variant', label: 'Style', type: 'select', default: 'single-slide', options: [
+    { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Featured' },
+    { key: 'title', label: 'Title', type: 'text', default: 'Community highlights' },
+    { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'Stay connected with the latest from your mosque.' },
+    { key: 'slides', label: 'Slides', type: 'slides', default: 'Daily prayers|Join us for congregational prayer|/templates/mosque-hero-1.svg\nWeekend classes|Learning for every age|/templates/mosque-hero-2.svg\nCommunity support|Serving neighbours with care|/templates/mosque-hero-3.svg', placeholder: 'Title|Subtitle|Image URL|Link|Button label, one slide per line' },
+
+    { key: 'variant', label: 'Carousel style', type: 'select', default: 'single-slide', group: 'Style', groupDefaultOpen: false, options: [
       { label: 'Hero slide', value: 'single-slide' },
       { label: 'Multi slide', value: 'multi-slide' },
       { label: 'Cards', value: 'cards' },
       { label: 'Split', value: 'split' },
       { label: 'Minimal', value: 'minimal' }
     ] },
-    { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Featured' },
-    { key: 'title', label: 'Title', type: 'text', default: 'Community highlights' },
-    { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'Stay connected with the latest from your mosque.' },
-    { key: 'slides', label: 'Slides', type: 'textarea', default: 'Daily prayers|Join us for congregational prayer|/templates/mosque-hero-1.svg\nWeekend classes|Learning for every age|/templates/mosque-hero-2.svg\nCommunity support|Serving neighbours with care|/templates/mosque-hero-3.svg', placeholder: 'Title|Subtitle|Image URL|Link|Button label, one slide per line' },
 
-    { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', span: 'half', options: [
+    { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', groupDefaultOpen: false, span: 'half', options: [
       { label: 'Primary', value: 'primary' },
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
