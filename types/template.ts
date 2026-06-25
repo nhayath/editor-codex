@@ -52,6 +52,7 @@ export interface HomepageConfigDraft {
   paletteId: string
   fontPairId: string
   customColors?: Record<string, string> | null
+  pageBackground?: PageBackgroundConfig | null
   sectionOrder: string[]
   sectionsEnabled: Record<string, boolean>
   sectionOverrides: Record<string, SectionOverride>
@@ -59,6 +60,33 @@ export interface HomepageConfigDraft {
   // sticky bar above the header when enabled.
   announcementBar?: AnnouncementBarConfig | null
 }
+
+export type PageBackgroundConfig =
+  | {
+      type: 'solid'
+      color: string
+    }
+  | {
+      type: 'gradient'
+      from: string
+      to: string
+      angle: number
+    }
+  | {
+      type: 'image'
+      url: string
+      fit: 'cover' | 'contain' | 'tile'
+      position: 'center' | 'top' | 'bottom' | 'left' | 'right'
+      overlayTone: 'dark' | 'light'
+      overlayOpacity: number
+    }
+  | {
+      type: 'pattern'
+      presetId: string
+      baseColor: string
+      scale: number
+      intensity: number
+    }
 
 export interface AnnouncementBarConfig {
   enabled: boolean

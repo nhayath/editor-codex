@@ -24,6 +24,15 @@ const announcementBar = computed(() => {
   return bar?.enabled ? bar.props : null
 })
 
+const pageBackground = computed(() => {
+  const config = data.value?.config
+  return getPageBackgroundPresentation(
+    config?.pageBackground,
+    config?.paletteId,
+    config?.customColors
+  )
+})
+
 const tenantName = computed(() => typeof data.value?.tenant?.name === 'string' ? data.value.tenant.name : 'Mosque site')
 const tenantSettings = computed(() => data.value?.tenant?.settings as { aboutText?: string } | undefined)
 
@@ -41,7 +50,9 @@ useHead(() => ({
 <template>
   <div
     class="tenant-site min-h-screen"
+    :class="pageBackground.className"
     :data-template="data?.config.templateId"
+    :style="pageBackground.style"
   >
     <UContainer
       v-if="pending"

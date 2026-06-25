@@ -86,6 +86,7 @@ model HomepageConfig {
   paletteId        String   @default("emerald")
   fontPairId       String   @default("inter-amiri")
   customColors     String?
+  pageBackground   String?
   sectionOverrides String   @default("{}")
   sectionOrder     String   @default("[]")
   sectionsEnabled  String   @default("{}")

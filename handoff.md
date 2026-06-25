@@ -229,6 +229,23 @@ restored. Typecheck clean.
   brand-new auto-imported component file. SSR found it fine; only the client
   manifest was stale.
 
+### 8. Tenant page backgrounds — newest
+
+Added a **Background** panel to the Theme tab with template-default, solid,
+gradient, image, and palette-tinted pattern modes. The config is stored as
+`pageBackground` JSON on `HomepageConfig` and is normalised/serialised with the
+rest of the homepage draft. `getPageBackgroundPresentation()` is shared by the
+editor preview and public site, so both render identical styles.
+
+Six seamless SVG masks live in `public/backgrounds/`: eight-point stars, girih
+diamonds, arabesque vines, rosette bloom, palm-leaf fan, and mihrab arches.
+Patterns inherit the active palette primary color and expose base color, scale,
+and intensity. Image mode reuses `ImagePicker` and supports cover/contain/tile,
+position, and light/dark overlay controls. Existing tenants remain unchanged
+while `pageBackground` is null. A `db:push` was applied for the new nullable
+column; restart the dev server so Prisma and the new auto-imported editor
+component are picked up.
+
 ## State of the tree
 - Modified, uncommitted (branch `widget/events`): the prayer trio + their
   templates, `widgets/services.ts` + `WidgetServices.vue`, `widgets/events.ts` +

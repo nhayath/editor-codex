@@ -366,7 +366,8 @@ export function useHomepageEditor() {
       templateId,
       paletteId: nextTemplate.defaultPaletteId ?? draft.value?.paletteId,
       fontPairId: nextTemplate.defaultFontPairId ?? draft.value?.fontPairId,
-      customColors: draft.value?.customColors ?? null
+      customColors: draft.value?.customColors ?? null,
+      pageBackground: draft.value?.pageBackground ?? null
     })
     activeSectionId.value = draft.value.sectionOrder[0] ?? null
     focusedSectionId.value = null
@@ -385,6 +386,11 @@ export function useHomepageEditor() {
   function setFontPair(fontPairId: string) {
     if (!draft.value) return
     draft.value.fontPairId = fontPairId
+  }
+
+  function setPageBackground(pageBackground: HomepageConfigDraft['pageBackground']) {
+    if (!draft.value) return
+    draft.value.pageBackground = pageBackground
   }
 
   function updateSettingsDraft(settings: Partial<TenantSettingsDraft>) {
@@ -531,6 +537,7 @@ export function useHomepageEditor() {
     setTemplate,
     setPalette,
     setFontPair,
+    setPageBackground,
     updateSettingsDraft,
     addNavItem,
     removeNavItem,

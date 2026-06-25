@@ -32,6 +32,34 @@ body {
   font-family: var(--font-body);
 }
 
+.tenant-site.tenant-page-background {
+  background-attachment: scroll;
+}
+
+.tenant-site.tenant-page-background-pattern {
+  position: relative;
+  isolation: isolate;
+}
+
+.tenant-site.tenant-page-background-pattern::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--tenant-pattern-color);
+  content: "";
+  mask-image: var(--tenant-pattern-image);
+  mask-position: top left;
+  mask-repeat: repeat;
+  mask-size: var(--tenant-pattern-size);
+  opacity: var(--tenant-pattern-opacity);
+  pointer-events: none;
+}
+
+.tenant-site.tenant-page-background-pattern > :not(.sticky) {
+  position: relative;
+  z-index: 1;
+}
+
 .tenant-heading {
   font-family: var(--font-heading);
 }

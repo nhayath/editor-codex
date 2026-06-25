@@ -57,6 +57,15 @@ const style = computed(() => {
   )
 })
 
+const pageBackground = computed(() => {
+  const draft = editor.draft.value
+  return getPageBackgroundPresentation(
+    draft?.pageBackground,
+    draft?.paletteId,
+    draft?.customColors
+  )
+})
+
 watch(
   () => editor.recentlyAddedSectionId.value,
   async (sectionId) => {
@@ -151,8 +160,9 @@ onBeforeUnmount(() => {
       <div
         v-else
         class="tenant-site min-h-full"
+        :class="pageBackground.className"
         :data-template="editor.draft.value.templateId"
-        :style="style"
+        :style="{ ...style, ...pageBackground.style }"
       >
         <WidgetAnnouncementBar
           v-if="announcementBar"

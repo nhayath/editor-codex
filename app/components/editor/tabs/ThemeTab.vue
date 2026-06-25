@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { colorPalettes, fontPairs } from '~~/types/theme'
 
-type ThemePanel = 'root' | 'template' | 'palette' | 'fonts'
+type ThemePanel = 'root' | 'template' | 'palette' | 'fonts' | 'background'
 
 const editor = useHomepageEditor()
 const panelStack = ref<ThemePanel[]>(['root'])
@@ -13,7 +13,8 @@ const panelTitle = computed(() => {
     root: 'Theme',
     template: 'Template',
     palette: 'Palette',
-    fonts: 'Fonts'
+    fonts: 'Fonts',
+    background: 'Background'
   }
 
   return titles[currentPanel.value]
@@ -39,6 +40,28 @@ const activePalette = computed(() => {
 
 const activeFontPair = computed(() => {
   return fontPairs.find(pair => pair.id === fontModel.value)
+})
+
+const backgroundModel = computed({
+  get: () => editor.draft.value?.pageBackground ?? null,
+  set: value => editor.setPageBackground(value)
+})
+
+const backgroundSummary = computed(() => {
+  const background = backgroundModel.value
+  if (!background) return 'Template default'
+  if (background.type === 'solid') return 'Solid color'
+  if (background.type === 'gradient') return 'Gradient'
+  if (background.type === 'image') return background.url ? 'Custom image' : 'Choose an image'
+  return pageBackgroundPatterns.find(pattern => pattern.id === background.presetId)?.name ?? 'Islamic pattern'
+})
+
+const backgroundPreview = computed(() => {
+  return getPageBackgroundPresentation(
+    backgroundModel.value,
+    editor.draft.value?.paletteId,
+    editor.draft.value?.customColors
+  )
 })
 
 function openPanel(panel: ThemePanel) {
@@ -148,6 +171,30 @@ function goBack() {
             class="size-4 shrink-0 text-muted"
           />
         </button>
+
+        <button
+          type="button"
+          class="flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
+          @click="openPanel('background')"
+        >
+          <UIcon
+            name="i-lucide-wallpaper"
+            class="size-4 shrink-0 text-muted"
+          />
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm font-medium text-default">Background</span>
+            <span class="block truncate text-xs text-muted">{{ backgroundSummary }}</span>
+          </span>
+          <span
+            class="tenant-site block size-9 shrink-0 overflow-hidden rounded-md border border-muted"
+            :class="backgroundPreview.className"
+            :style="backgroundModel ? backgroundPreview.style : { background: 'var(--color-bg)' }"
+          />
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-4 shrink-0 text-muted"
+          />
+        </button>
       </section>
 
       <section
@@ -202,7 +249,7 @@ function goBack() {
       </section>
 
       <section
-        v-else
+        v-else-if="currentPanel === 'fonts'"
         key="fonts"
         class="grid w-full min-w-0 gap-3 overflow-hidden"
       >
@@ -230,6 +277,19 @@ function goBack() {
             </p>
           </button>
         </div>
+      </section>
+
+      <section
+        v-else
+        key="background"
+        class="w-full min-w-0 overflow-hidden"
+      >
+        <PageBackgroundEditor
+          v-model="backgroundModel"
+          :tenant-id="typeof editor.tenant.value?.id === 'string' ? editor.tenant.value.id : undefined"
+          :palette-id="editor.draft.value?.paletteId"
+          :custom-colors="editor.draft.value?.customColors"
+        />
       </section>
     </Transition>
   </div>

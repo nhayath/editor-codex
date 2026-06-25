@@ -1,4 +1,4 @@
-import type { AnnouncementBarConfig, HomepageConfigDraft, ResolvedSection, SectionOverride, TemplateDefinition, TemplateSectionDef } from '~~/types/template'
+import type { AnnouncementBarConfig, HomepageConfigDraft, PageBackgroundConfig, ResolvedSection, SectionOverride, TemplateDefinition, TemplateSectionDef } from '~~/types/template'
 import type { WidgetDefinition, WidgetPropSchema } from '~~/types/widget'
 import { getTemplateDefinition } from '~~/templates'
 import { getWidgetDefinition } from '~~/widgets'
@@ -15,6 +15,65 @@ export function parseJsonField<T>(value: string | null | undefined, fallback: T)
 
 export function stringifyJsonField(value: unknown) {
   return JSON.stringify(value ?? {})
+}
+
+function normalisePageBackground(value: unknown): PageBackgroundConfig | null {
+  if (!value || typeof value !== 'object') return null
+  const background = value as Record<string, unknown>
+
+  if (background.type === 'solid' && typeof background.color === 'string') {
+    return { type: 'solid', color: background.color }
+  }
+
+  if (
+    background.type === 'gradient'
+    && typeof background.from === 'string'
+    && typeof background.to === 'string'
+    && Number.isFinite(Number(background.angle))
+  ) {
+    return {
+      type: 'gradient',
+      from: background.from,
+      to: background.to,
+      angle: Number(background.angle)
+    }
+  }
+
+  if (
+    background.type === 'image'
+    && typeof background.url === 'string'
+    && ['cover', 'contain', 'tile'].includes(String(background.fit))
+    && ['center', 'top', 'bottom', 'left', 'right'].includes(String(background.position))
+    && ['dark', 'light'].includes(String(background.overlayTone))
+    && Number.isFinite(Number(background.overlayOpacity))
+  ) {
+    return {
+      type: 'image',
+      url: background.url,
+      fit: background.fit as 'cover' | 'contain' | 'tile',
+      position: background.position as 'center' | 'top' | 'bottom' | 'left' | 'right',
+      overlayTone: background.overlayTone as 'dark' | 'light',
+      overlayOpacity: Number(background.overlayOpacity)
+    }
+  }
+
+  if (
+    background.type === 'pattern'
+    && typeof background.presetId === 'string'
+    && typeof background.baseColor === 'string'
+    && Number.isFinite(Number(background.scale))
+    && Number.isFinite(Number(background.intensity))
+  ) {
+    return {
+      type: 'pattern',
+      presetId: background.presetId,
+      baseColor: background.baseColor,
+      scale: Number(background.scale),
+      intensity: Number(background.intensity)
+    }
+  }
+
+  return null
 }
 
 function schemaDefaults(schema: WidgetPropSchema[] = []) {
@@ -106,6 +165,7 @@ export function normaliseDraft(template: TemplateDefinition, partial: Partial<Ho
     paletteId: partial.paletteId ?? template.defaultPaletteId ?? 'emerald',
     fontPairId: partial.fontPairId ?? template.defaultFontPairId ?? 'inter-amiri',
     customColors: partial.customColors ?? null,
+    pageBackground: normalisePageBackground(partial.pageBackground),
     sectionOrder,
     sectionsEnabled,
     sectionOverrides,
@@ -118,6 +178,7 @@ export function buildDraftFromDatabase(config?: {
   paletteId?: string
   fontPairId?: string
   customColors?: string | null
+  pageBackground?: string | null
   sectionOrder?: string
   sectionsEnabled?: string
   sectionOverrides?: string
@@ -130,6 +191,7 @@ export function buildDraftFromDatabase(config?: {
     paletteId: config?.paletteId,
     fontPairId: config?.fontPairId,
     customColors: parseJsonField<Record<string, string> | null>(config?.customColors, null),
+    pageBackground: normalisePageBackground(parseJsonField<unknown>(config?.pageBackground, null)),
     sectionOrder: parseJsonField<string[]>(config?.sectionOrder, []),
     sectionsEnabled: parseJsonField<Record<string, boolean>>(config?.sectionsEnabled, {}),
     sectionOverrides: parseJsonField<Record<string, SectionOverride>>(config?.sectionOverrides, {}),
@@ -146,6 +208,7 @@ export function serialiseDraftForDatabase(draft: HomepageConfigDraft) {
     paletteId: normalised.paletteId,
     fontPairId: normalised.fontPairId,
     customColors: normalised.customColors ? stringifyJsonField(normalised.customColors) : null,
+    pageBackground: normalised.pageBackground ? stringifyJsonField(normalised.pageBackground) : null,
     sectionOrder: stringifyJsonField(normalised.sectionOrder),
     sectionsEnabled: stringifyJsonField(normalised.sectionsEnabled),
     sectionOverrides: stringifyJsonField(normalised.sectionOverrides),
