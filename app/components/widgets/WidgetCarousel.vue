@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
   loop?: boolean
   autoplay?: boolean
   autoplaySpeed?: number
+  data?: Record<string, any>
 }>(), {
   eyebrow: 'Featured',
   title: 'Community highlights',
@@ -34,7 +35,8 @@ const props = withDefaults(defineProps<{
   showDots: true,
   loop: true,
   autoplay: true,
-  autoplaySpeed: 5000
+  autoplaySpeed: 5000,
+  data: () => ({})
 })
 
 interface Slide {
@@ -43,6 +45,149 @@ interface Slide {
   imageUrl: string
   link: string
   buttonLabel: string
+}
+
+// ----- Feature panels ---------------------------------------------------
+// The `feature` variant pairs an ayah / message panel (left) with a live
+// widget (right). Slide format, pipe-separated, one per line:
+//   panel | eyebrow | title | arabic | translation | reference | link | button | bg | tint
+// where panel ∈ prayer | donation | events | none, bg ∈ '' (auto) |
+// 'pattern:<id>' | 'image:<url>', and tint ∈ '' (auto) | primary | gold | ink.
+interface FeatureSlide {
+  panel: string
+  eyebrow: string
+  title: string
+  arabic: string
+  translation: string
+  reference: string
+  link: string
+  buttonLabel: string
+  bg: string
+  tint: string
+  i?: number
+}
+
+const featureFallback: FeatureSlide[] = [
+  {
+    panel: 'prayer',
+    eyebrow: 'The weight of salah',
+    title: 'Anchor your day in prayer',
+    arabic: 'إِنَّ الصَّلَاةَ تَنْهَىٰ عَنِ الْفَحْشَاءِ وَالْمُنكَرِ',
+    translation: 'Indeed, prayer restrains from shameful and unjust deeds.',
+    reference: "Qur'an 29:45",
+    link: '#prayer-times',
+    buttonLabel: 'View timetable',
+    bg: '',
+    tint: ''
+  },
+  {
+    panel: 'donation',
+    eyebrow: 'Sadaqah jariyah',
+    title: 'Give, and watch it multiply',
+    arabic: 'مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ',
+    translation: 'The likeness of those who spend in the way of Allah is as a grain that grows seven ears.',
+    reference: "Qur'an 2:261",
+    link: '',
+    buttonLabel: '',
+    bg: '',
+    tint: ''
+  },
+  {
+    panel: 'events',
+    eyebrow: 'This week',
+    title: 'Happening at the mosque',
+    arabic: '',
+    translation: 'Classes, halaqas, and community gatherings throughout the week.',
+    reference: '',
+    link: '#events',
+    buttonLabel: 'See all events',
+    bg: '',
+    tint: ''
+  }
+]
+
+const featureItems = computed<FeatureSlide[]>(() => {
+  const parsed = parsePipeRows(props.slides, 10)
+  const base = !parsed.length
+    ? featureFallback
+    : parsed.map(row => ({
+        panel: (row[0] ?? 'none').toLowerCase(),
+        eyebrow: row[1] ?? '',
+        title: row[2] ?? '',
+        arabic: row[3] ?? '',
+        translation: row[4] ?? '',
+        reference: row[5] ?? '',
+        link: row[6] ?? '',
+        buttonLabel: row[7] ?? '',
+        bg: row[8] ?? '',
+        tint: row[9] ?? ''
+      }))
+  return base.map((slide, i) => ({ ...slide, i }))
+})
+
+// Feature slides ride on dark, geometric-patterned (or image) panels so the
+// carousel reads as a richer, prayer-forward band. Each slide can pin its own
+// pattern/image + tint; blanks fall back to a cycle by slide index.
+const FEATURE_PATTERNS = [
+  '/backgrounds/rosette-bloom.svg',
+  '/backgrounds/eight-point-star.svg',
+  '/backgrounds/girih-diamonds.svg'
+]
+const FEATURE_TINTS = [
+  'var(--color-primary)',
+  'color-mix(in srgb, var(--color-primary) 68%, var(--color-secondary))',
+  'color-mix(in srgb, var(--color-primary) 70%, var(--color-text))'
+]
+function resolveTint(tint: string, i: number) {
+  switch (tint) {
+    case 'primary': return 'var(--color-primary)'
+    case 'gold': return 'color-mix(in srgb, var(--color-primary) 68%, var(--color-secondary))'
+    case 'ink': return 'color-mix(in srgb, var(--color-primary) 70%, var(--color-text))'
+    default: return FEATURE_TINTS[i % FEATURE_TINTS.length]
+  }
+}
+function isImageBg(item: FeatureSlide) {
+  return item.bg.startsWith('image:')
+}
+function featureRootStyle(item: FeatureSlide) {
+  const i = item.i ?? 0
+  if (isImageBg(item)) {
+    const url = item.bg.slice(6)
+    return {
+      backgroundImage: `linear-gradient(120deg, rgba(6,13,24,0.86), rgba(6,13,24,0.55)), url("${url}")`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    }
+  }
+  const tint = resolveTint(item.tint, i)
+  return {
+    background: `linear-gradient(135deg, color-mix(in srgb, ${tint} 90%, #060d18), color-mix(in srgb, ${tint} 60%, #060d18))`
+  }
+}
+function featurePatternStyle(item: FeatureSlide) {
+  if (isImageBg(item)) return null
+  const i = item.i ?? 0
+  const url = item.bg.startsWith('pattern:')
+    ? `/backgrounds/${item.bg.slice(8)}.svg`
+    : FEATURE_PATTERNS[i % FEATURE_PATTERNS.length]
+  return {
+    maskImage: `url("${url}")`,
+    WebkitMaskImage: `url("${url}")`,
+    maskSize: '184px',
+    WebkitMaskSize: '184px',
+    maskRepeat: 'repeat',
+    WebkitMaskRepeat: 'repeat'
+  }
+}
+
+// The events panel shows only the latest event, as a compact thumbnail card.
+const latestEvent = computed(() => {
+  const list = (props.data?.events ?? []) as Array<Record<string, any>>
+  return list[0] ?? null
+})
+function eventDate(value?: string) {
+  if (!value) return ''
+  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(value))
 }
 
 const items = computed<Slide[]>(() => {
@@ -98,7 +243,7 @@ const imageRatioClass = computed(() => {
 
 const basisClass = computed(() => {
   // Hero / split / minimal are always one slide at a time.
-  if (props.variant === 'single-slide' || props.variant === 'split' || props.variant === 'minimal') {
+  if (props.variant === 'single-slide' || props.variant === 'split' || props.variant === 'minimal' || props.variant === 'feature') {
     return 'basis-full'
   }
   switch (props.slidesPerView) {
@@ -123,11 +268,11 @@ function slideHref(item: Slide) {
     data-testid="carousel-widget"
     :data-carousel-variant="variant"
   >
-    <div :class="headerAlignClass">
+    <div v-if="eyebrow || title || subtitle" :class="headerAlignClass">
       <p v-if="eyebrow" class="text-sm font-semibold" :style="{ color: eyebrowColor }">
         {{ eyebrow }}
       </p>
-      <h2 class="tenant-heading mt-2 text-3xl font-bold" :style="{ color: headingColor }">
+      <h2 v-if="title" class="tenant-heading mt-2 text-3xl font-bold" :style="{ color: headingColor }">
         {{ title }}
       </h2>
       <p v-if="subtitle" class="mt-3 leading-7" :style="{ color: mutedColor }">
@@ -137,17 +282,135 @@ function slideHref(item: Slide) {
 
     <UCarousel
       v-slot="{ item }"
-      :items="items"
+      :items="variant === 'feature' ? featureItems : items"
       :arrows="showArrows"
       :dots="showDots"
       :loop="loop"
       :autoplay="autoplayConfig"
-      :ui="{ item: basisClass }"
+      :ui="variant === 'feature' ? { item: basisClass, container: 'items-stretch' } : { item: basisClass }"
       class="min-w-0 overflow-hidden rounded-lg"
     >
+      <!-- Feature: ayah / message panel paired with a live widget, on an
+           alternating dark, geometric-patterned panel (equal height). -->
+      <div
+        v-if="variant === 'feature'"
+        class="relative isolate mx-2 flex h-full min-h-[22rem] overflow-hidden rounded-2xl @md:min-h-[24rem]"
+        :style="featureRootStyle(item)"
+      >
+        <div
+          v-if="featurePatternStyle(item)"
+          class="pointer-events-none absolute inset-0 opacity-[0.08]"
+          :style="{ background: 'rgba(255,255,255,0.92)', ...featurePatternStyle(item) }"
+        />
+        <div
+          class="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full opacity-40"
+          :style="{ background: 'radial-gradient(circle, rgba(255,255,255,0.16), transparent 70%)' }"
+        />
+
+        <div
+          class="relative grid w-full items-center gap-6 p-6 @md:p-9"
+          :class="item.panel && item.panel !== 'none' ? '@2xl:grid-cols-2' : ''"
+        >
+          <!-- left: ayah / message -->
+          <div class="flex flex-col gap-3">
+            <p v-if="item.eyebrow" class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--color-secondary)">
+              {{ item.eyebrow }}
+            </p>
+            <h3 v-if="item.title" class="tenant-heading text-2xl font-bold text-white @xl:text-4xl">
+              {{ item.title }}
+            </h3>
+            <p v-if="item.arabic" dir="rtl" lang="ar" class="tenant-heading text-2xl leading-loose text-white @md:text-3xl">
+              {{ item.arabic }}
+            </p>
+            <p v-if="item.translation" class="leading-7 text-white/75">
+              &ldquo;{{ item.translation }}&rdquo;
+            </p>
+            <p v-if="item.reference" class="text-sm font-semibold" style="color: var(--color-secondary)">
+              {{ item.reference }}
+            </p>
+            <a
+              v-if="showCta && item.link"
+              :href="item.link"
+              class="mt-1 inline-flex w-fit items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/25"
+              style="background: rgba(255,255,255,0.16)"
+            >
+              {{ item.buttonLabel || 'Learn more' }}
+              <UIcon name="i-lucide-arrow-right" class="size-4" />
+            </a>
+          </div>
+
+          <!-- right: live widget -->
+          <div v-if="item.panel && item.panel !== 'none'" class="min-w-0">
+            <WidgetPrayerCountdown
+              v-if="item.panel === 'prayer'"
+              variant="card"
+              background="gradient"
+              title="Next iqamah"
+              :show-progress="true"
+              :data="data"
+            />
+            <WidgetDonationCta
+              v-else-if="item.panel === 'donation'"
+              variant="compact"
+              background="surface"
+              :show-amounts="true"
+              :data="data"
+            />
+            <!-- events: latest only, compact thumbnail card -->
+            <div
+              v-else-if="item.panel === 'events'"
+              class="rounded-xl p-4"
+              style="background: rgba(255,255,255,0.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16)"
+            >
+              <template v-if="latestEvent">
+                <div class="flex items-center gap-4">
+                  <img
+                    v-if="latestEvent.imageUrl"
+                    :src="latestEvent.imageUrl"
+                    :alt="latestEvent.title"
+                    class="size-16 shrink-0 rounded-lg object-cover @sm:size-20"
+                  >
+                  <div
+                    v-else
+                    class="grid size-16 shrink-0 place-items-center rounded-lg @sm:size-20"
+                    style="background: rgba(255,255,255,0.16)"
+                  >
+                    <UIcon name="i-lucide-calendar-days" class="size-7 text-white" />
+                  </div>
+                  <div class="min-w-0">
+                    <p v-if="latestEvent.category" class="text-xs font-semibold uppercase tracking-wide" style="color: var(--color-secondary)">
+                      {{ latestEvent.category }}
+                    </p>
+                    <h4 class="mt-0.5 truncate text-base font-bold text-white @sm:text-lg">
+                      {{ latestEvent.title }}
+                    </h4>
+                    <p v-if="latestEvent.description" class="mt-1 line-clamp-2 text-sm text-white/70">
+                      {{ latestEvent.description }}
+                    </p>
+                  </div>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/70">
+                  <span v-if="latestEvent.date" class="flex items-center gap-1.5">
+                    <UIcon name="i-lucide-calendar-days" class="size-4" style="color: var(--color-secondary)" />
+                    {{ eventDate(latestEvent.date) }}
+                  </span>
+                  <span v-if="latestEvent.location" class="flex items-center gap-1.5">
+                    <UIcon name="i-lucide-map-pin" class="size-4" style="color: var(--color-secondary)" />
+                    {{ latestEvent.location }}
+                  </span>
+                </div>
+              </template>
+              <p v-else class="text-sm text-white/70">
+                No upcoming events.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Cards: image-topped content card -->
       <div
-        v-if="variant === 'cards'"
+        v-else-if="variant === 'cards'"
         class="mx-2 flex h-full flex-col overflow-hidden rounded-xl"
         :style="{ background: cardBg, boxShadow: `inset 0 0 0 1px ${hairlineColor}` }"
       >

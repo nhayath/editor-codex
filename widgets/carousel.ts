@@ -11,21 +11,23 @@ export const carouselWidget: WidgetDefinition = {
     { id: 'multi-slide', name: 'Multi slide' },
     { id: 'cards', name: 'Cards' },
     { id: 'split', name: 'Split' },
-    { id: 'minimal', name: 'Minimal' }
+    { id: 'minimal', name: 'Minimal' },
+    { id: 'feature', name: 'Feature panels' }
   ],
   component: 'WidgetCarousel',
   propSchema: [
-    { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Featured' },
-    { key: 'title', label: 'Title', type: 'text', default: 'Community highlights' },
-    { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'Stay connected with the latest from your mosque.' },
-    { key: 'slides', label: 'Slides', type: 'slides', default: 'Daily prayers|Join us for congregational prayer|/templates/mosque-hero-1.svg\nWeekend classes|Learning for every age|/templates/mosque-hero-2.svg\nCommunity support|Serving neighbours with care|/templates/mosque-hero-3.svg', placeholder: 'Title|Subtitle|Image URL|Link|Button label, one slide per line' },
+    { key: 'eyebrow', label: 'Eyebrow (optional)', type: 'text', default: 'Featured' },
+    { key: 'title', label: 'Title (optional)', type: 'text', default: 'Community highlights' },
+    { key: 'subtitle', label: 'Subtitle (optional)', type: 'textarea', default: 'Stay connected with the latest from your mosque.' },
+    { key: 'slides', label: 'Slides', type: 'slides', default: 'Daily prayers|Join us for congregational prayer|/templates/mosque-hero-1.svg\nWeekend classes|Learning for every age|/templates/mosque-hero-2.svg\nCommunity support|Serving neighbours with care|/templates/mosque-hero-3.svg', placeholder: 'Title|Subtitle|Image URL|Link|Button label, one slide per line. Feature panels: Panel|Eyebrow|Title|Arabic|Translation|Reference|Link|Button (panel = prayer | donation | events | none)' },
 
     { key: 'variant', label: 'Carousel style', type: 'select', default: 'single-slide', group: 'Style', groupDefaultOpen: false, options: [
       { label: 'Hero slide', value: 'single-slide' },
       { label: 'Multi slide', value: 'multi-slide' },
       { label: 'Cards', value: 'cards' },
       { label: 'Split', value: 'split' },
-      { label: 'Minimal', value: 'minimal' }
+      { label: 'Minimal', value: 'minimal' },
+      { label: 'Feature panels', value: 'feature' }
     ] },
 
     { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', groupDefaultOpen: false, span: 'half', options: [

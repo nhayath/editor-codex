@@ -163,6 +163,12 @@ const richtextBubble = [
       :tenant-id="tenantId"
     />
 
+    <FeaturePanelPicker
+      v-else-if="field.type === 'feature-slides'"
+      v-model="stringValue"
+      :tenant-id="tenantId"
+    />
+
     <UInput
       v-else
       v-model="stringValue"

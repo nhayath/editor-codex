@@ -73,9 +73,15 @@ const tenantSeeds = [
       overrides: {
         carousel: {
           props: {
-            title: 'East London Islamic Centre',
-            subtitle: 'A centre for worship, knowledge, service, and belonging.',
-            slides: 'Daily worship|Five daily prayers and Jumuah services|/templates/mosque-hero-2.svg\nLearning circles|Classes for children, youth, and adults|/templates/mosque-hero-1.svg\nCommunity welfare|Support for families across East London|/templates/mosque-hero-3.svg'
+            variant: 'feature',
+            eyebrow: '',
+            title: '',
+            subtitle: '',
+            slides: [
+              "prayer|The weight of salah|Anchor your day in prayer|إِنَّ الصَّلَاةَ تَنْهَىٰ عَنِ الْفَحْشَاءِ وَالْمُنكَرِ|Indeed, prayer restrains from shameful and unjust deeds.|Qur'an 29:45|#prayer-times|View timetable",
+              'donation|Sadaqah jariyah|Give, and watch it multiply|مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ|The likeness of those who spend in the way of Allah is as a grain that grows seven ears.|Qur\'an 2:261||',
+              'events|This week|Happening across the centre||Classes, learning circles, and welfare programmes for every generation.||#events|See all events'
+            ].join('\n')
           }
         },
         'rich-text': {

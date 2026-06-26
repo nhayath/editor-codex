@@ -219,6 +219,206 @@ body {
   border-top: 1px solid color-mix(in srgb, var(--color-text) 6%, transparent);
 }
 
+/* ============================================================
+   Classic — refined traditional layout with Islamic geometric
+   touches and gentle motion. Everything here is scoped to
+   [data-template='classic'] so the other templates (and the
+   shared TenantHeader/Footer fallback) are untouched.
+   ============================================================ */
+.tenant-site[data-template='classic'] {
+  position: relative;
+  isolation: isolate;
+  --classic-gold: var(--color-secondary);
+  --classic-hairline: color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+
+/* Decorative geometric texture behind the whole page. Only shown when the
+   tenant has NOT set a custom page background (which owns ::before itself). */
+.tenant-site[data-template='classic']:not(.tenant-page-background)::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-primary) 64%, var(--color-secondary));
+  content: "";
+  mask-image: url("/backgrounds/eight-point-star.svg");
+  mask-position: top center;
+  mask-repeat: repeat;
+  mask-size: 132px;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.tenant-site[data-template='classic']:not(.tenant-page-background) > :not(.sticky) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Section rhythm */
+.tenant-site[data-template='classic'] > .tenant-section {
+  padding-block: clamp(2.75rem, 6vw, 4.5rem);
+}
+
+.tenant-site[data-template='classic'] > .tenant-section:first-of-type {
+  padding-block: clamp(1.5rem, 4vw, 2.75rem) clamp(2.5rem, 5vw, 4rem);
+}
+
+/* Ornamental gold hairline divider between consecutive sections */
+.tenant-site[data-template='classic'] > .tenant-section + .tenant-section::before {
+  display: block;
+  width: min(440px, 64%);
+  height: 9px;
+  margin: 0 auto clamp(2rem, 5vw, 3.25rem);
+  background:
+    linear-gradient(90deg, transparent, var(--classic-hairline) 16%, color-mix(in srgb, var(--color-secondary) 55%, transparent) 50%, var(--classic-hairline) 84%, transparent) center / 100% 1px no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--color-secondary) 80%, transparent) 0 3px, transparent 3.5px) center / 9px 9px no-repeat;
+  content: "";
+}
+
+/* Cards: a calmer resting shadow plus a gentle hover lift */
+.tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .rounded-lg) {
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+}
+
+.tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1) {
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--color-primary) 9%, transparent);
+}
+
+/* Header: gold-tinted base line + soft elevation */
+.tenant-site[data-template='classic'] > header {
+  border-bottom-color: color-mix(in srgb, var(--color-secondary) 32%, var(--classic-hairline));
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--color-primary) 7%, transparent);
+}
+
+/* Footer: gold gradient top accent */
+.tenant-site[data-template='classic'] > footer {
+  border-top: 2px solid transparent;
+  border-image: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-secondary) 70%, transparent) 35%, color-mix(in srgb, var(--color-secondary) 70%, transparent) 65%, transparent) 1;
+}
+
+/* Motion — opt-in only when the visitor allows it */
+@media (prefers-reduced-motion: no-preference) {
+  .tenant-site[data-template='classic'] > .tenant-section {
+    animation: classic-section-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .tenant-site[data-template='classic'] > .tenant-section:nth-of-type(1) { animation-delay: 0.02s; }
+  .tenant-site[data-template='classic'] > .tenant-section:nth-of-type(2) { animation-delay: 0.1s; }
+  .tenant-site[data-template='classic'] > .tenant-section:nth-of-type(3) { animation-delay: 0.18s; }
+  .tenant-site[data-template='classic'] > .tenant-section:nth-of-type(4) { animation-delay: 0.26s; }
+  .tenant-site[data-template='classic'] > .tenant-section:nth-of-type(5) { animation-delay: 0.34s; }
+  .tenant-site[data-template='classic'] > .tenant-section:nth-of-type(n+6) { animation-delay: 0.4s; }
+
+  .tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1):hover {
+    box-shadow: 0 20px 44px color-mix(in srgb, var(--color-primary) 16%, transparent);
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes classic-section-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Modern — contemporary, prayer-focused layout. Leads with a
+   slim prayer strip, a feature carousel, then a full schedule.
+   Scoped to [data-template='modern']; ModernHeader/Footer are
+   this template's own chrome, so styling them here is safe.
+   ============================================================ */
+.tenant-site[data-template='modern'] {
+  position: relative;
+  isolation: isolate;
+  --modern-gold: var(--color-secondary);
+  --modern-hairline: color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+
+/* Faint geometric texture behind the page (suppressed when the tenant set a
+   custom page background, which owns ::before itself). */
+.tenant-site[data-template='modern']:not(.tenant-page-background)::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-primary) 70%, var(--color-secondary));
+  content: "";
+  mask-image: url("/backgrounds/girih-diamonds.svg");
+  mask-position: top center;
+  mask-repeat: repeat;
+  mask-size: 156px;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.tenant-site[data-template='modern']:not(.tenant-page-background) > :not(.sticky) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Section rhythm — tight lead so the prayer strip reads as a top band. */
+.tenant-site[data-template='modern'] > .tenant-section {
+  padding-block: clamp(2.5rem, 5.5vw, 4rem);
+}
+
+.tenant-site[data-template='modern'] > .tenant-section:first-of-type {
+  padding-block: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.tenant-site[data-template='modern'] > .tenant-section:nth-of-type(2) {
+  padding-block: clamp(1.25rem, 3vw, 2rem) clamp(2.5rem, 5.5vw, 4rem);
+}
+
+/* Cards: calmer resting shadow + gentle hover lift. */
+.tenant-site[data-template='modern'] :where(.tenant-section article, .tenant-section .rounded-2xl, .tenant-section .rounded-lg.ring-1) {
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+}
+
+/* Header: gold-tinted base line + soft elevation. */
+.tenant-site[data-template='modern'] > header {
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+/* Footer: gold gradient top accent. */
+.tenant-site[data-template='modern'] > footer {
+  border-top: 2px solid transparent;
+  border-image: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-secondary) 70%, transparent) 35%, color-mix(in srgb, var(--color-secondary) 70%, transparent) 65%, transparent) 1;
+}
+
+/* Motion — opt-in only when the visitor allows it. */
+@media (prefers-reduced-motion: no-preference) {
+  .tenant-site[data-template='modern'] > .tenant-section {
+    animation: modern-section-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .tenant-site[data-template='modern'] > .tenant-section:nth-of-type(1) { animation: none; }
+  .tenant-site[data-template='modern'] > .tenant-section:nth-of-type(2) { animation-delay: 0.04s; }
+  .tenant-site[data-template='modern'] > .tenant-section:nth-of-type(3) { animation-delay: 0.12s; }
+  .tenant-site[data-template='modern'] > .tenant-section:nth-of-type(4) { animation-delay: 0.2s; }
+  .tenant-site[data-template='modern'] > .tenant-section:nth-of-type(n+5) { animation-delay: 0.28s; }
+
+  .tenant-site[data-template='modern'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1):hover {
+    box-shadow: 0 20px 44px color-mix(in srgb, var(--color-primary) 14%, transparent);
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes modern-section-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (max-width: 1024px) {
   .tenant-site[data-template='fattan'] {
     padding-block: 0.75rem 1.75rem;

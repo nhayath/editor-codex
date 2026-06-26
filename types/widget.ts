@@ -11,6 +11,7 @@ export type WidgetPropType =
   | 'image'
   | 'images'
   | 'slides'
+  | 'feature-slides'
   | 'url'
   | 'icon'
 

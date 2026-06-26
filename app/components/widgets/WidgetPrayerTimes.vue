@@ -9,6 +9,8 @@ const props = withDefaults(defineProps<{
   accent?: string
   background?: string
   align?: string
+  scheduleLabel?: string
+  scheduleHref?: string
   data?: Record<string, any>
 }>(), {
   title: 'Today Prayer Times',
@@ -20,6 +22,8 @@ const props = withDefaults(defineProps<{
   accent: 'primary',
   background: 'surface',
   align: 'left',
+  scheduleLabel: 'Full schedule',
+  scheduleHref: '',
   data: () => ({})
 })
 
@@ -134,10 +138,66 @@ const nextBadgeStyle = computed(() => isFilled.value
   : { background: accentVar.value, color: '#fff' })
 
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
+
+// Strip shows the five obligatory prayers only (no sunrise), to read as a clean
+// top-of-page bar.
+const stripRows = computed(() => rows.value.filter(row => row.isPrayer))
 </script>
 
 <template>
+  <!-- Strip: slim full-width prayer bar, ideal as the lead element of a page -->
   <div
+    v-if="variant === 'strip'"
+    class="@container overflow-hidden rounded-lg px-4 py-3.5 @md:px-6"
+    :style="containerStyle"
+  >
+    <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+      <div class="-mx-1 flex flex-1 items-stretch gap-1.5 overflow-x-auto px-1 @sm:gap-2.5 @lg:gap-3">
+        <div
+          v-for="row in stripRows"
+          :key="row.name"
+          class="relative flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 transition-colors @md:px-3.5"
+          :style="isActive(row.name)
+            ? { background: 'color-mix(in srgb, var(--color-secondary) 20%, transparent)', boxShadow: `inset 0 0 0 1.5px ${accentTextColor}` }
+            : {}"
+        >
+          <UIcon
+            v-if="showIcons"
+            :name="row.icon"
+            class="size-5 shrink-0 @md:size-[22px]"
+            :style="{ color: isActive(row.name) ? accentTextColor : mutedColor }"
+          />
+          <div class="flex flex-col leading-tight">
+            <span
+              class="text-[11px] font-semibold uppercase tracking-[0.14em]"
+              :style="{ color: isActive(row.name) ? accentTextColor : mutedColor }"
+            >
+              {{ row.name }}
+            </span>
+            <span
+              class="tabular-nums @md:text-xl"
+              :class="isActive(row.name) ? 'text-xl font-bold' : 'text-lg font-semibold'"
+              :style="{ color: headingColor }"
+            >
+              {{ row.time || '--:--' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <a
+        v-if="scheduleHref"
+        :href="scheduleHref"
+        class="group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold transition-colors"
+        :style="{ color: accentTextColor }"
+      >
+        {{ scheduleLabel }}
+        <UIcon name="i-lucide-arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5" />
+      </a>
+    </div>
+  </div>
+
+  <div
+    v-else
     class="@container h-full overflow-hidden rounded-lg p-6"
     :style="containerStyle"
   >

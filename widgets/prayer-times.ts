@@ -9,7 +9,8 @@ export const prayerTimesWidget: WidgetDefinition = {
   variants: [
     { id: 'table', name: 'Table' },
     { id: 'cards', name: 'Cards' },
-    { id: 'compact', name: 'Compact' }
+    { id: 'compact', name: 'Compact' },
+    { id: 'strip', name: 'Strip' }
   ],
   component: 'WidgetPrayerTimes',
   dataDependencies: ['prayerTimes'],
@@ -17,9 +18,12 @@ export const prayerTimesWidget: WidgetDefinition = {
     { key: 'variant', label: 'Style', type: 'select', default: 'cards', options: [
       { label: 'Table', value: 'table' },
       { label: 'Cards', value: 'cards' },
-      { label: 'Compact', value: 'compact' }
+      { label: 'Compact', value: 'compact' },
+      { label: 'Strip', value: 'strip' }
     ] },
     { key: 'title', label: 'Title', type: 'text', default: 'Today Prayer Times' },
+    { key: 'scheduleLabel', label: 'Schedule link label', type: 'text', default: 'Full schedule', group: 'Strip link', showWhen: { key: 'variant', value: 'strip' } },
+    { key: 'scheduleHref', label: 'Schedule link target', type: 'text', default: '#prayer-overview', group: 'Strip link', showWhen: { key: 'variant', value: 'strip' } },
     { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', span: 'half', options: [
       { label: 'Primary', value: 'primary' },
       { label: 'Soft', value: 'soft' },
