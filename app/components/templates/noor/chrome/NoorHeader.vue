@@ -25,7 +25,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-3"
       >
-        <div class="grid size-11 shrink-0 place-items-center overflow-hidden rounded-sm bg-[var(--color-secondary)] text-[var(--color-primary)]">
+        <div class="grid size-11 shrink-0 place-items-center overflow-hidden rounded-sm bg-[var(--color-secondary)] text-[var(--color-primary)] shadow-[0_10px_26px_color-mix(in_srgb,var(--color-secondary)_42%,transparent)]">
           <img
             v-if="logoUrl"
             :src="logoUrl"
@@ -37,6 +37,11 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         <span class="tenant-heading truncate text-xl font-bold text-white">
           {{ tenant?.name }}
         </span>
+        <UIcon
+          name="i-lucide-moon-star"
+          class="hidden size-4 shrink-0 text-[var(--color-secondary)] @sm:block"
+          aria-hidden="true"
+        />
       </NuxtLink>
 
       <nav class="hidden items-center gap-1 @5xl:flex">

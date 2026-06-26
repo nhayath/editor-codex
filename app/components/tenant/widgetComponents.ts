@@ -17,6 +17,8 @@ import WidgetRichText from '~/components/widgets/WidgetRichText.vue'
 import WidgetImage from '~/components/widgets/WidgetImage.vue'
 import WidgetQuickLinks from '~/components/widgets/WidgetQuickLinks.vue'
 import FattanPrayerTimes from '~/components/templates/fattan/widgets/FattanPrayerTimes.vue'
+import NoorHero from '~/components/templates/noor/widgets/NoorHero.vue'
+import NoorPrayerBoard from '~/components/templates/noor/widgets/NoorPrayerBoard.vue'
 import SacredModernHero from '~/components/templates/sacred-modern/widgets/SacredModernHero.vue'
 import SacredModernPrayerTimes from '~/components/templates/sacred-modern/widgets/SacredModernPrayerTimes.vue'
 import SacredModernKhutbahCard from '~/components/templates/sacred-modern/widgets/SacredModernKhutbahCard.vue'
@@ -63,6 +65,8 @@ const namedWidgetComponents: Record<string, Component> = {
   WidgetImage,
   WidgetQuickLinks,
   FattanPrayerTimes,
+  NoorHero,
+  NoorPrayerBoard,
   SacredModernHero,
   SacredModernPrayerTimes,
   SacredModernKhutbahCard,

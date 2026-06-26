@@ -113,8 +113,73 @@ FeaturePanelPicker.vue` (NEW); `app/components/editor/panels/PropField.vue`
   (`FeaturePanelPicker.vue`) — until the re-scan it renders as an unresolved
   `<featurepanelpicker>` element (same gotcha as handoff #7 / #12b).
 
+### DONE — Noor ("Illuminated" navy & gold)
+A deep-navy night identity lit by gold *noor* glow + coral, with the navy
+moments **component-owned** so they survive any section reorder (this also
+**fixed a real bug**: the old block painted navy/tint bands by fragile
+`:nth-of-type(2)/(4)`, which attach to the wrong section once a tenant
+reorders/disables sections).
+
+1. **Two signature custom widgets** (sacred-modern pattern — component under
+   `app/components/templates/noor/widgets/`, registered in
+   `app/components/tenant/widgetComponents.ts`, wired via `templates/noor.ts`
+   `widgets:` override record):
+   - **`NoorHero`** (overrides `hero`, variant `illuminated`) — navy canvas +
+     gold radial glow + arabesque-vines texture wash + twinkling stars + a
+     floating rub-el-hizb (8-point) star ornament; a **live "next prayer" pill**
+     (reads `data.prayerTimes`, 60s tick); coral primary CTA. New prop
+     `showNextPrayer`. **GOTCHA:** `illuminated` isn't in the global hero's
+     `showWhen` gates (imagePanelVariants/buttonVariants), so the override
+     **re-declares** `imageUrl` + the 4 button fields (replace-by-key) to keep
+     them editable; `eyebrow/title/subtitle` merge in (no showWhen).
+   - **`NoorPrayerBoard`** (overrides `prayer-times` group **main** slot, variant
+     `illuminated-board`) — the centerpiece: navy panel + rosette-bloom motif,
+     gold per-prayer cells, the next prayer **glowing gold with a "Next" badge +
+     pulse**, and a live **"Next in 29m" countdown** (60s tick, midnight wrap).
+     `title/showIqamah/showSunrise` merge in from the global schema; jummah stays
+     the global `jummah-times` card in the `side` slot. Motion is reduced-motion
+     guarded in each SFC's scoped `<style>`.
+2. **`[data-template='noor']` block rewritten** (`main.css`) — removed the
+   `:nth-of-type` bands; added arabesque-vines **page texture** (4.5%, guarded
+   `:not(.tenant-page-background)`), a gold **"bead" ornamental divider** (gold
+   dot + halo ring on a hairline — distinct from classic's plain dot), card
+   resting-shadow + **hover lift**, staggered **`noor-section-rise`** entrance,
+   and **gold header underline + footer top accent** (border-image). All motion
+   under `prefers-reduced-motion: no-preference`.
+3. **Chrome polish** (noor-owned components): NoorHeader got a gold-glowing logo
+   tile + a gold `moon-star` mark by the brand; NoorFooter got a gold `moon-star`
+   above the name + an **arabesque (rosette) corner motif**.
+4. **Section order reworked** (per user) — `hero → prayer-times → community-actions
+   → events → donate → about → contact`. The **prayer-times group** (NoorPrayerBoard
+   + jummah) now sits **directly below the hero**. The old **prayer-countdown side
+   slot was removed** (redundant with the board now right above it), so
+   **community-actions was converted from a group to a SINGLE full-width
+   `quick-links` section** ("Start here") and relocated to #3. quick-links is
+   pinned to **`columns: '2'`** (NOTE: string, not number — WidgetQuickLinks types
+   `columns` as String; a numeric `2` throws a Vue prop warning) → a 2×2 grid of
+   horizontal shortcut cards full-width. Navy is reserved for the hero + prayer
+   board; everything else is light.
+
+**Files (Noor):** `app/components/templates/noor/widgets/NoorHero.vue` (NEW),
+`NoorPrayerBoard.vue` (NEW); `app/components/tenant/widgetComponents.ts` (register
+both); `templates/noor.ts` (`widgets:` overrides, variant pins, community-actions
+rebalance, refreshed hero copy); `app/assets/css/main.css` (noor block);
+`app/components/templates/noor/chrome/NoorHeader.vue` + `NoorFooter.vue`.
+
+**Noor QA notes:** no seeded tenant uses `noor`, so QA was done by a
+**non-destructive** `PUT /config` switching `birmingham-central` to
+`templateId:'noor'` + `paletteId:'navy-coral'` + empty order/overrides; verified
+hero/board/community/footer at **1280 / 768 / 375** (no horizontal overflow, live
+pill + countdown working, no console errors after the `columns` string fix);
+config **restored** to classic/burgundy. Build + `vue-tsc` clean.
+- The custom components are a **manual registry** (`widgetComponents.ts`), NOT
+  auto-imported — no dev-server restart needed for auto-import, but the import
+  must be added in two places (the `import` + the `namedWidgetComponents` map).
+- The noor `donate` section renders the donation-cta on a navy fill — that's the
+  global widget's own palette-driven default (pre-existing), not part of this work.
+
 ### NEXT — remaining templates (apply the same approach)
-`noor`, `fattan`, `sacred-modern` — each already has a `[data-template]` block
+`fattan`, `sacred-modern` — each already has a `[data-template]` block
 and its own chrome under `app/components/templates/<id>/`, so enhancement builds
 on the existing block (and may touch the custom chrome) rather than starting blank.
 

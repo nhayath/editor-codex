@@ -12,9 +12,19 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
 </script>
 
 <template>
-  <footer class="@container !bg-[var(--color-primary)] py-14 text-white">
+  <footer class="@container relative isolate overflow-hidden !bg-[var(--color-primary)] py-14 text-white">
+    <!-- Arabesque corner motif -->
+    <div
+      class="pointer-events-none absolute -right-12 -top-12 -z-10 size-72 bg-[var(--color-secondary)] opacity-[0.06] [mask-image:url(/backgrounds/rosette-bloom.svg)] [mask-position:top_right] [mask-repeat:repeat] [mask-size:170px]"
+      aria-hidden="true"
+    />
     <div class="tenant-container grid gap-10 @2xl:grid-cols-[1.2fr_0.8fr_0.9fr]">
       <div>
+        <UIcon
+          name="i-lucide-moon-star"
+          class="mb-3 block size-7 text-[var(--color-secondary)]"
+          aria-hidden="true"
+        />
         <p class="tenant-heading text-3xl font-bold text-white">
           {{ tenant?.name }}
         </p>

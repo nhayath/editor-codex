@@ -136,48 +136,96 @@ body {
   box-shadow: 0 14px 32px color-mix(in srgb, var(--color-primary) 12%, transparent);
 }
 
+/* ============================================================
+   Noor — "Illuminated". A deep-navy night identity lit by gold
+   "noor" glow and coral warmth. The navy moments (hero, prayer
+   board) are component-owned (NoorHero / NoorPrayerBoard), so
+   the navy travels with its section regardless of order — no
+   fragile positional background bands. The page chrome here
+   stays light with an arabesque texture, gold ornamental
+   dividers, and gentle motion. NoorHeader/NoorFooter are this
+   template's own chrome, so styling them here is safe.
+   ============================================================ */
 .tenant-site[data-template='noor'] {
-  background:
-    linear-gradient(180deg, #f7f8f3 0%, #ffffff 42%, #f7f8f3 100%);
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, #f7f8f3 0%, #ffffff 42%, #f7f8f3 100%);
+  --noor-gold: var(--color-secondary);
+  --noor-hairline: color-mix(in srgb, var(--color-text) 10%, transparent);
 }
 
-.tenant-site[data-template='noor'] > header {
-  border-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
-  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
-  box-shadow: 0 12px 34px color-mix(in srgb, var(--color-primary) 8%, transparent);
+/* Arabesque page texture (suppressed when the tenant set a custom page bg,
+   which owns ::before itself). */
+.tenant-site[data-template='noor']:not(.tenant-page-background)::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-primary) 62%, var(--color-secondary));
+  content: "";
+  mask-image: url("/backgrounds/arabesque-vines.svg");
+  mask-position: top center;
+  mask-repeat: repeat;
+  mask-size: 200px;
+  opacity: 0.045;
+  pointer-events: none;
+}
+
+.tenant-site[data-template='noor']:not(.tenant-page-background) > :not(.sticky) {
+  position: relative;
+  z-index: 1;
 }
 
 .tenant-site[data-template='noor'] .tenant-container {
   width: min(1180px, calc(100% - 2rem));
 }
 
+/* Section rhythm. */
 .tenant-site[data-template='noor'] > .tenant-section {
   padding-block: clamp(3rem, 6vw, 5rem);
 }
 
 .tenant-site[data-template='noor'] > .tenant-section:first-of-type {
-  padding-block: clamp(1rem, 3vw, 2rem) clamp(2rem, 5vw, 4rem);
+  padding-block: clamp(1rem, 3vw, 2rem) clamp(2.5rem, 5vw, 4rem);
 }
 
-.tenant-site[data-template='noor'] > .tenant-section:nth-of-type(2) {
+/* Gold ornamental "bead" divider between consecutive sections (a gold dot
+   haloed by a thin gold ring on a hairline) — distinct from classic's plain
+   dot. Keyed to the universal section-after-section selector, so it survives
+   any reorder. */
+.tenant-site[data-template='noor'] > .tenant-section + .tenant-section::before {
+  display: block;
+  width: min(420px, 62%);
+  height: 16px;
+  margin: 0 auto clamp(2rem, 5vw, 3.25rem);
+  content: "";
   background:
-    linear-gradient(180deg, var(--color-primary) 0 34%, transparent 34%);
-}
-
-.tenant-site[data-template='noor'] > .tenant-section:nth-of-type(4) {
-  background: color-mix(in srgb, var(--color-bg) 88%, white);
+    linear-gradient(90deg, transparent, var(--noor-hairline) 16%, color-mix(in srgb, var(--color-secondary) 52%, transparent) 50%, var(--noor-hairline) 84%, transparent) center / 100% 1px no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--color-secondary) 85%, transparent) 0 2.5px, transparent 3px) center / 7px 7px no-repeat,
+    radial-gradient(circle, transparent 0 5px, color-mix(in srgb, var(--color-secondary) 42%, transparent) 5px 6px, transparent 6.5px) center / 16px 16px no-repeat;
 }
 
 .tenant-site[data-template='noor'] :where(.rounded-lg) {
   border-radius: 0.75rem;
 }
 
+/* Cards: resting shadow + a transition for the hover lift below. */
 .tenant-site[data-template='noor'] :where(.tenant-section article, .tenant-section .ring-1, .tenant-section .rounded-lg) {
   box-shadow: 0 16px 42px color-mix(in srgb, var(--color-primary) 10%, transparent);
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
 }
 
+/* Header (navy, set by NoorHeader): gold bottom accent + soft elevation. */
+.tenant-site[data-template='noor'] > header {
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-secondary) 60%, transparent) 30%, color-mix(in srgb, var(--color-secondary) 60%, transparent) 70%, transparent) 1;
+  box-shadow: 0 14px 36px color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+/* Footer (navy): gold top accent. */
 .tenant-site[data-template='noor'] footer {
   background: var(--color-primary);
+  border-top: 2px solid transparent;
+  border-image: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-secondary) 65%, transparent) 35%, color-mix(in srgb, var(--color-secondary) 65%, transparent) 65%, transparent) 1;
   color: white;
 }
 
@@ -187,6 +235,36 @@ body {
 
 .tenant-site[data-template='noor'] footer :where(.tenant-heading) {
   color: white;
+}
+
+/* Motion — opt-in only when the visitor allows it. */
+@media (prefers-reduced-motion: no-preference) {
+  .tenant-site[data-template='noor'] > .tenant-section {
+    animation: noor-section-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .tenant-site[data-template='noor'] > .tenant-section:nth-of-type(1) { animation-delay: 0.02s; }
+  .tenant-site[data-template='noor'] > .tenant-section:nth-of-type(2) { animation-delay: 0.1s; }
+  .tenant-site[data-template='noor'] > .tenant-section:nth-of-type(3) { animation-delay: 0.18s; }
+  .tenant-site[data-template='noor'] > .tenant-section:nth-of-type(4) { animation-delay: 0.26s; }
+  .tenant-site[data-template='noor'] > .tenant-section:nth-of-type(n+5) { animation-delay: 0.32s; }
+
+  .tenant-site[data-template='noor'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1):hover {
+    box-shadow: 0 22px 48px color-mix(in srgb, var(--color-primary) 18%, transparent);
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes noor-section-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .tenant-site[data-template='sacred-modern'] {
