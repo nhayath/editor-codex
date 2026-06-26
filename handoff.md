@@ -179,9 +179,43 @@ config **restored** to classic/burgundy. Build + `vue-tsc` clean.
   global widget's own palette-driven default (pre-existing), not part of this work.
 
 ### NEXT — remaining templates (apply the same approach)
-`fattan`, `sacred-modern` — each already has a `[data-template]` block
+`sacred-modern` — already has a `[data-template]` block
 and its own chrome under `app/components/templates/<id>/`, so enhancement builds
 on the existing block (and may touch the custom chrome) rather than starting blank.
+
+### DONE — Fattan ("illuminated manuscript" plum & gold)
+Created a stable QA tenant **Fattan Islamic Centre** (`/editor/fattan-islamic-centre`,
+`/site/fattan-islamic-centre`) with `templateId:'fattan'` in both the live local
+SQLite DB and `prisma/seed.ts`.
+
+1. **FattanHero** — new template-owned animated SVG hero (`fattan-hero` widget)
+   with mihrab arch/lattice artwork, star/crescent ornament, gold glow, and a
+   live next-prayer chip. Registered manually in `widgetComponents.ts`.
+   Later update: FattanHero now exposes editable `backgroundImageUrl` and
+   `imageUrl` admin fields; the animated SVG ornament is an independent overlay
+   that remains on top when either image changes.
+2. **FattanPrayerTimes** — rebuilt as a manuscript-style prayer board with
+   rosette texture, live next-prayer countdown, tomorrow wrap after Isha, active
+   gold highlight, safer interval cleanup, and current seeded date rows through
+   **2026-06-30**.
+3. **Template structure** — standard anchors now line up with shared nav:
+   `hero → prayer-times → events → services → lectures → donate → about-mosque →
+   contact`. Donation/support duplication was reduced: services now describes
+   community pathways, while donation is one dedicated featured CTA.
+4. **Fattan chrome + scoped CSS** — header search removed (it was inert);
+   mobile title no longer truncates; header/footer got star/pattern accents.
+   `[data-template='fattan']` now has guarded mihrab page texture, ornamental
+   dividers, scoped hover lift, and reduced-motion-safe entrance animation.
+5. **Public-site theme fix** — `app/pages/site/[slug].vue` now applies theme CSS
+   variables inline on `.tenant-site`, matching editor preview behavior and
+   preventing desktop captures from briefly using root emerald variables.
+
+**QA:** `vue-tsc --noEmit` clean; `npm run build` clean except existing Nuxt/Rollup
+warnings. Browser QA on `/site/fattan-islamic-centre` at **1280 / 768 / 375**:
+no document overflow (`scrollWidth === clientWidth`), hero SVG + prayer board
+render, mobile menu opens, and public/editor both report `data-template='fattan'`.
+The small dark timing pill visible in dev screenshots is Nuxt DevTools, not the
+template.
 
 ---
 

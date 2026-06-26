@@ -17,15 +17,17 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 <template>
   <header
     id="top"
-    class="@container z-30 overflow-hidden border border-[color:color-mix(in_srgb,var(--color-secondary)_18%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_88%,white)]"
+    class="fattan-header @container z-30 overflow-hidden border border-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_88%,white)] shadow-[0_18px_50px_color-mix(in_srgb,var(--color-primary)_10%,transparent)] backdrop-blur"
     :class="sticky !== false ? 'sticky top-0' : ''"
   >
+    <div class="pointer-events-none h-1.5 bg-[linear-gradient(90deg,transparent,var(--color-secondary),transparent)] opacity-80" />
     <div class="tenant-container grid min-h-24 grid-cols-[1fr_auto] items-center gap-4 py-4 @5xl:grid-cols-[1fr_auto_1fr]">
       <NuxtLink
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-4"
       >
-        <div class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[var(--color-primary)] text-white shadow-[0_16px_34px_color-mix(in_srgb,var(--color-primary)_22%,transparent)]">
+        <div class="relative grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[var(--color-primary)] text-white shadow-[0_16px_34px_color-mix(in_srgb,var(--color-primary)_22%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_35%,transparent)]">
+          <span class="pointer-events-none absolute inset-0 bg-[var(--color-secondary)] opacity-[0.13] [mask-image:url(/backgrounds/eight-point-star.svg)] [mask-position:center] [mask-repeat:repeat] [mask-size:46px]" aria-hidden="true" />
           <img
             v-if="logoUrl"
             :src="logoUrl"
@@ -35,8 +37,8 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
           <span v-else class="tenant-heading text-xl font-black leading-none">{{ logoInitials }}</span>
         </div>
         <span class="min-w-0">
-          <span class="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-[var(--color-secondary)]">Community mosque</span>
-          <span class="tenant-heading block truncate text-2xl font-bold text-[var(--color-primary)]">{{ tenant?.name }}</span>
+          <span class="hidden text-[0.68rem] font-black uppercase tracking-[0.18em] text-[var(--color-secondary)] @sm:block">Community mosque</span>
+          <span class="tenant-heading block text-lg font-bold leading-tight text-[var(--color-primary)] @sm:text-xl @3xl:text-2xl">{{ tenant?.name }}</span>
         </span>
       </NuxtLink>
 
@@ -54,14 +56,6 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
       </nav>
 
       <div class="flex items-center justify-end gap-2">
-        <UButton
-          to="#top"
-          color="neutral"
-          variant="ghost"
-          icon="i-lucide-search"
-          aria-label="Search"
-          class="hidden rounded-full text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_12%,transparent)] @4xl:inline-flex"
-        />
         <UButton
           to="#donate"
           color="neutral"

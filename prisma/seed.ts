@@ -132,6 +132,65 @@ const tenantSeeds = [
         }
       }
     }
+  },
+  {
+    owner: { email: 'owner@fattan.test', name: 'Fattan IC Owner' },
+    tenant: {
+      name: 'Fattan Islamic Centre',
+      slug: 'fattan-islamic-centre',
+      domain: 'fattan.msaas.test',
+      templateId: 'fattan',
+      paletteId: 'plum-gold',
+      fontPairId: 'playfair-lato',
+      settings: {
+        address: '27 Lantern Lane',
+        city: 'London',
+        postcode: 'E7 9FT',
+        phone: '+44 20 7946 4040',
+        email: 'salam@fattan.test',
+        logoUrl: '',
+        primaryColor: '#5B244A',
+        secondaryColor: '#D6AD47',
+        aboutText: 'Fattan Islamic Centre is a warm community masjid for daily salah, Quran learning, family support, youth work, and service.',
+        facebook: 'https://facebook.com/fattanic',
+        instagram: 'https://instagram.com/fattanic',
+        youtube: 'https://youtube.com/@fattanic',
+        timezone: 'Europe/London'
+      },
+      navItems: [
+        { label: 'Home', href: '#top', order: 0 },
+        { label: 'Prayer Times', href: '#prayer-times', order: 1 },
+        { label: 'Events', href: '#events', order: 2 },
+        { label: 'Services', href: '#services', order: 3 },
+        { label: 'Contact', href: '#contact', order: 4 }
+      ],
+      footerLinks: [
+        { label: 'Prayer Times', href: '#prayer-times', order: 0 },
+        { label: 'Services', href: '#services', order: 1 },
+        { label: 'Reflections', href: '#lectures', order: 2 },
+        { label: 'Donate', href: '#donate', order: 3 },
+        { label: 'Contact', href: '#contact', order: 4 }
+      ],
+      overrides: {
+        hero: {
+          props: {
+            title: 'Fattan Islamic Centre',
+            subtitle: 'A radiant home for prayer, learning, family support, and service in East London.'
+          }
+        },
+        'about-mosque': {
+          props: {
+            body: '<p>Fattan Islamic Centre welcomes worshippers, families, students, elders, and neighbours through daily prayers, weekly learning circles, youth programmes, and community care.</p><p>Our doors are open for worship, counsel, service, and belonging.</p>'
+          }
+        },
+        donate: {
+          props: {
+            title: 'Support Fattan Islamic Centre',
+            subtitle: 'Your sadaqah sustains worship, education, welfare, and youth programmes.'
+          }
+        }
+      }
+    }
   }
 ]
 
@@ -142,7 +201,16 @@ const prayerRows = [
   { date: '2026-06-18', fajr: '02:42', sunrise: '04:39', dhuhr: '13:08', asr: '17:28', maghrib: '21:26', isha: '22:46', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:31', ishaIqamah: '23:00' },
   { date: '2026-06-19', fajr: '02:42', sunrise: '04:39', dhuhr: '13:08', asr: '17:28', maghrib: '21:26', isha: '22:46', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:31', ishaIqamah: '23:00' },
   { date: '2026-06-20', fajr: '02:43', sunrise: '04:40', dhuhr: '13:08', asr: '17:28', maghrib: '21:27', isha: '22:47', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
-  { date: '2026-06-21', fajr: '02:43', sunrise: '04:40', dhuhr: '13:09', asr: '17:29', maghrib: '21:27', isha: '22:47', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' }
+  { date: '2026-06-21', fajr: '02:43', sunrise: '04:40', dhuhr: '13:09', asr: '17:29', maghrib: '21:27', isha: '22:47', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
+  { date: '2026-06-22', fajr: '02:44', sunrise: '04:40', dhuhr: '13:09', asr: '17:29', maghrib: '21:27', isha: '22:47', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
+  { date: '2026-06-23', fajr: '02:45', sunrise: '04:41', dhuhr: '13:09', asr: '17:29', maghrib: '21:27', isha: '22:47', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
+  { date: '2026-06-24', fajr: '02:46', sunrise: '04:41', dhuhr: '13:10', asr: '17:29', maghrib: '21:27', isha: '22:47', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
+  { date: '2026-06-25', fajr: '02:47', sunrise: '04:42', dhuhr: '13:10', asr: '17:29', maghrib: '21:27', isha: '22:47', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
+  { date: '2026-06-26', fajr: '02:49', sunrise: '04:42', dhuhr: '13:10', asr: '17:29', maghrib: '21:27', isha: '22:47', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
+  { date: '2026-06-27', fajr: '02:50', sunrise: '04:43', dhuhr: '13:10', asr: '17:29', maghrib: '21:27', isha: '22:46', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
+  { date: '2026-06-28', fajr: '02:52', sunrise: '04:44', dhuhr: '13:10', asr: '17:29', maghrib: '21:27', isha: '22:46', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:32', ishaIqamah: '23:00' },
+  { date: '2026-06-29', fajr: '02:54', sunrise: '04:44', dhuhr: '13:10', asr: '17:29', maghrib: '21:26', isha: '22:45', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:31', ishaIqamah: '23:00' },
+  { date: '2026-06-30', fajr: '02:56', sunrise: '04:45', dhuhr: '13:11', asr: '17:29', maghrib: '21:26', isha: '22:45', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:31', ishaIqamah: '23:00' }
 ]
 
 async function main() {
@@ -241,23 +309,23 @@ async function main() {
     })
 
     await prisma.navItem.createMany({
-      data: [
+      data: (seed.tenant.navItems ?? [
         { tenantId: tenant.id, label: 'Home', href: '#top', order: 0 },
         { tenantId: tenant.id, label: 'Prayer Times', href: '#prayer-times', order: 1 },
         { tenantId: tenant.id, label: 'Events', href: '#events', order: 2 },
         { tenantId: tenant.id, label: 'About', href: '#about-mosque', order: 3 },
         { tenantId: tenant.id, label: 'Contact', href: '#contact', order: 4 }
-      ]
+      ]).map(item => ({ ...item, tenantId: tenant.id }))
     })
 
     await prisma.footerLink.createMany({
-      data: [
+      data: (seed.tenant.footerLinks ?? [
         { tenantId: tenant.id, label: 'Home', href: '#top', order: 0 },
         { tenantId: tenant.id, label: 'About Us', href: '#about-mosque', order: 1 },
         { tenantId: tenant.id, label: 'Services', href: '#events', order: 2 },
         { tenantId: tenant.id, label: 'Programs', href: '#announcements', order: 3 },
         { tenantId: tenant.id, label: 'Get Involved', href: '#donate', order: 4 }
-      ]
+      ]).map(item => ({ ...item, tenantId: tenant.id }))
     })
   }
 }

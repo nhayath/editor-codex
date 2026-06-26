@@ -1,5 +1,9 @@
 <script setup lang="ts">
 const { data: tenants, pending, error } = await useAsyncData('tenants', () => $fetch('/api/tenant'))
+
+function templateThumbnail(templateId?: string) {
+  return `/templates/${templateId || 'classic'}.svg`
+}
 </script>
 
 <template>
@@ -62,7 +66,7 @@ const { data: tenants, pending, error } = await useAsyncData('tenants', () => $f
         </template>
 
         <img
-          :src="tenant.homepageConfig?.templateId === 'modern' ? '/templates/modern.svg' : '/templates/classic.svg'"
+          :src="templateThumbnail(tenant.homepageConfig?.templateId)"
           :alt="tenant.name"
           class="aspect-[16/10] w-full rounded-md object-cover"
         >

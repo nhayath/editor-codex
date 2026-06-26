@@ -10,7 +10,7 @@ const { data, pending, error } = await useAsyncData(
   { watch: [slug] }
 )
 
-useTheme(
+const { style: themeStyle } = useTheme(
   computed(() => data.value?.config.paletteId),
   computed(() => data.value?.config.fontPairId),
   computed(() => data.value?.config.customColors)
@@ -52,7 +52,7 @@ useHead(() => ({
     class="tenant-site min-h-screen"
     :class="pageBackground.className"
     :data-template="data?.config.templateId"
-    :style="pageBackground.style"
+    :style="{ ...themeStyle, ...pageBackground.style }"
   >
     <UContainer
       v-if="pending"

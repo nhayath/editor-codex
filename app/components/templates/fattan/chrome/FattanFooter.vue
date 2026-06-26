@@ -13,11 +13,14 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
 </script>
 
 <template>
-  <footer class="@container overflow-hidden bg-[var(--color-primary)] py-14 text-white">
+  <footer class="fattan-footer @container relative isolate overflow-hidden bg-[var(--color-primary)] py-14 text-white">
+    <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.07] [mask-image:url(/backgrounds/mihrab-arches.svg)] [mask-position:top_center] [mask-repeat:repeat] [mask-size:250px]" />
+    <div class="pointer-events-none absolute -right-24 -top-28 -z-10 size-80 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-secondary)_30%,transparent),transparent_68%)]" />
     <div class="tenant-container grid gap-10 @2xl:grid-cols-[1.2fr_0.8fr_1fr]">
       <div>
         <div class="flex items-center gap-4">
-          <div class="grid size-14 place-items-center rounded-2xl bg-[var(--color-secondary)] text-white">
+          <div class="relative grid size-14 place-items-center overflow-hidden rounded-2xl bg-[var(--color-secondary)] text-white shadow-[0_16px_34px_color-mix(in_srgb,var(--color-secondary)_20%,transparent)]">
+            <span class="pointer-events-none absolute inset-0 bg-white opacity-20 [mask-image:url(/backgrounds/eight-point-star.svg)] [mask-position:center] [mask-repeat:repeat] [mask-size:44px]" aria-hidden="true" />
             <span class="tenant-heading text-xl font-black leading-none">{{ logoInitials }}</span>
           </div>
           <div>
@@ -34,7 +37,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
         </p>
         <div class="mt-7 flex flex-wrap gap-3">
           <UButton
-            to="#prayers"
+            to="#prayer-times"
             color="neutral"
             icon="i-lucide-clock"
             label="Prayer times"

@@ -74,11 +74,36 @@ body {
 }
 
 .tenant-site[data-template='fattan'] {
+  position: relative;
+  isolation: isolate;
   background:
-    radial-gradient(circle at 8% 12%, color-mix(in srgb, var(--color-secondary) 22%, transparent), transparent 30%),
-    radial-gradient(circle at 96% 5%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 24%),
+    radial-gradient(circle at 8% 12%, color-mix(in srgb, var(--color-secondary) 20%, transparent), transparent 30%),
+    radial-gradient(circle at 96% 5%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 24%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 92%, white), var(--color-bg) 48%, color-mix(in srgb, var(--color-secondary) 8%, var(--color-bg))),
     var(--color-bg);
+  overflow-x: hidden;
   padding: clamp(0.5rem, 2vw, 2.25rem) 0;
+  --fattan-hairline: color-mix(in srgb, var(--color-secondary) 24%, transparent);
+  --fattan-shadow: color-mix(in srgb, var(--color-primary) 13%, transparent);
+}
+
+.tenant-site[data-template='fattan']:not(.tenant-page-background)::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--color-primary);
+  content: "";
+  mask-image: url('/backgrounds/mihrab-arches.svg');
+  mask-position: top center;
+  mask-repeat: repeat;
+  mask-size: 280px;
+  opacity: 0.045;
+  pointer-events: none;
+}
+
+.tenant-site[data-template='fattan'] > :not(.sticky) {
+  position: relative;
+  z-index: 1;
 }
 
 .tenant-site[data-template='fattan'] > header,
@@ -91,14 +116,40 @@ body {
 .tenant-site[data-template='fattan'] > header {
   border-radius: clamp(1.25rem, 2vw, 2.375rem) clamp(1.25rem, 2vw, 2.375rem) 0 0;
   background: color-mix(in srgb, var(--color-surface) 88%, white);
-  box-shadow: 0 24px 70px color-mix(in srgb, var(--color-primary) 14%, transparent);
+  box-shadow: 0 24px 70px var(--fattan-shadow);
 }
 
 .tenant-site[data-template='fattan'] > .tenant-section {
+  position: relative;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 88%, white), color-mix(in srgb, var(--color-surface) 96%, white)),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-secondary) 7%, transparent), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 90%, white), color-mix(in srgb, var(--color-surface) 97%, white)),
     var(--color-surface);
   padding-block: clamp(2rem, 5vw, 4rem);
+}
+
+.tenant-site[data-template='fattan'] > .tenant-section + .tenant-section::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(720px, calc(100% - 3rem));
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--fattan-hairline), transparent);
+  content: "";
+  transform: translateX(-50%);
+}
+
+.tenant-site[data-template='fattan'] > .tenant-section + .tenant-section::after {
+  position: absolute;
+  top: -0.55rem;
+  left: 50%;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 54%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 90%, white);
+  box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--color-secondary) 7%, transparent);
+  content: "";
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .tenant-site[data-template='fattan'] > .tenant-section:first-of-type {
@@ -114,14 +165,7 @@ body {
   border-radius: clamp(1.25rem, 2vw, 2rem);
   background: var(--color-primary);
   color: white;
-}
-
-.tenant-site[data-template='fattan'] > footer :where(p, span, a) {
-  color: color-mix(in srgb, white 74%, transparent);
-}
-
-.tenant-site[data-template='fattan'] > footer :where(.tenant-heading) {
-  color: white;
+  box-shadow: 0 24px 70px var(--fattan-shadow);
 }
 
 .tenant-site[data-template='fattan'] .tenant-container {
@@ -133,7 +177,41 @@ body {
 }
 
 .tenant-site[data-template='fattan'] :where(.tenant-section article, .tenant-section .ring-1, .tenant-section .rounded-lg) {
-  box-shadow: 0 14px 32px color-mix(in srgb, var(--color-primary) 12%, transparent);
+  box-shadow: 0 14px 32px var(--fattan-shadow);
+}
+
+.tenant-site[data-template='fattan'] :where(.tenant-section .rounded-2xl, .tenant-section .rounded-xl) {
+  border-color: color-mix(in srgb, var(--color-secondary) 16%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tenant-site[data-template='fattan'] > header,
+  .tenant-site[data-template='fattan'] > .tenant-section,
+  .tenant-site[data-template='fattan'] > footer {
+    animation: fattan-section-rise 0.68s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .tenant-site[data-template='fattan'] > .tenant-section:nth-of-type(2) { animation-delay: 0.07s; }
+  .tenant-site[data-template='fattan'] > .tenant-section:nth-of-type(3) { animation-delay: 0.12s; }
+  .tenant-site[data-template='fattan'] > .tenant-section:nth-of-type(4) { animation-delay: 0.17s; }
+  .tenant-site[data-template='fattan'] > .tenant-section:nth-of-type(n+5) { animation-delay: 0.22s; }
+
+  .tenant-site[data-template='fattan'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1):hover {
+    box-shadow: 0 22px 48px color-mix(in srgb, var(--color-primary) 16%, transparent);
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes fattan-section-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ============================================================
