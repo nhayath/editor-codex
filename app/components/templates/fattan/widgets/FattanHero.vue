@@ -154,53 +154,53 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
             v-if="imageUrl"
             :src="imageUrl"
             :alt="`${title} feature image`"
-            class="absolute inset-0 h-full w-full object-cover opacity-[0.55]"
+            class="absolute inset-0 h-full w-full object-cover opacity-[0.82]"
           >
-          <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_58%,transparent),color-mix(in_srgb,var(--color-primary)_82%,black))]" aria-hidden="true" />
+          <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_18%,transparent),color-mix(in_srgb,var(--color-primary)_46%,black))]" aria-hidden="true" />
           <svg
             viewBox="0 0 520 520"
             role="img"
-            aria-label="Animated Islamic arch ornament"
+            aria-label="Subtle animated Islamic ornament overlay"
             class="fattan-hero-svg relative z-10 size-full"
           >
             <defs>
               <pattern id="fattan-lattice" width="52" height="52" patternUnits="userSpaceOnUse">
-                <path d="M26 0 52 26 26 52 0 26Z" fill="none" stroke="currentColor" stroke-width="1.25" opacity="0.32" />
-                <circle cx="26" cy="26" r="4" fill="currentColor" opacity="0.35" />
+                <path d="M26 0 52 26 26 52 0 26Z" fill="none" stroke="currentColor" stroke-width="1" opacity="0.18" />
+                <circle cx="26" cy="26" r="2.4" fill="currentColor" opacity="0.18" />
               </pattern>
-              <linearGradient id="fattan-gold" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0" stop-color="var(--color-secondary)" />
-                <stop offset="1" stop-color="color-mix(in srgb, var(--color-secondary) 64%, white)" />
-              </linearGradient>
             </defs>
 
             <rect width="520" height="520" rx="42" fill="transparent" />
-            <rect width="520" height="520" rx="42" fill="url(#fattan-lattice)" class="text-[var(--color-secondary)]" opacity="0.34" />
-            <path
-              d="M84 444V238c0-97 78-176 176-176s176 79 176 176v206"
-              fill="none"
-              stroke="url(#fattan-gold)"
-              stroke-width="20"
-              stroke-linecap="round"
-              opacity="0.88"
-            />
-            <path
-              d="M128 444V246c0-73 59-132 132-132s132 59 132 132v198"
-              fill="none"
-              stroke="white"
-              stroke-width="2"
-              opacity="0.22"
-            />
-            <g class="fattan-hero-orbit" transform-origin="260 270">
-              <path d="M260 158 278 226 346 244 278 262 260 330 242 262 174 244 242 226Z" fill="var(--color-secondary)" opacity="0.96" />
-              <circle cx="260" cy="244" r="29" fill="var(--color-primary)" opacity="0.94" />
-              <path d="M275 222a31 31 0 1 0 0 44 24 24 0 1 1 0-44Z" fill="var(--color-secondary)" />
+            <rect width="520" height="520" rx="42" fill="url(#fattan-lattice)" class="text-[var(--color-secondary)]" opacity="0.18" />
+
+            <g class="fattan-hero-moon" fill="var(--color-secondary)" opacity="0.38">
+              <path d="M401 88a45 45 0 1 0 0 82 35 35 0 1 1 0-82Z" />
+              <circle cx="354" cy="128" r="2.8" />
+              <circle cx="436" cy="148" r="2.4" />
             </g>
-            <g class="fattan-hero-stars" fill="var(--color-secondary)">
-              <circle cx="158" cy="168" r="4" />
-              <circle cx="368" cy="176" r="3.5" />
-              <circle cx="128" cy="330" r="3" />
-              <circle cx="398" cy="332" r="4" />
+
+            <g class="fattan-hero-lanterns" fill="none" stroke="var(--color-secondary)" stroke-linecap="round" stroke-linejoin="round" opacity="0.34">
+              <path d="M126 112v42" stroke-width="1.5" />
+              <path d="M108 184c0-26 8-42 18-42s18 16 18 42c0 25-8 42-18 42s-18-17-18-42Z" stroke-width="3" />
+              <path d="M113 184h26M117 160h18M117 208h18" stroke-width="1.5" />
+              <path d="M380 300v34" stroke-width="1.25" />
+              <path d="M366 360c0-20 6-32 14-32s14 12 14 32-6 32-14 32-14-12-14-32Z" stroke-width="2.5" />
+              <path d="M370 360h20M373 342h14M373 378h14" stroke-width="1.25" />
+            </g>
+
+            <g class="fattan-hero-shapes" fill="none" stroke="var(--color-secondary)" stroke-width="2" opacity="0.28">
+              <path d="M86 348 112 374 86 400 60 374Z" />
+              <path d="M242 86 266 110 242 134 218 110Z" />
+              <path d="M448 380 468 400 448 420 428 400Z" />
+              <circle cx="182" cy="396" r="28" />
+            </g>
+
+            <g class="fattan-hero-stars" fill="var(--color-secondary)" opacity="0.5">
+              <path d="M174 156 180 174 198 180 180 186 174 204 168 186 150 180 168 174Z" />
+              <path d="M320 224 325 238 339 243 325 248 320 262 315 248 301 243 315 238Z" />
+              <circle cx="104" cy="278" r="3" />
+              <circle cx="428" cy="238" r="3.5" />
+              <circle cx="262" cy="356" r="2.8" />
             </g>
           </svg>
         </div>
@@ -228,8 +228,17 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
     animation: fattan-live-pulse 2.4s ease-in-out infinite;
   }
 
-  .fattan-hero-orbit {
-    animation: fattan-hero-orbit 12s ease-in-out infinite;
+  .fattan-hero-moon {
+    animation: fattan-moon-drift 9s ease-in-out infinite;
+  }
+
+  .fattan-hero-lanterns {
+    animation: fattan-lantern-sway 7s ease-in-out infinite;
+    transform-origin: center top;
+  }
+
+  .fattan-hero-shapes {
+    animation: fattan-shapes-breathe 10s ease-in-out infinite;
   }
 
   .fattan-hero-stars {
@@ -242,13 +251,23 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
   50% { opacity: 1; transform: scale(1.15); }
 }
 
-@keyframes fattan-hero-orbit {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(5deg) scale(1.035); }
+@keyframes fattan-moon-drift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.3; }
+  50% { transform: translate(-5px, 4px); opacity: 0.48; }
+}
+
+@keyframes fattan-lantern-sway {
+  0%, 100% { transform: rotate(-1.5deg); opacity: 0.26; }
+  50% { transform: rotate(1.5deg); opacity: 0.42; }
+}
+
+@keyframes fattan-shapes-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.18; }
+  50% { transform: scale(1.025); opacity: 0.34; }
 }
 
 @keyframes fattan-star-glow {
-  0%, 100% { opacity: 0.45; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.22; }
+  50% { opacity: 0.62; }
 }
 </style>
