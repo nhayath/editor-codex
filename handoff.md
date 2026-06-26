@@ -1,6 +1,124 @@
 # Session Handoff
 
-_Last updated: 2026-06-23_
+_Last updated: 2026-06-26_
+
+## CURRENT initiative: per-template visual enhancement (one template at a time)
+
+Make each template **more modern with Islamic touches + tasteful subtle
+animation**, great on **mobile / tablet / desktop**. User-confirmed decisions:
+motion = **tasteful & subtle**; chrome styling = **scoped CSS only** (style the
+shared/own chrome via `.tenant-site[data-template='<id>']` blocks in
+`app/assets/css/main.css`, don't fork components); motif = **page texture +
+gold accents** (low-opacity geometric pattern behind the page + gold
+dividers/accents). Order: classic → **modern** → (next) noor / fattan /
+sacred-modern.
+
+### How template identity is applied
+- Both the public site (`app/pages/site/[slug].vue`) and the editor preview
+  (`EditorPreview.vue`) set `:data-template`, so a scoped
+  `.tenant-site[data-template='<id>']` CSS block in `main.css` styles **both**.
+- Page-background feature owns `.tenant-page-background[-pattern]::before`, so
+  any decorative page texture must be guarded with
+  `:not(.tenant-page-background)::before` to avoid colliding (see classic/modern).
+- `SectionRenderer` + `GroupRenderer` both render `<section class="tenant-section">`
+  and set `:id="section.id"` → `> .tenant-section` selectors hit both, and
+  `#<section-id>` anchors work for single AND group sections.
+
+### DONE — Classic (`[data-template='classic']` block in `main.css`)
+Eight-point-star page texture (5%, palette-tinted, `:not(.tenant-page-background)`
+guarded), gold ornamental dividers between sections, card resting-shadow + hover
+lift, gold header/footer accents, staggered `classic-section-rise` entrance —
+all under `@media (prefers-reduced-motion: no-preference)`. CSS-only, no
+template/widget edits. Verified both classic tenants, no overflow 375/768/desktop.
+
+### DONE — Modern (prayer-forward redesign)
+Reordered to lead with prayer + a feature carousel. Section order is now
+**`prayer-times` (strip) → `carousel` (feature) → services → events → gallery →
+donation-cta → rich-text → contact**. The redundant `prayer-overview` group was
+**removed** (its cards duplicated the strip; its countdown duplicated the
+carousel's "Next iqamah" card).
+
+1. **Prayer strip** — new `strip` variant on `WidgetPrayerTimes` (+ registry
+   variant). A slim full-width bar: 5 obligatory prayers (no sunrise), **per-prayer
+   icons** (`showIcons`), and the **next prayer as a strong gold chip** (gold
+   ring + gold-tint bg + gold icon/label + bolder time). New props
+   `scheduleLabel`/`scheduleHref` (an optional "Full schedule →" link; left blank
+   in Modern since the strip *is* the schedule). The lead section's id is
+   `prayer-times` so the header "Prayer Times" nav (`#prayer-times`) resolves.
+2. **Feature carousel** — new `feature` variant on `WidgetCarousel`. Each slide =
+   ayah/message panel (left) + a **live widget** (right) on an **alternating dark,
+   geometric-patterned panel**, equal height. Panels: `prayer` →
+   `WidgetPrayerCountdown variant="card"` titled "Next iqamah" (upcoming only, no
+   list); `donation` → `WidgetDonationCta variant="compact" showAmounts`;
+   `events` → a compact **latest-event** thumbnail card (reads `data.events[0]`).
+   Carousel now takes a `data` prop (passed through `SectionRenderer`) to feed the
+   embedded widgets; header (eyebrow/title/subtitle) collapses when empty.
+   - **Equal height:** Nuxt UI's UCarousel track defaults to `items-start`;
+     overridden to `items-stretch` via `:ui.container` **for the feature variant
+     only** + `h-full`/`min-h` on slides.
+   - **Arabic** ayah line renders RTL in the heading font.
+3. **Feature slide format = 10-col pipe** (one slide per line):
+   `panel | eyebrow | title | arabic | translation | reference | link | button | bg | tint`
+   `panel ∈ prayer|donation|events|none`; `bg ∈ '' (auto cycle) | pattern:<id> |
+   image:<url>`; `tint ∈ '' (auto) | primary | gold | ink`. Renderer reads
+   per-slide bg/tint and falls back to an index cycle when blank (back-compatible
+   with the earlier 8-col strings). Image bg gets a dark overlay for legibility.
+4. **Template-only widget `modern-prayer-carousel`** (`templates/modern.ts →
+   widgets`) — `component: 'WidgetCarousel'` (reuses the `feature` render) with a
+   **trimmed schema**: `slides` (type `feature-slides`) + a collapsed
+   **"Heading (optional)"** accordion (eyebrow/title/subtitle) + a **"Display"**
+   accordion (autoplay/speed/arrows/dots/loop). Dropped variant/accent/background/
+   align/slidesPerView/imageRatio/showCta. The Modern `carousel` **section** points
+   its `widgetId` here; `variant:'feature'` comes from `defaultProps`. The global
+   `carousel` widget is untouched for every other tenant.
+   - **Why template-only:** template widget overrides **merge by key and CANNOT
+     remove base fields** (`utils/homepage.ts` `mergePropSchema`). A widgetId with
+     **no global base** makes `resolveWidgetDefinition` return the override
+     `propSchema` **verbatim** (the `!base` branch) → a genuinely clean schema.
+     This is the same mechanism sacred-modern uses for `sacred-khutbah-card`.
+5. **New slide editor** — `app/components/editor/shared/FeaturePanelPicker.vue`
+   (auto-imported) + new prop type **`feature-slides`** (`types/widget.ts`), wired
+   in `PropField.vue` next to the `slides` branch. A draggable stack with real
+   **thumbnails** (pattern swatch / image / "AUTO") labelled by panel type; an edit
+   modal with the panel selector, text fields, and a **background picker** (Auto /
+   6 geometric **patterns** + tint / custom **image** via Upload or Media library,
+   reusing `/api/media`). Fixes the old bug where the generic 5-col
+   `CarouselSlidePicker` mis-read feature slides (broken thumbnails) and would
+   **corrupt** the 10-col data on save.
+6. **`[data-template='modern']` block in `main.css`** — girih-diamond page texture
+   (4%, guarded), gold header/footer accents, tight lead band, staggered
+   `modern-section-rise` entrance + card hover (reduced-motion guarded).
+
+**Files touched (Modern):** `app/components/widgets/WidgetPrayerTimes.vue` +
+`widgets/prayer-times.ts` (strip variant, icons, gold chip, schedule link);
+`app/components/widgets/WidgetCarousel.vue` (data prop, optional header, feature
+variant, per-slide bg/tint); `widgets/carousel.ts` (feature variant registered on
+the GLOBAL widget too); `templates/modern.ts` (reorder, remove prayer-overview,
+`modern-prayer-carousel` widget + section); `app/components/editor/shared/
+FeaturePanelPicker.vue` (NEW); `app/components/editor/panels/PropField.vue`
+(`feature-slides` wiring); `types/widget.ts` (`feature-slides` type);
+`app/assets/css/main.css` (classic + modern blocks); `prisma/seed.ts`
+(east-london-ic carousel override → feature slides; reseeded).
+
+### Modern-initiative gotchas
+- **`east-london-ic` IS `modern`** in the current seed (templateId `modern`) — the
+  QA tenant for this work. (Supersedes the stale note at the very bottom of this
+  file that said it's classic.)
+- Seeded tenants store `sectionOrder:'[]'` / `sectionsEnabled:'{}'`, so template
+  section order/rename/remove apply **live without a reseed**. But **prop
+  overrides** baked into `seed.ts` (e.g. the carousel slides) DO need a reseed.
+- `sectionOverrides` is keyed by **section id**, not widget id — changing a
+  section's `widgetId` keeps its saved override.
+- **Restart `nuxt dev` after adding a brand-new auto-imported component**
+  (`FeaturePanelPicker.vue`) — until the re-scan it renders as an unresolved
+  `<featurepanelpicker>` element (same gotcha as handoff #7 / #12b).
+
+### NEXT — remaining templates (apply the same approach)
+`noor`, `fattan`, `sacred-modern` — each already has a `[data-template]` block
+and its own chrome under `app/components/templates/<id>/`, so enhancement builds
+on the existing block (and may touch the custom chrome) rather than starting blank.
+
+---
 
 ## Ongoing initiative: widget style/feature upgrades
 
@@ -472,6 +590,6 @@ picking up new work, apply the **exact same pattern** (see top of this file).
 - Container queries need `@container` on an ancestor; widgets must not overflow at 390px.
 - Always restore tenant config after non-destructive render tests.
 - Preview needs absolute `DATABASE_URL`; rebuild before QA under preview. `dev` serves source live.
-- CLAUDE.md tenant→template map is partly stale: `east-london-ic` is actually
-  `classic` in the seeded DB, not modern. `birmingham-central` = classic (best for
-  testing global widgets).
+- Seeded tenant→template map (current): `east-london-ic` = **modern** (the QA
+  tenant for the modern redesign), `birmingham-central` = **classic** (best for
+  testing global widgets), `al-noor` = **sacred-modern**.
