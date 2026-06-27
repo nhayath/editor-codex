@@ -85,6 +85,8 @@ body {
   padding: clamp(0.5rem, 2vw, 2.25rem) 0;
   --fattan-hairline: color-mix(in srgb, var(--color-secondary) 24%, transparent);
   --fattan-shadow: color-mix(in srgb, var(--color-primary) 13%, transparent);
+  --color-text: var(--color-primary);
+  --color-text-muted: color-mix(in srgb, var(--color-primary) 76%, black);
 }
 
 .tenant-site[data-template='fattan']:not(.tenant-page-background)::before {
