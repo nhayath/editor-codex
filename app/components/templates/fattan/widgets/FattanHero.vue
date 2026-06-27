@@ -100,6 +100,20 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
     <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.07] [mask-image:url(/backgrounds/mihrab-arches.svg)] [mask-position:top_center] [mask-repeat:repeat] [mask-size:260px]" />
     <div class="pointer-events-none absolute -right-28 -top-28 -z-10 size-[28rem] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-secondary)_38%,transparent)_0%,transparent_68%)] opacity-80" />
 
+    <!-- Animated background confetti overlay -->
+    <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <div class="fattan-confetti-particle p1"><svg viewBox="0 0 24 24"><path d="M12 2 L15.5 5.5 L20.5 5.5 L20.5 10.5 L24 12 L20.5 13.5 L20.5 18.5 L15.5 18.5 L12 22 L8.5 18.5 L3.5 18.5 L3.5 13.5 L0 12 L3.5 10.5 L3.5 5.5 L8.5 5.5 Z" /></svg></div>
+      <div class="fattan-confetti-particle p2"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 18 8 8 0 1 1-10-18z" /></svg></div>
+      <div class="fattan-confetti-particle p3"><svg viewBox="0 0 24 24"><path d="M12 2 L14.5 9.5 L22 12 L14.5 14.5 L12 22 L9.5 14.5 L2 12 L9.5 9.5 Z" /></svg></div>
+      <div class="fattan-confetti-particle p4"><svg viewBox="0 0 24 24"><path d="M12 2 L15.5 5.5 L20.5 5.5 L20.5 10.5 L24 12 L20.5 13.5 L20.5 18.5 L15.5 18.5 L12 22 L8.5 18.5 L3.5 18.5 L3.5 13.5 L0 12 L3.5 10.5 L3.5 5.5 L8.5 5.5 Z" /></svg></div>
+      <div class="fattan-confetti-particle p5"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 18 8 8 0 1 1-10-18z" /></svg></div>
+      <div class="fattan-confetti-particle p6"><svg viewBox="0 0 24 24"><path d="M12 2 L14.5 9.5 L22 12 L14.5 14.5 L12 22 L9.5 14.5 L2 12 L9.5 9.5 Z" /></svg></div>
+      <div class="fattan-confetti-particle p7"><svg viewBox="0 0 24 24"><path d="M12 2 L15.5 5.5 L20.5 5.5 L20.5 10.5 L24 12 L20.5 13.5 L20.5 18.5 L15.5 18.5 L12 22 L8.5 18.5 L3.5 18.5 L3.5 13.5 L0 12 L3.5 10.5 L3.5 5.5 L8.5 5.5 Z" /></svg></div>
+      <div class="fattan-confetti-particle p8"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 18 8 8 0 1 1-10-18z" /></svg></div>
+      <div class="fattan-confetti-particle p9"><svg viewBox="0 0 24 24"><path d="M12 2 L14.5 9.5 L22 12 L14.5 14.5 L12 22 L9.5 14.5 L2 12 L9.5 9.5 Z" /></svg></div>
+      <div class="fattan-confetti-particle p10"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 18 8 8 0 1 1-10-18z" /></svg></div>
+    </div>
+
     <div class="grid min-h-[520px] items-center gap-8 p-6 @lg:p-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(330px,0.88fr)] @4xl:gap-12 @5xl:p-14">
       <div class="min-w-0">
         <div
@@ -157,52 +171,7 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
             class="absolute inset-0 h-full w-full object-cover opacity-[0.82]"
           >
           <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_18%,transparent),color-mix(in_srgb,var(--color-primary)_46%,black))]" aria-hidden="true" />
-          <svg
-            viewBox="0 0 520 520"
-            role="img"
-            aria-label="Subtle animated Islamic ornament overlay"
-            class="fattan-hero-svg relative z-10 size-full"
-          >
-            <defs>
-              <pattern id="fattan-lattice" width="52" height="52" patternUnits="userSpaceOnUse">
-                <path d="M26 0 52 26 26 52 0 26Z" fill="none" stroke="currentColor" stroke-width="1" opacity="0.18" />
-                <circle cx="26" cy="26" r="2.4" fill="currentColor" opacity="0.18" />
-              </pattern>
-            </defs>
 
-            <rect width="520" height="520" rx="42" fill="transparent" />
-            <rect width="520" height="520" rx="42" fill="url(#fattan-lattice)" class="text-[var(--color-secondary)]" opacity="0.18" />
-
-            <g class="fattan-hero-moon" fill="var(--color-secondary)" opacity="0.38">
-              <path d="M401 88a45 45 0 1 0 0 82 35 35 0 1 1 0-82Z" />
-              <circle cx="354" cy="128" r="2.8" />
-              <circle cx="436" cy="148" r="2.4" />
-            </g>
-
-            <g class="fattan-hero-lanterns" fill="none" stroke="var(--color-secondary)" stroke-linecap="round" stroke-linejoin="round" opacity="0.34">
-              <path d="M126 112v42" stroke-width="1.5" />
-              <path d="M108 184c0-26 8-42 18-42s18 16 18 42c0 25-8 42-18 42s-18-17-18-42Z" stroke-width="3" />
-              <path d="M113 184h26M117 160h18M117 208h18" stroke-width="1.5" />
-              <path d="M380 300v34" stroke-width="1.25" />
-              <path d="M366 360c0-20 6-32 14-32s14 12 14 32-6 32-14 32-14-12-14-32Z" stroke-width="2.5" />
-              <path d="M370 360h20M373 342h14M373 378h14" stroke-width="1.25" />
-            </g>
-
-            <g class="fattan-hero-shapes" fill="none" stroke="var(--color-secondary)" stroke-width="2" opacity="0.28">
-              <path d="M86 348 112 374 86 400 60 374Z" />
-              <path d="M242 86 266 110 242 134 218 110Z" />
-              <path d="M448 380 468 400 448 420 428 400Z" />
-              <circle cx="182" cy="396" r="28" />
-            </g>
-
-            <g class="fattan-hero-stars" fill="var(--color-secondary)" opacity="0.5">
-              <path d="M174 156 180 174 198 180 180 186 174 204 168 186 150 180 168 174Z" />
-              <path d="M320 224 325 238 339 243 325 248 320 262 315 248 301 243 315 238Z" />
-              <circle cx="104" cy="278" r="3" />
-              <circle cx="428" cy="238" r="3.5" />
-              <circle cx="262" cy="356" r="2.8" />
-            </g>
-          </svg>
         </div>
       </div>
     </div>
@@ -210,10 +179,6 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
 </template>
 
 <style scoped>
-.fattan-hero-svg {
-  color: var(--color-secondary);
-}
-
 .fattan-hero-svg-wrap::after {
   position: absolute;
   inset: 1rem;
@@ -223,27 +188,54 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
   pointer-events: none;
 }
 
+.fattan-confetti-particle {
+  position: absolute;
+  color: var(--color-secondary);
+  opacity: 0;
+  will-change: transform, opacity;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px var(--color-secondary));
+}
+
+.fattan-confetti-particle svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+/* Staggered positioning, sizing, and animation timings */
+.fattan-confetti-particle.p1 { left: 8%; top: -10%; width: 22px; height: 22px; animation: fattan-confetti-fall-a 24s linear infinite; animation-delay: -2s; }
+.fattan-confetti-particle.p2 { left: 22%; top: -10%; width: 14px; height: 14px; animation: fattan-confetti-fall-b 30s linear infinite; animation-delay: -10s; }
+.fattan-confetti-particle.p3 { left: 36%; top: -10%; width: 26px; height: 26px; animation: fattan-confetti-fall-a 20s linear infinite; animation-delay: -6s; }
+.fattan-confetti-particle.p4 { left: 50%; top: -10%; width: 16px; height: 16px; animation: fattan-confetti-fall-b 28s linear infinite; animation-delay: -15s; }
+.fattan-confetti-particle.p5 { left: 64%; top: -10%; width: 22px; height: 22px; animation: fattan-confetti-fall-a 22s linear infinite; animation-delay: -4s; }
+.fattan-confetti-particle.p6 { left: 78%; top: -10%; width: 12px; height: 12px; animation: fattan-confetti-fall-b 32s linear infinite; animation-delay: -12s; }
+.fattan-confetti-particle.p7 { left: 92%; top: -10%; width: 18px; height: 18px; animation: fattan-confetti-fall-a 26s linear infinite; animation-delay: -18s; }
+.fattan-confetti-particle.p8 { left: 15%; top: -10%; width: 16px; height: 16px; animation: fattan-confetti-fall-b 25s linear infinite; animation-delay: -8s; }
+.fattan-confetti-particle.p9 { left: 43%; top: -10%; width: 24px; height: 24px; animation: fattan-confetti-fall-a 27s linear infinite; animation-delay: -14s; }
+.fattan-confetti-particle.p10 { left: 72%; top: -10%; width: 15px; height: 15px; animation: fattan-confetti-fall-b 29s linear infinite; animation-delay: -22s; }
+
 @media (prefers-reduced-motion: no-preference) {
   .fattan-live-dot {
     animation: fattan-live-pulse 2.4s ease-in-out infinite;
   }
+}
 
-  .fattan-hero-moon {
-    animation: fattan-moon-drift 9s ease-in-out infinite;
+@media (prefers-reduced-motion: reduce) {
+  .fattan-confetti-particle {
+    animation: none !important;
+    opacity: 0.12 !important;
+    top: 20% !important; /* freeze them in a random layout */
   }
-
-  .fattan-hero-lanterns {
-    animation: fattan-lantern-sway 7s ease-in-out infinite;
-    transform-origin: center top;
-  }
-
-  .fattan-hero-shapes {
-    animation: fattan-shapes-breathe 10s ease-in-out infinite;
-  }
-
-  .fattan-hero-stars {
-    animation: fattan-star-glow 4s ease-in-out infinite;
-  }
+  .fattan-confetti-particle.p2 { top: 45% !important; }
+  .fattan-confetti-particle.p3 { top: 70% !important; }
+  .fattan-confetti-particle.p4 { top: 15% !important; }
+  .fattan-confetti-particle.p5 { top: 60% !important; }
+  .fattan-confetti-particle.p6 { top: 30% !important; }
+  .fattan-confetti-particle.p7 { top: 80% !important; }
+  .fattan-confetti-particle.p8 { top: 50% !important; }
+  .fattan-confetti-particle.p9 { top: 35% !important; }
+  .fattan-confetti-particle.p10 { top: 75% !important; }
 }
 
 @keyframes fattan-live-pulse {
@@ -251,23 +243,43 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
   50% { opacity: 1; transform: scale(1.15); }
 }
 
-@keyframes fattan-moon-drift {
-  0%, 100% { transform: translate(0, 0); opacity: 0.3; }
-  50% { transform: translate(-5px, 4px); opacity: 0.48; }
+@keyframes fattan-confetti-fall-a {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.28;
+  }
+  50% {
+    transform: translateY(60vh) rotate(180deg) translateX(25px);
+  }
+  90% {
+    opacity: 0.28;
+  }
+  100% {
+    transform: translateY(120vh) rotate(360deg) translateX(-15px);
+    opacity: 0;
+  }
 }
 
-@keyframes fattan-lantern-sway {
-  0%, 100% { transform: rotate(-1.5deg); opacity: 0.26; }
-  50% { transform: rotate(1.5deg); opacity: 0.42; }
-}
-
-@keyframes fattan-shapes-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.18; }
-  50% { transform: scale(1.025); opacity: 0.34; }
-}
-
-@keyframes fattan-star-glow {
-  0%, 100% { opacity: 0.22; }
-  50% { opacity: 0.62; }
+@keyframes fattan-confetti-fall-b {
+  0% {
+    transform: translateY(0) rotate(360deg) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.22;
+  }
+  50% {
+    transform: translateY(60vh) rotate(180deg) translateX(-20px);
+  }
+  85% {
+    opacity: 0.22;
+  }
+  100% {
+    transform: translateY(120vh) rotate(0deg) translateX(20px);
+    opacity: 0;
+  }
 }
 </style>
