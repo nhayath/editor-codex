@@ -191,6 +191,67 @@ const tenantSeeds = [
         }
       }
     }
+  },
+  {
+    owner: { email: 'owner@sacredmodern.test', name: 'Sacred Modern Owner' },
+    tenant: {
+      name: 'Sacred Modern Centre',
+      slug: 'sacred-modern-centre',
+      domain: 'sacredmodern.msaas.test',
+      templateId: 'sacred-modern',
+      paletteId: 'sacred-modern',
+      fontPairId: 'playfair-jakarta',
+      settings: {
+        address: '41 Garden Crescent',
+        city: 'London',
+        postcode: 'N1 8SM',
+        phone: '+44 20 7946 5050',
+        email: 'salam@sacredmodern.test',
+        logoUrl: '',
+        primaryColor: '#004532',
+        secondaryColor: '#DDBB32',
+        aboutText: 'Sacred Modern Centre is a welcoming masjid for prayer, learning, service, and neighbourly care.',
+        facebook: 'https://facebook.com/sacredmodern',
+        instagram: 'https://instagram.com/sacredmodern',
+        youtube: 'https://youtube.com/@sacredmodern',
+        timezone: 'Europe/London'
+      },
+      navItems: [
+        { label: 'Home', href: '#top', order: 0 },
+        { label: 'Prayer Times', href: '#prayer-times', order: 1 },
+        { label: 'Pathways', href: '#community-pathways', order: 2 },
+        { label: 'Events', href: '#events', order: 3 },
+        { label: 'Donate', href: '#donate', order: 4 },
+        { label: 'Contact', href: '#contact', order: 5 }
+      ],
+      footerLinks: [
+        { label: 'Prayer Times', href: '#prayer-times', order: 0 },
+        { label: 'Pathways', href: '#community-pathways', order: 1 },
+        { label: 'Events', href: '#events', order: 2 },
+        { label: 'Donate', href: '#donate', order: 3 },
+        { label: 'Contact', href: '#contact', order: 4 }
+      ],
+      overrides: {
+        hero: {
+          props: {
+            title: 'Sacred Modern Centre',
+            subtitle: 'A calm home for daily salah, Quran learning, service, and community care.',
+            locationLabel: 'Sacred Modern Centre, London'
+          }
+        },
+        about: {
+          props: {
+            body: '<p>Our centre welcomes worshippers, families, students, elders, and neighbours through daily prayers, weekly reminders, youth programmes, and charitable support.</p><p>Use this section for your imam message, visitor welcome, or mosque story.</p>'
+          }
+        },
+        donate: {
+          props: {
+            title: 'Sustain worship, learning, and care',
+            subtitle: 'Your sadaqah keeps the masjid open, warm, and ready to serve every generation.'
+          }
+        }
+      }
+    }
   }
 ]
 

@@ -27,6 +27,7 @@ interface PrayerRow {
 }
 
 const currentSeconds = ref<number | null>(null)
+let interval: ReturnType<typeof window.setInterval> | undefined
 
 function updateCurrentSeconds() {
   const now = new Date()
@@ -35,8 +36,11 @@ function updateCurrentSeconds() {
 
 onMounted(() => {
   updateCurrentSeconds()
-  const interval = window.setInterval(updateCurrentSeconds, 1000)
-  onBeforeUnmount(() => window.clearInterval(interval))
+  interval = window.setInterval(updateCurrentSeconds, 1000)
+})
+
+onBeforeUnmount(() => {
+  if (interval) window.clearInterval(interval)
 })
 
 const prayerTimes = computed(() => props.data?.prayerTimes)
@@ -68,17 +72,27 @@ function secondsFromTime(time?: string | null) {
 
 const nextPrayer = computed(() => {
   const secondsNow = currentSeconds.value
+  const prayers = featureRows.value.filter(row => row.time)
+  if (!prayers.length) return featureRows.value[0]
 
-  return featureRows.value.find((row) => {
-    if (secondsNow === null) return row.time
+  if (secondsNow === null) return prayers[0]
+
+  return prayers.find((row) => {
     const prayerSeconds = secondsFromTime(row.time)
-    return prayerSeconds !== null && prayerSeconds > secondsNow
-  }) ?? featureRows.value.find(row => row.name === 'Asr') ?? featureRows.value[0]
+    return prayerSeconds !== null && prayerSeconds >= secondsNow
+  }) ?? prayers[0]
 })
 
 const featureDate = computed(() => {
   const value = prayerTimes.value?.date
-  if (!value) return 'Wednesday, May 24, 2026'
+  if (!value) {
+    return new Intl.DateTimeFormat('en-GB', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(new Date())
+  }
 
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
@@ -96,7 +110,8 @@ const remainingLabel = computed(() => {
   const prayerSeconds = secondsFromTime(nextPrayer.value?.time)
   if (secondsNow === null || prayerSeconds === null) return nextPrayer.value?.time ?? '--:--'
 
-  const diff = Math.max(0, prayerSeconds - secondsNow)
+  let diff = prayerSeconds - secondsNow
+  if (diff < 0) diff += 24 * 3600
   const hours = Math.floor(diff / 3600).toString().padStart(2, '0')
   const minutes = Math.floor((diff % 3600) / 60).toString().padStart(2, '0')
   const seconds = Math.floor(diff % 60).toString().padStart(2, '0')
@@ -115,11 +130,14 @@ const jummahRows = computed(() => {
 </script>
 
 <template>
-  <div class="@container flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-[var(--color-primary)] text-white shadow-[0_18px_42px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]">
-    <div class="flex-1 p-6 @2xl:p-9">
+  <div class="sacred-modern-prayer-board @container relative isolate flex h-full flex-col overflow-hidden rounded-lg bg-[var(--color-primary)] text-white shadow-[0_22px_58px_color-mix(in_srgb,var(--color-primary)_20%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_28%,transparent)]">
+    <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_92%_0%,color-mix(in_srgb,var(--color-secondary)_20%,transparent),transparent_30%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_94%,black),var(--color-primary))]" />
+    <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.075] [mask-image:url(/backgrounds/girih-diamonds.svg)] [mask-position:top_right] [mask-repeat:repeat] [mask-size:240px]" />
+
+    <div class="flex-1 p-5 @md:p-6 @2xl:p-9">
       <div class="grid gap-4 @3xl:grid-cols-[1fr_auto] @3xl:items-start">
         <div>
-          <h2 class="tenant-heading text-4xl font-bold leading-tight text-[var(--color-secondary)]">
+          <h2 class="tenant-heading text-3xl font-bold leading-tight text-[var(--color-secondary)] @md:text-4xl">
             {{ title }}
           </h2>
           <p class="mt-1 text-sm font-semibold text-white/62 @md:text-base">
@@ -129,7 +147,7 @@ const jummahRows = computed(() => {
 
         <div
           v-if="showCountdown && nextPrayer"
-          class="inline-flex w-fit items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 text-sm font-bold text-white/90"
+          class="sacred-modern-countdown inline-flex w-fit max-w-full items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_36%,transparent)] bg-[color:color-mix(in_srgb,black_18%,transparent)] px-4 py-2 text-sm font-bold text-white/90"
         >
           <UIcon name="i-lucide-clock-3" class="size-4 text-[var(--color-secondary)]" />
           <span>{{ nextPrayer.name }} {{ countdownLabel }}</span>
@@ -137,27 +155,33 @@ const jummahRows = computed(() => {
         </div>
       </div>
 
-      <div class="mt-10 grid gap-3 @md:grid-cols-2 @xl:grid-cols-5">
+      <div class="mt-8 grid auto-rows-fr grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-5 @2xl:gap-2.5 @5xl:gap-3">
         <article
           v-for="row in featureRows"
           :key="row.name"
-          class="grid min-h-36 place-items-center rounded-2xl p-4 text-center @xl:min-h-32 @xl:px-2 @2xl:px-3"
-          :class="row.name === nextPrayer?.name ? 'bg-[var(--color-surface)] text-[var(--color-primary)] shadow-[0_18px_34px_rgba(0,0,0,0.2)]' : 'text-white/82'"
+          class="sacred-modern-prayer-cell relative grid min-h-32 place-items-center rounded-xl border p-4 text-center transition @2xl:min-h-36 @2xl:px-2 @5xl:px-3"
+          :class="row.name === nextPrayer?.name ? 'sacred-modern-prayer-cell-active border-[color:color-mix(in_srgb,var(--color-secondary)_58%,transparent)] bg-[var(--color-surface)] text-[var(--color-primary)] shadow-[0_18px_34px_rgba(0,0,0,0.2)]' : 'border-white/10 bg-white/[0.035] text-white/82'"
         >
+          <span
+            v-if="row.name === nextPrayer?.name"
+            class="absolute right-3 top-3 rounded-full bg-[var(--color-secondary)] px-2 py-0.5 text-[0.62rem] font-black uppercase tracking-normal text-[var(--color-primary)]"
+          >
+            Next
+          </span>
           <IconGlyph
             :name="row.icon"
-            class="size-9 text-[var(--color-secondary)] @xl:size-8"
+            class="size-9 text-[var(--color-secondary)] @2xl:size-8"
           />
           <div>
-            <h3 class="mt-2 text-base font-bold @xl:text-sm @2xl:text-base">
+            <h3 class="mt-2 text-base font-bold @2xl:text-sm @5xl:text-base">
               {{ row.name }}
             </h3>
-            <p class="tenant-heading mt-2 text-3xl font-bold @xl:text-2xl @2xl:text-3xl">
+            <p class="tenant-heading mt-2 text-3xl font-bold tabular-nums @2xl:text-2xl @5xl:text-3xl">
               {{ row.time || '--:--' }}
             </p>
             <p
               v-if="showIqamah && row.iqamah"
-              class="mt-1 text-xs font-semibold opacity-70 @xl:text-[0.65rem] @2xl:text-xs"
+              class="mt-1 text-xs font-semibold opacity-70 @2xl:text-[0.65rem] @5xl:text-xs"
             >
               Iqamah {{ row.iqamah }}
             </p>
@@ -171,7 +195,7 @@ const jummahRows = computed(() => {
         <span class="grid size-12 shrink-0 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_24%,transparent)] text-[var(--color-secondary)]">
           <IconGlyph name="islamic-quran" class="size-6" />
         </span>
-        <h3 class="tenant-heading text-3xl font-bold text-[var(--color-secondary)]">
+        <h3 class="tenant-heading text-2xl font-bold text-[var(--color-secondary)] @md:text-3xl">
           Jumu'ah Prayers
         </h3>
       </div>
@@ -193,3 +217,22 @@ const jummahRows = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+@media (prefers-reduced-motion: no-preference) {
+  .sacred-modern-countdown,
+  .sacred-modern-prayer-cell-active {
+    animation: sacred-modern-prayer-glow 3s ease-in-out infinite;
+  }
+}
+
+@keyframes sacred-modern-prayer-glow {
+  0%, 100% {
+    box-shadow: 0 16px 30px color-mix(in srgb, var(--color-secondary) 6%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 18px 42px color-mix(in srgb, var(--color-secondary) 24%, transparent);
+  }
+}
+</style>

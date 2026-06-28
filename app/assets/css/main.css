@@ -348,8 +348,34 @@ body {
 }
 
 .tenant-site[data-template='sacred-modern'] {
+  position: relative;
+  isolation: isolate;
   background:
-    linear-gradient(180deg, var(--color-bg) 0%, color-mix(in srgb, var(--color-surface) 52%, var(--color-bg)) 100%);
+    radial-gradient(circle at 6% 8%, color-mix(in srgb, var(--color-secondary) 14%, transparent), transparent 28%),
+    radial-gradient(circle at 96% 12%, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent 28%),
+    linear-gradient(180deg, var(--color-bg) 0%, color-mix(in srgb, var(--color-surface) 54%, var(--color-bg)) 52%, var(--color-bg) 100%);
+  overflow-x: hidden;
+  --sacred-modern-hairline: color-mix(in srgb, var(--color-secondary) 24%, transparent);
+  --sacred-modern-shadow: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.tenant-site[data-template='sacred-modern']:not(.tenant-page-background)::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--color-primary);
+  content: "";
+  mask-image: url("/backgrounds/rosette-bloom.svg");
+  mask-position: top center;
+  mask-repeat: repeat;
+  mask-size: 300px;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.tenant-site[data-template='sacred-modern']:not(.tenant-page-background) > :not(.sticky) {
+  position: relative;
+  z-index: 1;
 }
 
 .tenant-site[data-template='sacred-modern'] .tenant-container {
@@ -357,6 +383,7 @@ body {
 }
 
 .tenant-site[data-template='sacred-modern'] > .tenant-section {
+  position: relative;
   padding-block: clamp(2.5rem, 6vw, 4.5rem);
 }
 
@@ -364,17 +391,74 @@ body {
   padding-block: clamp(1rem, 2vw, 2rem) clamp(3rem, 6vw, 5rem);
 }
 
-.tenant-site[data-template='sacred-modern'] > .tenant-section:nth-of-type(2) {
-  padding-top: clamp(1rem, 3vw, 2rem);
+.tenant-site[data-template='sacred-modern'] > .tenant-section + .tenant-section::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(760px, calc(100% - 3rem));
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sacred-modern-hairline), transparent);
+  content: "";
+  transform: translateX(-50%);
 }
 
-.tenant-site[data-template='sacred-modern'] > .tenant-section:nth-of-type(3) {
-  padding-top: clamp(1rem, 3vw, 2rem);
-  padding-bottom: clamp(5rem, 8vw, 7rem);
+.tenant-site[data-template='sacred-modern'] > .tenant-section + .tenant-section::after {
+  position: absolute;
+  top: -0.65rem;
+  left: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 52%, transparent);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, var(--color-secondary) 0 25%, transparent 28%),
+    color-mix(in srgb, var(--color-bg) 92%, white);
+  box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--color-secondary) 8%, transparent);
+  content: "";
+  transform: translateX(-50%);
+}
+
+.tenant-site[data-template='sacred-modern'] > header {
+  border-image: linear-gradient(90deg, transparent, var(--color-secondary), transparent) 1;
+}
+
+.tenant-site[data-template='sacred-modern'] :where(.tenant-section article, .tenant-section .ring-1, .tenant-section .rounded-lg) {
+  backface-visibility: hidden;
 }
 
 .tenant-site[data-template='sacred-modern'] footer {
-  border-top: 1px solid color-mix(in srgb, var(--color-text) 6%, transparent);
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, transparent, var(--color-secondary), transparent) 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tenant-site[data-template='sacred-modern'] > header,
+  .tenant-site[data-template='sacred-modern'] > .tenant-section,
+  .tenant-site[data-template='sacred-modern'] > footer {
+    animation: sacred-modern-section-rise 0.68s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .tenant-site[data-template='sacred-modern'] > .tenant-section:nth-of-type(2) { animation-delay: 0.07s; }
+  .tenant-site[data-template='sacred-modern'] > .tenant-section:nth-of-type(3) { animation-delay: 0.12s; }
+  .tenant-site[data-template='sacred-modern'] > .tenant-section:nth-of-type(4) { animation-delay: 0.17s; }
+  .tenant-site[data-template='sacred-modern'] > .tenant-section:nth-of-type(n+5) { animation-delay: 0.22s; }
+
+  .tenant-site[data-template='sacred-modern'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1):hover {
+    box-shadow: 0 22px 48px var(--sacred-modern-shadow);
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes sacred-modern-section-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ============================================================

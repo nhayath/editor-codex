@@ -25,7 +25,7 @@ import SacredModernPrayerTimes from '~/components/templates/sacred-modern/widget
 import SacredModernKhutbahCard from '~/components/templates/sacred-modern/widgets/SacredModernKhutbahCard.vue'
 import SacredModernEvents from '~/components/templates/sacred-modern/widgets/SacredModernEvents.vue'
 import SacredModernDonationCta from '~/components/templates/sacred-modern/widgets/SacredModernDonationCta.vue'
-import SacredModernSupportLinks from '~/components/templates/sacred-modern/widgets/SacredModernSupportLinks.vue'
+import SacredModernPathways from '~/components/templates/sacred-modern/widgets/SacredModernPathways.vue'
 
 export const widgetComponents: Record<string, Component> = {
   hero: WidgetHero,
@@ -74,7 +74,7 @@ const namedWidgetComponents: Record<string, Component> = {
   SacredModernKhutbahCard,
   SacredModernEvents,
   SacredModernDonationCta,
-  SacredModernSupportLinks
+  SacredModernPathways
 }
 
 export function resolveWidgetComponent(component?: string, widgetId?: string) {

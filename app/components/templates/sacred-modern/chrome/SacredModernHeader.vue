@@ -17,24 +17,25 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 <template>
   <header
     id="top"
-    class="@container z-30 bg-[color:color-mix(in_srgb,var(--color-bg)_94%,transparent)] backdrop-blur"
+    class="@container z-30 border-b border-[color:color-mix(in_srgb,var(--color-secondary)_18%,transparent)] bg-[color:color-mix(in_srgb,var(--color-bg)_88%,transparent)] shadow-[0_12px_34px_color-mix(in_srgb,var(--color-primary)_6%,transparent)] backdrop-blur"
     :class="sticky !== false ? 'sticky top-0' : ''"
   >
-    <div class="tenant-container flex h-24 items-center justify-between gap-6">
+    <div class="tenant-container flex h-20 items-center justify-between gap-6 @4xl:h-24">
       <NuxtLink
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-3"
       >
-        <div class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-[var(--color-primary)] text-white shadow-[0_12px_24px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]">
+        <div class="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-[var(--color-primary)] text-white shadow-[0_12px_24px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_28%,transparent)]">
+          <span class="pointer-events-none absolute inset-0 bg-[var(--color-secondary)] opacity-[0.14] [mask-image:url(/backgrounds/eight-point-star.svg)] [mask-position:center] [mask-repeat:repeat] [mask-size:44px]" aria-hidden="true" />
           <img
             v-if="logoUrl"
             :src="logoUrl"
             :alt="`${tenant?.name ?? 'Mosque'} logo`"
             class="size-full object-contain p-1.5"
           >
-          <span v-else class="tenant-heading text-xl font-black leading-none">{{ logoInitials }}</span>
+          <span v-else class="tenant-heading relative text-xl font-black leading-none">{{ logoInitials }}</span>
         </div>
-        <span class="tenant-heading truncate text-2xl font-bold text-[var(--color-primary)]">
+        <span class="tenant-heading truncate text-xl font-bold text-[var(--color-primary)] @md:text-2xl">
           {{ tenant?.name }}
         </span>
       </NuxtLink>
@@ -54,25 +55,11 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 
       <div class="hidden items-center gap-4 @5xl:flex">
         <UButton
-          to="#top"
-          color="neutral"
-          variant="ghost"
-          icon="i-lucide-search"
-          aria-label="Search"
-          class="text-[var(--color-text)] hover:bg-transparent hover:text-[var(--color-primary)]"
-        />
-        <UButton
-          to="#contact"
-          color="neutral"
-          variant="ghost"
-          label="Login"
-          class="px-0 font-bold text-[var(--color-text)] hover:bg-transparent hover:text-[var(--color-primary)]"
-        />
-        <UButton
           to="#donate"
           color="neutral"
           label="Donate"
-          class="rounded-full bg-[var(--color-secondary)] px-7 font-black text-white hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_88%,black)]"
+          trailing-icon="i-lucide-arrow-up-right"
+          class="rounded-full bg-[var(--color-secondary)] px-7 font-black text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_88%,white)]"
         />
       </div>
 
@@ -108,7 +95,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         color="neutral"
         size="sm"
         label="Donate"
-        class="mt-2 justify-center rounded-full bg-[var(--color-secondary)] font-black text-white"
+        class="mt-2 justify-center rounded-full bg-[var(--color-secondary)] font-black text-[var(--color-primary)]"
         @click="menuOpen = false"
       />
     </nav>

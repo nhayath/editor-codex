@@ -20,7 +20,8 @@ export const sacredModernTemplate: TemplateDefinition = {
           { label: 'Editorial split', value: 'editorial-split' }
         ] },
         { key: 'locationLabel', label: 'Location label', type: 'text', default: 'Fattan Mosque, Berlin, Germany' },
-        { key: 'showLocationPill', label: 'Show location pill', type: 'toggle', default: true }
+        { key: 'showLocationPill', label: 'Show location pill', type: 'toggle', default: true },
+        { key: 'showNextPrayer', label: 'Show next prayer chip', type: 'toggle', default: true }
       ]
     },
     'prayer-times': {
@@ -67,17 +68,21 @@ export const sacredModernTemplate: TemplateDefinition = {
         { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Giving' }
       ]
     },
-    'quick-links': {
-      name: 'Sacred Modern Support Links',
-      description: 'Minimal two-action community support card.',
-      component: 'SacredModernSupportLinks',
+    'sacred-modern-pathways': {
+      name: 'Sacred Modern Pathways',
+      description: 'Three refined action pathways for visitors, learners, and volunteers.',
+      component: 'SacredModernPathways',
       variants: [
-        { id: 'support-card', name: 'Support card' }
+        { id: 'pathways', name: 'Pathways' }
       ],
       propSchema: [
-        { key: 'variant', label: 'Style', type: 'select', default: 'support-card', options: [
-          { label: 'Support card', value: 'support-card' }
-        ] }
+        { key: 'variant', label: 'Style', type: 'select', default: 'pathways', options: [
+          { label: 'Pathways', value: 'pathways' }
+        ] },
+        { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Community pathways' },
+        { key: 'title', label: 'Title', type: 'text', default: 'Begin with clarity' },
+        { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'Three simple ways to connect with the masjid this week.' },
+        { key: 'items', label: 'Pathways', type: 'textarea', default: 'Visit the mosque|Prayer spaces, visitor guidance, and directions for first-time guests|#contact|i-lucide-map-pin\nLearn with us|Quran circles, reminders, and classes for every age and stage|#events|i-lucide-book-open\nServe the community|Volunteer, give time, and support neighbours with care|#donate|i-lucide-heart-handshake' }
       ]
     },
     'sacred-khutbah-card': {
@@ -91,8 +96,8 @@ export const sacredModernTemplate: TemplateDefinition = {
         { key: 'imamName', label: 'Imam name', type: 'text', default: 'Imam Rashid Al-Qasimi' },
         { key: 'quote', label: 'Quote', type: 'textarea', default: 'Indeed, with hardship comes ease.' },
         { key: 'quoteSource', label: 'Quote source', type: 'text', default: "Qur'an 94:6" },
-        { key: 'imageUrl', label: 'Portrait image', type: 'image', default: '/templates/mosque-hero-2.svg' },
-        { key: 'buttonLabel', label: 'Button label', type: 'text', default: 'View Profile' },
+        { key: 'imageUrl', label: 'Decorative image (optional)', type: 'image', default: '' },
+        { key: 'buttonLabel', label: 'Button label', type: 'text', default: 'Meet the Imam' },
         { key: 'buttonUrl', label: 'Button URL', type: 'url', default: '#about' }
       ]
     }
@@ -121,11 +126,12 @@ export const sacredModernTemplate: TemplateDefinition = {
         eyebrow: '',
         title: 'A place of worship, unity & positive change.',
         subtitle: 'Nourish your faith. Serve the community. Inspire a better tomorrow.',
-        imageUrl: '/templates/mosque-hero-1.svg',
-        primaryLabel: 'Plan Your Visit',
-        primaryUrl: '#contact',
-        secondaryLabel: 'Watch Intro',
+        imageUrl: '/templates/sacred-modern-courtyard.webp',
+        primaryLabel: 'Prayer Times',
+        primaryUrl: '#prayer-times',
+        secondaryLabel: 'Plan Your Visit',
         secondaryUrl: '#about',
+        showNextPrayer: true,
         align: 'left'
       }
     },
@@ -156,8 +162,8 @@ export const sacredModernTemplate: TemplateDefinition = {
               imamName: 'Imam Rashid Al-Qasimi',
               quote: 'Indeed, with hardship comes ease.',
               quoteSource: "Qur'an 94:6",
-              imageUrl: '/templates/mosque-hero-2.svg',
-              buttonLabel: 'View Profile',
+              imageUrl: '',
+              buttonLabel: 'Meet the Imam',
               buttonUrl: '#about'
             }
           },
@@ -178,57 +184,47 @@ export const sacredModernTemplate: TemplateDefinition = {
       }
     },
     {
-      id: 'events',
-      title: 'Events, Giving & Support',
-      type: 'group',
+      id: 'community-pathways',
+      title: 'Community Pathways',
+      type: 'single',
       required: false,
       removable: true,
-      group: {
-        layout: 'row',
-        groupProps: [
-          { key: 'layout', label: 'Layout', type: 'select', default: 'row', options: [
-            { label: 'Side by side', value: 'row' },
-            { label: 'Stacked', value: 'stack' }
-          ] },
-          { key: 'arrangement', label: 'Arrangement', type: 'select', default: 'three-card', options: [
-            { label: 'Three cards', value: 'three-card' },
-            { label: 'Main and side', value: 'main-side' }
-          ] }
-        ],
-        widgets: [
-          {
-            slot: 'events',
-            widgetId: 'events',
-            defaultProps: {
-              variant: 'compact-list',
-              eyebrow: 'Upcoming Events',
-              title: 'Upcoming Events',
-              maxItems: 2
-            }
-          },
-          {
-            slot: 'donate',
-            widgetId: 'donation-cta',
-            defaultProps: {
-              variant: 'split-card',
-              eyebrow: 'Giving',
-              title: 'Your donation builds a better hereafter',
-              subtitle: 'Support our mission of worship, education and community.',
-              buttonLabel: 'Donate Now'
-            }
-          },
-          {
-            slot: 'support',
-            widgetId: 'quick-links',
-            defaultProps: {
-              variant: 'support-card',
-              title: 'Community Support',
-              eyebrow: 'Get involved',
-              featuredIcon: 'islamic-community',
-              items: 'New Muslim Support|Welcome, mentoring, and learning|#contact|islamic-community\nVolunteer With Us|Serve worshippers and neighbours|#contact|i-lucide-star'
-            }
-          }
-        ]
+      widgetId: 'sacred-modern-pathways',
+      defaultProps: {
+        variant: 'pathways',
+        eyebrow: 'Community pathways',
+        title: 'Begin with clarity',
+        subtitle: 'Three simple ways to connect with the masjid this week.',
+        items: 'Visit the mosque|Prayer spaces, visitor guidance, and directions for first-time guests|#contact|i-lucide-map-pin\nLearn with us|Quran circles, reminders, and classes for every age and stage|#events|i-lucide-book-open\nServe the community|Volunteer, give time, and support neighbours with care|#donate|i-lucide-heart-handshake'
+      }
+    },
+    {
+      id: 'events',
+      title: 'Events',
+      type: 'single',
+      required: false,
+      removable: true,
+      widgetId: 'events',
+      defaultProps: {
+        variant: 'compact-list',
+        eyebrow: 'Upcoming Events',
+        title: 'Upcoming Events',
+        maxItems: 3
+      }
+    },
+    {
+      id: 'donate',
+      title: 'Donate',
+      type: 'single',
+      required: false,
+      removable: true,
+      widgetId: 'donation-cta',
+      defaultProps: {
+        variant: 'split-card',
+        eyebrow: 'Giving',
+        title: 'Your donation builds a better hereafter',
+        subtitle: 'Support our mission of worship, education and community.',
+        buttonLabel: 'Donate Now'
       }
     },
     {
@@ -242,8 +238,12 @@ export const sacredModernTemplate: TemplateDefinition = {
         variant: 'split',
         title: 'A welcoming centre for worship, learning, and service.',
         body: '<p>Share the story of your mosque, the imam message, and practical guidance for first-time visitors.</p><p>Keep this section warm, concise, and community-focused.</p>',
-        imageUrl: '/templates/mosque-hero-3.svg',
-        imagePosition: 'right'
+        imageUrl: '/templates/sacred-modern-courtyard.webp',
+        imagePosition: 'right',
+        showStats: true,
+        stats: '5|Daily prayers\n3|Weekly circles\n1|Open community',
+        ctaLabel: 'Visit us',
+        ctaUrl: '#contact'
       }
     },
     {
