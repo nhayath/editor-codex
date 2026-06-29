@@ -10,7 +10,8 @@ export const prayerCountdownWidget: WidgetDefinition = {
     { id: 'card', name: 'Card' },
     { id: 'banner', name: 'Banner' },
     { id: 'minimal', name: 'Minimal' },
-    { id: 'split', name: 'Split' }
+    { id: 'split', name: 'Split' },
+    { id: 'iqamah-panel', name: 'Iqamah Panel' }
   ],
   component: 'WidgetPrayerCountdown',
   dataDependencies: ['prayerTimes'],
@@ -19,7 +20,8 @@ export const prayerCountdownWidget: WidgetDefinition = {
       { label: 'Card', value: 'card' },
       { label: 'Banner', value: 'banner' },
       { label: 'Minimal', value: 'minimal' },
-      { label: 'Split', value: 'split' }
+      { label: 'Split', value: 'split' },
+      { label: 'Iqamah Panel', value: 'iqamah-panel' }
     ] },
     { key: 'title', label: 'Title', type: 'text', default: 'Next prayer' },
     { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', options: [

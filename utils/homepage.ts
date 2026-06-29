@@ -144,10 +144,19 @@ export function normaliseDraft(template: TemplateDefinition, partial: Partial<Ho
   const templateIdSet = new Set(templateIds)
   const sectionOverrides = partial.sectionOverrides ?? {}
   const providedOrder = partial.sectionOrder?.filter(id => templateIdSet.has(id) || isCustomSection(id, sectionOverrides)) ?? []
-  const sectionOrder = [
-    ...providedOrder,
-    ...templateIds.filter(id => !providedOrder.includes(id))
-  ]
+  const sectionOrder = [...providedOrder]
+  for (const id of templateIds) {
+    if (sectionOrder.includes(id)) continue
+
+    const nextTemplateId = templateIds
+      .slice(templateIds.indexOf(id) + 1)
+      .find(candidate => sectionOrder.includes(candidate))
+    if (nextTemplateId) {
+      sectionOrder.splice(sectionOrder.indexOf(nextTemplateId), 0, id)
+    } else {
+      sectionOrder.push(id)
+    }
+  }
 
   const sectionsEnabled = defaultSectionsEnabled(template)
   for (const section of template.sections) {

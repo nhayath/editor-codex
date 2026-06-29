@@ -16,6 +16,22 @@ export const classicTemplate: TemplateDefinition = {
   dataDependencies: ['settings', 'navItems', 'prayerTimes', 'jummahTimes', 'events', 'announcements', 'donations'],
   sections: [
     {
+      id: 'next-prayer',
+      title: 'Next Prayer',
+      type: 'single',
+      required: true,
+      removable: false,
+      widgetId: 'prayer-countdown',
+      defaultProps: {
+        title: 'Next salah',
+        showIqamah: true,
+        showIcon: true,
+        showProgress: false,
+        precision: 'minutes',
+        variant: 'iqamah-panel'
+      }
+    },
+    {
       id: 'hero',
       title: 'Hero',
       type: 'single',
@@ -40,38 +56,19 @@ export const classicTemplate: TemplateDefinition = {
       widgetId: 'prayer-times',
       defaultProps: {
         variant: 'cards',
-        title: 'Today Prayer Times',
+        title: 'Todays Prayer Times',
         showIqamah: true,
         showSunrise: true
       }
     },
     {
-      id: 'prayer-and-jummah',
-      title: "Prayer & Jumu'ah",
-      type: 'group',
+      id: 'jummah-prayers',
+      title: "Jumu'ah Prayers",
+      type: 'single',
       required: false,
       removable: false,
-      group: {
-        layout: 'row',
-        groupProps: [
-          { key: 'layout', label: 'Layout', type: 'select', default: 'row', options: [
-            { label: 'Side by side', value: 'row' },
-            { label: 'Stacked', value: 'stack' }
-          ] }
-        ],
-        widgets: [
-          {
-            slot: 'main',
-            widgetId: 'prayer-countdown',
-            defaultProps: { title: 'Next prayer', showIqamah: true, variant: 'card' }
-          },
-          {
-            slot: 'side',
-            widgetId: 'jummah-times',
-            defaultProps: { title: "Jumu'ah prayers", variant: 'card', showLocation: true }
-          }
-        ]
-      }
+      widgetId: 'jummah-times',
+      defaultProps: { title: "Jumu'ah prayers", variant: 'card', showLocation: true }
     },
     {
       id: 'announcements',
