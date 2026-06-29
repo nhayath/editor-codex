@@ -510,11 +510,23 @@ body {
 
 /* Section rhythm */
 .tenant-site[data-template='classic'] > .tenant-section {
-  padding-block: clamp(2.75rem, 6vw, 4.5rem);
+  padding-block: clamp(1.75rem, 4vw, 3rem);
 }
 
 .tenant-site[data-template='classic'] > .tenant-section:first-of-type {
-  padding-block: clamp(1.5rem, 4vw, 2.75rem) clamp(2.5rem, 5vw, 4rem);
+  padding-block: clamp(1rem, 2.5vw, 1.75rem) clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.tenant-site[data-template='classic'] > #next-prayer {
+  padding-block: clamp(0.75rem, 2vw, 1.25rem) clamp(0.5rem, 1.5vw, 1rem);
+}
+
+.tenant-site[data-template='classic'] > #next-prayer + #hero {
+  padding-block-start: clamp(0.5rem, 1.5vw, 1rem);
+}
+
+.tenant-site[data-template='classic'] > #next-prayer + #hero::before {
+  display: none;
 }
 
 /* Ornamental gold hairline divider between consecutive sections */
@@ -522,7 +534,7 @@ body {
   display: block;
   width: min(440px, 64%);
   height: 9px;
-  margin: 0 auto clamp(2rem, 5vw, 3.25rem);
+  margin: 0 auto clamp(1rem, 2.5vw, 1.75rem);
   background:
     linear-gradient(90deg, transparent, var(--classic-hairline) 16%, color-mix(in srgb, var(--color-secondary) 55%, transparent) 50%, var(--classic-hairline) 84%, transparent) center / 100% 1px no-repeat,
     radial-gradient(circle, color-mix(in srgb, var(--color-secondary) 80%, transparent) 0 3px, transparent 3.5px) center / 9px 9px no-repeat;
