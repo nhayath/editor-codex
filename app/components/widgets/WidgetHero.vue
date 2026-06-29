@@ -87,26 +87,27 @@ function buttonClass(index: number, light: boolean) {
   <!-- IMMERSIVE: full-bleed background image, tall, text on top -->
   <div
     v-if="variant === 'immersive'"
-    class="relative isolate min-h-[620px] overflow-hidden rounded-lg bg-[var(--color-primary)] text-[var(--color-surface)]"
+    class="@container relative left-1/2 isolate min-h-[560px] w-screen -translate-x-1/2 overflow-hidden bg-[var(--color-primary)] text-[var(--color-surface)] @4xl:min-h-[720px]"
   >
     <img
       v-if="imageUrl"
       :src="imageUrl"
       :alt="title"
-      class="absolute inset-0 -z-20 h-full w-full object-cover"
+      class="absolute inset-0 -z-20 h-full w-full scale-[1.02] object-cover object-[72%_center]"
     >
-    <div class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-primary)_96%,var(--color-text))_0%,color-mix(in_srgb,var(--color-primary)_76%,transparent)_48%,color-mix(in_srgb,var(--color-accent)_22%,transparent)_100%),linear-gradient(180deg,transparent_0%,color-mix(in_srgb,var(--color-primary)_90%,var(--color-text))_100%)]" />
-    <div class="absolute inset-0 -z-10 opacity-30 [background-image:linear-gradient(45deg,color-mix(in_srgb,var(--color-secondary)_28%,transparent)_25%,transparent_25%),linear-gradient(-45deg,color-mix(in_srgb,var(--color-secondary)_20%,transparent)_25%,transparent_25%)] [background-size:28px_28px]" />
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_78%_28%,color-mix(in_srgb,var(--color-accent)_18%,transparent),transparent_34%),linear-gradient(90deg,color-mix(in_srgb,var(--color-primary)_90%,var(--color-text))_0%,color-mix(in_srgb,var(--color-primary)_58%,transparent)_38%,transparent_78%),linear-gradient(180deg,transparent_35%,color-mix(in_srgb,var(--color-primary)_72%,var(--color-text))_100%)]" />
+    <div class="absolute inset-0 -z-10 opacity-10 mix-blend-soft-light [background-image:linear-gradient(45deg,color-mix(in_srgb,var(--color-surface)_42%,transparent)_25%,transparent_25%),linear-gradient(-45deg,color-mix(in_srgb,var(--color-surface)_34%,transparent)_25%,transparent_25%)] [background-size:72px_72px]" />
+    <div class="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-black/20 to-transparent" />
 
-    <div class="flex min-h-[620px] max-w-3xl flex-col justify-end p-6 @lg:p-10 @2xl:p-14">
+    <div class="mx-auto flex min-h-[560px] w-[min(1120px,calc(100%-2rem))] flex-col justify-end p-6 @lg:p-10 @2xl:p-14 @4xl:min-h-[720px]">
       <p
         v-if="eyebrow"
-        class="mb-5 inline-flex w-fit items-center gap-2 rounded-md bg-[var(--color-accent)] px-3 py-2 text-sm font-bold text-[var(--color-surface)] shadow-[0_12px_30px_rgba(0,0,0,0.18)]"
+        class="mb-5 inline-flex w-fit items-center gap-2 rounded-md bg-[color:color-mix(in_srgb,var(--color-surface)_16%,transparent)] px-3 py-2 text-sm font-bold text-[var(--color-surface)] shadow-[0_12px_30px_rgba(0,0,0,0.18)] ring-1 ring-[color:color-mix(in_srgb,var(--color-surface)_26%,transparent)] backdrop-blur-md"
       >
         <IconGlyph name="islamic-mosque" class="size-4" />
         {{ eyebrow }}
       </p>
-      <h1 class="tenant-heading text-5xl font-bold leading-[1.02] tracking-normal text-[var(--color-surface)] @lg:text-6xl @2xl:text-7xl">
+      <h1 class="tenant-heading max-w-3xl text-5xl font-bold leading-[1.02] tracking-normal text-[var(--color-surface)] @lg:text-6xl @2xl:text-7xl">
         {{ title }}
       </h1>
       <p class="mt-6 max-w-2xl text-lg leading-8 text-[color:color-mix(in_srgb,var(--color-surface)_78%,transparent)]">
