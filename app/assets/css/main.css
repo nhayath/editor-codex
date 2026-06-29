@@ -391,6 +391,19 @@ body {
   padding-block: clamp(1rem, 2vw, 2rem) clamp(3rem, 6vw, 5rem);
 }
 
+.tenant-site[data-template='sacred-modern'] > #iqamah-panel {
+  padding-block: clamp(1rem, 2vw, 2rem) clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+.tenant-site[data-template='sacred-modern'] > #iqamah-panel + #hero {
+  padding-block-start: clamp(0.75rem, 1.75vw, 1.5rem);
+}
+
+.tenant-site[data-template='sacred-modern'] > #iqamah-panel + #hero::before,
+.tenant-site[data-template='sacred-modern'] > #iqamah-panel + #hero::after {
+  display: none;
+}
+
 .tenant-site[data-template='sacred-modern'] > .tenant-section + .tenant-section::before {
   position: absolute;
   top: 0;

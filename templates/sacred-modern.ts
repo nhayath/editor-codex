@@ -20,8 +20,22 @@ export const sacredModernTemplate: TemplateDefinition = {
           { label: 'Editorial split', value: 'editorial-split' }
         ] },
         { key: 'locationLabel', label: 'Location label', type: 'text', default: 'Fattan Mosque, Berlin, Germany' },
-        { key: 'showLocationPill', label: 'Show location pill', type: 'toggle', default: true },
-        { key: 'showNextPrayer', label: 'Show next iqamah panel', type: 'toggle', default: true }
+        { key: 'showLocationPill', label: 'Show location pill', type: 'toggle', default: true }
+      ]
+    },
+    'sacred-modern-iqamah-panel': {
+      name: 'Sacred Modern Iqamah Panel',
+      description: 'Standalone next salah and iqamah countdown panel.',
+      component: 'SacredModernIqamahPanel',
+      variants: [
+        { id: 'feature-strip', name: 'Feature strip' }
+      ],
+      propSchema: [
+        { key: 'variant', label: 'Style', type: 'select', default: 'feature-strip', options: [
+          { label: 'Feature strip', value: 'feature-strip' }
+        ] },
+        { key: 'label', label: 'Label', type: 'text', default: 'Next salah' },
+        { key: 'countdownLabel', label: 'Countdown label', type: 'text', default: 'Iqamah in' }
       ]
     },
     'prayer-times': {
@@ -113,6 +127,19 @@ export const sacredModernTemplate: TemplateDefinition = {
   dataDependencies: ['settings', 'navItems', 'prayerTimes', 'jummahTimes', 'events', 'announcements', 'donations'],
   sections: [
     {
+      id: 'iqamah-panel',
+      title: 'Iqamah Panel',
+      type: 'single',
+      required: true,
+      removable: false,
+      widgetId: 'sacred-modern-iqamah-panel',
+      defaultProps: {
+        variant: 'feature-strip',
+        label: 'Next salah',
+        countdownLabel: 'Iqamah in'
+      }
+    },
+    {
       id: 'hero',
       title: 'Hero',
       type: 'single',
@@ -131,7 +158,6 @@ export const sacredModernTemplate: TemplateDefinition = {
         primaryUrl: '#prayer-times',
         secondaryLabel: 'Plan Your Visit',
         secondaryUrl: '#about',
-        showNextPrayer: true,
         align: 'left'
       }
     },

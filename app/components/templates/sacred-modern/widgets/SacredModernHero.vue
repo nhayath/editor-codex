@@ -10,7 +10,6 @@ const props = withDefaults(defineProps<{
   secondaryUrl?: string
   locationLabel?: string
   showLocationPill?: boolean
-  showNextPrayer?: boolean
   data?: Record<string, any>
 }>(), {
   eyebrow: '',
@@ -23,101 +22,7 @@ const props = withDefaults(defineProps<{
   secondaryUrl: '#about',
   locationLabel: '',
   showLocationPill: true,
-  showNextPrayer: true,
   data: () => ({})
-})
-
-const prayerIcons: Record<string, string> = {
-  Fajr: 'i-lucide-sunrise',
-  Dhuhr: 'i-lucide-sun',
-  Asr: 'i-lucide-cloud-sun',
-  Maghrib: 'i-lucide-sunset',
-  Isha: 'i-lucide-moon-star'
-}
-
-interface HeroPrayerRow {
-  name: string
-  time?: string | null
-  iqamah?: string | null
-}
-
-const currentSeconds = ref<number | null>(null)
-let interval: ReturnType<typeof window.setInterval> | undefined
-
-function updateCurrentSeconds() {
-  const now = new Date()
-  currentSeconds.value = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()
-}
-
-onMounted(() => {
-  updateCurrentSeconds()
-  interval = window.setInterval(updateCurrentSeconds, 1000)
-})
-
-onBeforeUnmount(() => {
-  if (interval) window.clearInterval(interval)
-})
-
-function secondsFromTime(value?: string | null) {
-  if (!value) return null
-  const [hoursRaw, minutesRaw] = value.split(':')
-  const hours = Number(hoursRaw)
-  const minutes = Number(minutesRaw)
-  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return null
-  return hours * 3600 + minutes * 60
-}
-
-function secondsUntil(targetSeconds?: number | null) {
-  const now = currentSeconds.value
-  if (now === null || targetSeconds === null || targetSeconds === undefined) return null
-
-  let diff = targetSeconds - now
-  if (diff < 0) diff += 24 * 3600
-  return diff
-}
-
-function formatTimeLeft(totalSeconds?: number | null) {
-  if (totalSeconds === null || totalSeconds === undefined) return '--'
-  if (totalSeconds < 60) return `${Math.max(0, Math.floor(totalSeconds))}s`
-
-  const hours = Math.floor(totalSeconds / 3600)
-  const minutes = Math.floor((totalSeconds % 3600) / 60)
-
-  if (hours > 0) return `${hours}h ${minutes.toString().padStart(2, '0')}m`
-  return `${minutes}m`
-}
-
-const prayerRows = computed<HeroPrayerRow[]>(() => {
-  const p = props.data?.prayerTimes ?? {}
-  return [
-    { name: 'Fajr', time: p.fajr, iqamah: p.fajrIqamah },
-    { name: 'Dhuhr', time: p.dhuhr, iqamah: p.dhuhrIqamah },
-    { name: 'Asr', time: p.asr, iqamah: p.asrIqamah },
-    { name: 'Maghrib', time: p.maghrib, iqamah: p.maghribIqamah },
-    { name: 'Isha', time: p.isha, iqamah: p.ishaIqamah }
-  ].filter(row => row.time || row.iqamah)
-})
-
-const nextIqamah = computed(() => {
-  const rows = prayerRows.value
-  if (!rows.length) return null
-
-  const now = currentSeconds.value
-  if (now === null) return rows[0]
-
-  for (const row of rows) {
-    const target = secondsFromTime(row.iqamah || row.time)
-    if (target !== null && target >= now) return row
-  }
-
-  return rows[0]
-})
-
-const iqamahSecondsLeft = computed(() => secondsUntil(secondsFromTime(nextIqamah.value?.iqamah || nextIqamah.value?.time)))
-const iqamahCountdownLabel = computed(() => formatTimeLeft(iqamahSecondsLeft.value))
-const isFinalMinute = computed(() => {
-  const value = iqamahSecondsLeft.value
-  return value !== null && value < 60
 })
 
 const locationText = computed(() => {
@@ -132,55 +37,6 @@ const locationText = computed(() => {
   <div class="sacred-modern-hero @container relative isolate overflow-hidden rounded-lg bg-[color:color-mix(in_srgb,var(--color-surface)_88%,var(--color-bg))] px-5 py-8 shadow-[0_24px_70px_color-mix(in_srgb,var(--color-primary)_9%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_18%,transparent)] @lg:px-8 @4xl:px-12 @4xl:py-12">
     <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--color-secondary)_17%,transparent),transparent_30%),radial-gradient(circle_at_92%_4%,color-mix(in_srgb,var(--color-primary)_10%,transparent),transparent_28%)]" />
     <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-primary)] opacity-[0.045] [mask-image:url(/backgrounds/rosette-bloom.svg)] [mask-position:top_center] [mask-repeat:repeat] [mask-size:260px]" />
-
-    <section
-      v-if="showNextPrayer && nextIqamah"
-      class="sacred-modern-iqamah-panel mb-8 grid gap-4 rounded-lg border border-[color:color-mix(in_srgb,var(--color-secondary)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--color-primary)_94%,black)] p-4 text-white shadow-[0_22px_56px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] @md:grid-cols-[auto_1fr_auto] @md:items-center @md:p-5 @4xl:mb-10"
-      :class="{ 'sacred-modern-iqamah-panel-urgent': isFinalMinute }"
-      aria-live="polite"
-    >
-      <div class="flex items-center gap-3">
-        <span class="sacred-modern-live-dot grid size-12 shrink-0 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_18%,transparent)] text-[var(--color-secondary)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_42%,transparent)]">
-          <UIcon :name="prayerIcons[nextIqamah.name] ?? 'i-lucide-clock-3'" class="size-6" />
-        </span>
-        <div>
-          <p class="text-[0.68rem] font-black uppercase tracking-normal text-[var(--color-secondary)]">
-            Next salah
-          </p>
-          <h2 class="tenant-heading mt-0.5 text-2xl font-bold leading-none text-white @md:text-3xl">
-            {{ nextIqamah.name }}
-          </h2>
-        </div>
-      </div>
-
-      <div class="grid gap-2 border-y border-white/10 py-4 @md:grid-cols-2 @md:border-x @md:border-y-0 @md:px-6 @md:py-0">
-        <div>
-          <p class="text-xs font-bold uppercase tracking-normal text-white/50">
-            Prayer begins
-          </p>
-          <p class="mt-1 text-2xl font-black tabular-nums text-white">
-            {{ nextIqamah.time || '--:--' }}
-          </p>
-        </div>
-        <div>
-          <p class="text-xs font-bold uppercase tracking-normal text-white/50">
-            Iqamah
-          </p>
-          <p class="mt-1 text-2xl font-black tabular-nums text-[var(--color-secondary)]">
-            {{ nextIqamah.iqamah || nextIqamah.time || '--:--' }}
-          </p>
-        </div>
-      </div>
-
-      <div class="rounded-md bg-[color:color-mix(in_srgb,var(--color-secondary)_14%,transparent)] px-4 py-3 ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)] @md:min-w-44 @md:text-right">
-        <p class="text-xs font-bold uppercase tracking-normal text-white/64">
-          Iqamah in
-        </p>
-        <p class="mt-1 text-3xl font-black tabular-nums text-[var(--color-secondary)] @md:text-4xl">
-          {{ iqamahCountdownLabel }}
-        </p>
-      </div>
-    </section>
 
     <div class="grid items-center gap-8 @4xl:grid-cols-[minmax(0,0.92fr)_minmax(340px,1.08fr)] @4xl:gap-10 @6xl:gap-16">
       <div class="min-w-0">
@@ -255,18 +111,8 @@ const locationText = computed(() => {
 
 <style scoped>
 @media (prefers-reduced-motion: no-preference) {
-  .sacred-modern-live-dot,
   .sacred-modern-hero-rosette {
     animation: sacred-modern-soft-pulse 3.2s ease-in-out infinite;
-  }
-
-  .sacred-modern-iqamah-panel {
-    animation: sacred-modern-iqamah-glow 4s ease-in-out infinite;
-  }
-
-  .sacred-modern-iqamah-panel-urgent .sacred-modern-live-dot,
-  .sacred-modern-iqamah-panel-urgent {
-    animation: sacred-modern-heartbeat 0.85s ease-in-out infinite;
   }
 }
 
@@ -282,29 +128,4 @@ const locationText = computed(() => {
   }
 }
 
-@keyframes sacred-modern-iqamah-glow {
-  0%, 100% {
-    box-shadow: 0 22px 56px color-mix(in srgb, var(--color-primary) 18%, transparent);
-  }
-
-  50% {
-    box-shadow: 0 24px 72px color-mix(in srgb, var(--color-secondary) 22%, transparent);
-  }
-}
-
-@keyframes sacred-modern-heartbeat {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 22px 56px color-mix(in srgb, var(--color-secondary) 18%, transparent);
-  }
-
-  35% {
-    transform: scale(1.018);
-    box-shadow: 0 28px 84px color-mix(in srgb, var(--color-secondary) 32%, transparent);
-  }
-
-  58% {
-    transform: scale(0.995);
-  }
-}
 </style>

@@ -22,6 +22,7 @@ import NoorHero from '~/components/templates/noor/widgets/NoorHero.vue'
 import NoorPrayerBoard from '~/components/templates/noor/widgets/NoorPrayerBoard.vue'
 import SacredModernHero from '~/components/templates/sacred-modern/widgets/SacredModernHero.vue'
 import SacredModernPrayerTimes from '~/components/templates/sacred-modern/widgets/SacredModernPrayerTimes.vue'
+import SacredModernIqamahPanel from '~/components/templates/sacred-modern/widgets/SacredModernIqamahPanel.vue'
 import SacredModernKhutbahCard from '~/components/templates/sacred-modern/widgets/SacredModernKhutbahCard.vue'
 import SacredModernEvents from '~/components/templates/sacred-modern/widgets/SacredModernEvents.vue'
 import SacredModernDonationCta from '~/components/templates/sacred-modern/widgets/SacredModernDonationCta.vue'
@@ -71,6 +72,7 @@ const namedWidgetComponents: Record<string, Component> = {
   NoorPrayerBoard,
   SacredModernHero,
   SacredModernPrayerTimes,
+  SacredModernIqamahPanel,
   SacredModernKhutbahCard,
   SacredModernEvents,
   SacredModernDonationCta,
