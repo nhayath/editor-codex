@@ -44,7 +44,7 @@ const directionsUrl = computed(() => `https://www.google.com/maps/search/?api=1&
       />
     </div>
 
-    <div class="min-h-72 overflow-hidden rounded-lg bg-[color:color-mix(in_srgb,var(--color-primary)_10%,white)] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]">
+    <div class="min-h-72 overflow-hidden rounded-lg bg-[color:color-mix(in_srgb,var(--color-primary)_10%,var(--color-surface))] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]">
       <iframe
         v-if="embedUrl"
         :src="embedUrl"

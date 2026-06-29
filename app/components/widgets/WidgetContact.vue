@@ -124,7 +124,7 @@ const panelStyle = computed(() =>
   isFilled.value
     ? { background: 'rgba(255,255,255,0.1)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)' }
     : {
-        background: 'color-mix(in srgb, var(--color-surface) 92%, white)',
+        background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))',
         boxShadow: `inset 0 0 0 1px ${hairlineColor.value}`
       }
 )
@@ -132,7 +132,7 @@ const panelStyle = computed(() =>
 const iconStyle = computed(() =>
   isFilled.value
     ? { background: 'rgba(255,255,255,0.14)', color: '#fff' }
-    : { background: `color-mix(in srgb, ${accentVar.value} 12%, white)`, color: accentVar.value }
+    : { background: `color-mix(in srgb, ${accentVar.value} 12%, var(--color-surface))`, color: accentVar.value }
 )
 
 const primaryActionStyle = computed(() =>

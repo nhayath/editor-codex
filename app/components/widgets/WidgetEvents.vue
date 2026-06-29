@@ -107,7 +107,7 @@ const cardStyle = computed(() => isFilled.value
 
 const imageTileStyle = computed(() => isFilled.value
   ? { background: 'rgba(255,255,255,0.16)', color: '#fff' }
-  : { background: 'color-mix(in srgb, var(--color-primary) 12%, white)', color: accentVar.value })
+  : { background: 'color-mix(in srgb, var(--color-primary) 12%, var(--color-surface))', color: accentVar.value })
 
 const headerAlignClass = computed(() => props.align === 'center' ? 'text-center' : '')
 

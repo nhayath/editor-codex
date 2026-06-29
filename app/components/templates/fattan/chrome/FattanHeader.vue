@@ -17,7 +17,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 <template>
   <header
     id="top"
-    class="fattan-header @container z-30 overflow-hidden border border-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_88%,white)] shadow-[0_18px_50px_color-mix(in_srgb,var(--color-primary)_10%,transparent)] backdrop-blur"
+    class="fattan-header @container z-30 overflow-hidden border border-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_88%,var(--color-surface))] shadow-[0_18px_50px_color-mix(in_srgb,var(--color-primary)_10%,transparent)] backdrop-blur"
     :class="sticky !== false ? 'sticky top-0' : ''"
   >
     <div class="pointer-events-none h-1.5 bg-[linear-gradient(90deg,transparent,var(--color-secondary),transparent)] opacity-80" />
@@ -26,7 +26,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-4"
       >
-        <div class="relative grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[var(--color-primary)] text-white shadow-[0_16px_34px_color-mix(in_srgb,var(--color-primary)_22%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_35%,transparent)]">
+        <div class="relative grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[var(--color-primary)] text-[var(--color-surface)] shadow-[0_16px_34px_color-mix(in_srgb,var(--color-primary)_22%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_35%,transparent)]">
           <span class="pointer-events-none absolute inset-0 bg-[var(--color-secondary)] opacity-[0.13] [mask-image:url(/backgrounds/eight-point-star.svg)] [mask-position:center] [mask-repeat:repeat] [mask-size:46px]" aria-hidden="true" />
           <img
             v-if="logoUrl"
@@ -42,7 +42,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         </span>
       </NuxtLink>
 
-      <nav class="hidden rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_24%,transparent)] bg-white/72 p-1 shadow-[0_12px_26px_color-mix(in_srgb,var(--color-primary)_8%,transparent)] @5xl:flex">
+      <nav class="hidden rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_24%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_72%,transparent)] p-1 shadow-[0_12px_26px_color-mix(in_srgb,var(--color-primary)_8%,transparent)] @5xl:flex">
         <UButton
           v-for="item in navItems"
           :key="item.id"
@@ -50,7 +50,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
           color="neutral"
           variant="ghost"
           size="sm"
-          class="rounded-full px-4 font-black text-[var(--color-primary)] hover:bg-[var(--color-secondary)] hover:text-white"
+          class="rounded-full px-4 font-black text-[var(--color-primary)] hover:bg-[var(--color-secondary)] hover:text-[var(--color-surface)]"
           :label="item.label"
         />
       </nav>
@@ -62,14 +62,14 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
           icon="i-lucide-heart"
           label="Support"
           size="sm"
-          class="hidden rounded-full bg-[var(--color-secondary)] px-6 font-black text-white hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_88%,black)] @4xl:inline-flex"
+          class="hidden rounded-full bg-[var(--color-secondary)] px-6 font-black text-[var(--color-surface)] hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_88%,var(--color-text))] @4xl:inline-flex"
         />
         <UButton
           color="neutral"
           icon="i-lucide-align-justify"
           size="sm"
           :aria-label="menuOpen ? 'Close menu' : 'Open menu'"
-          class="rounded-full bg-[var(--color-primary)] text-white hover:bg-[color:color-mix(in_srgb,var(--color-primary)_88%,black)] @5xl:hidden"
+          class="rounded-full bg-[var(--color-primary)] text-[var(--color-surface)] hover:bg-[color:color-mix(in_srgb,var(--color-primary)_88%,var(--color-text))] @5xl:hidden"
           @click="menuOpen = !menuOpen"
         />
       </div>
@@ -87,7 +87,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         color="neutral"
         variant="ghost"
         size="sm"
-        class="justify-between rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_18%,transparent)] bg-white/70 px-4 font-black text-[var(--color-primary)]"
+        class="justify-between rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_18%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_70%,transparent)] px-4 font-black text-[var(--color-primary)]"
         trailing-icon="i-lucide-arrow-up-right"
         :label="item.label"
         @click="menuOpen = false"
@@ -98,7 +98,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         icon="i-lucide-heart"
         label="Support the mosque"
         size="sm"
-        class="justify-center rounded-full bg-[var(--color-secondary)] font-black text-white"
+        class="justify-center rounded-full bg-[var(--color-secondary)] font-black text-[var(--color-surface)]"
         @click="menuOpen = false"
       />
     </nav>

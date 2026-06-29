@@ -12,7 +12,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
 </script>
 
 <template>
-  <footer class="@container relative isolate overflow-hidden !bg-[var(--color-primary)] py-14 text-white">
+  <footer class="@container relative isolate overflow-hidden !bg-[var(--color-primary)] py-14 text-[var(--color-surface)]">
     <!-- Arabesque corner motif -->
     <div
       class="pointer-events-none absolute -right-12 -top-12 -z-10 size-72 bg-[var(--color-secondary)] opacity-[0.06] [mask-image:url(/backgrounds/rosette-bloom.svg)] [mask-position:top_right] [mask-repeat:repeat] [mask-size:170px]"
@@ -25,10 +25,10 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
           class="mb-3 block size-7 text-[var(--color-secondary)]"
           aria-hidden="true"
         />
-        <p class="tenant-heading text-3xl font-bold text-white">
+        <p class="tenant-heading text-3xl font-bold text-[var(--color-surface)]">
           {{ tenant?.name }}
         </p>
-        <p class="mt-4 max-w-lg text-sm font-medium leading-7 text-white/72">
+        <p class="mt-4 max-w-lg text-sm font-medium leading-7 text-[color:color-mix(in_srgb,var(--color-surface)_72%,transparent)]">
           {{ tenant?.settings?.aboutText || 'A calmer, sharper mosque homepage for prayer, events, giving, and community updates.' }}
         </p>
       </div>
@@ -37,12 +37,12 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
         <h2 class="tenant-heading text-xl font-bold text-[var(--color-secondary)]">
           Site
         </h2>
-        <nav class="mt-4 grid gap-3 text-sm font-bold text-white/74">
+        <nav class="mt-4 grid gap-3 text-sm font-bold text-[color:color-mix(in_srgb,var(--color-surface)_74%,transparent)]">
           <NuxtLink
             v-for="item in footerLinks"
             :key="item.id ?? item.href"
             :to="item.href"
-            class="hover:text-white"
+            class="hover:text-[var(--color-surface)]"
           >
             {{ item.label }}
           </NuxtLink>
@@ -53,7 +53,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
         <h2 class="tenant-heading text-xl font-bold text-[var(--color-secondary)]">
           Visit
         </h2>
-        <div class="mt-4 grid gap-3 text-sm font-medium leading-6 text-white/72">
+        <div class="mt-4 grid gap-3 text-sm font-medium leading-6 text-[color:color-mix(in_srgb,var(--color-surface)_72%,transparent)]">
           <span>{{ tenant?.settings?.address }}</span>
           <span>{{ tenant?.settings?.city }} {{ tenant?.settings?.postcode }}</span>
           <span>{{ tenant?.settings?.email }}</span>
@@ -62,7 +62,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
       </div>
     </div>
 
-    <div class="tenant-container mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/12 pt-6 text-xs font-semibold text-white/62">
+    <div class="tenant-container mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-[color:color-mix(in_srgb,var(--color-surface)_12%,transparent)] pt-6 text-xs font-semibold text-[color:color-mix(in_srgb,var(--color-surface)_62%,transparent)]">
       <span>© {{ year }} {{ tenant?.name }}</span>
       <div class="flex items-center gap-2">
         <UButton
@@ -73,7 +73,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
           variant="ghost"
           icon="i-lucide-facebook"
           size="xs"
-          class="text-white/70 hover:bg-white/10 hover:text-white"
+          class="text-[color:color-mix(in_srgb,var(--color-surface)_70%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] hover:text-[var(--color-surface)]"
           aria-label="Facebook"
         />
         <UButton
@@ -84,7 +84,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
           variant="ghost"
           icon="i-lucide-instagram"
           size="xs"
-          class="text-white/70 hover:bg-white/10 hover:text-white"
+          class="text-[color:color-mix(in_srgb,var(--color-surface)_70%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] hover:text-[var(--color-surface)]"
           aria-label="Instagram"
         />
         <UButton
@@ -95,7 +95,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
           variant="ghost"
           icon="i-lucide-youtube"
           size="xs"
-          class="text-white/70 hover:bg-white/10 hover:text-white"
+          class="text-[color:color-mix(in_srgb,var(--color-surface)_70%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] hover:text-[var(--color-surface)]"
           aria-label="YouTube"
         />
       </div>

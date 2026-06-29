@@ -40,7 +40,7 @@ withDefaults(defineProps<{
         <p class="text-xs font-black uppercase tracking-normal text-[var(--color-primary)]">
           {{ label }}
         </p>
-        <span class="grid size-12 shrink-0 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_18%,white)] text-[var(--color-primary)]">
+        <span class="grid size-12 shrink-0 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_18%,var(--color-surface))] text-[var(--color-primary)]">
           <IconGlyph name="islamic-quran" class="size-6" />
         </span>
       </div>
@@ -60,7 +60,7 @@ withDefaults(defineProps<{
         <UButton
           :to="buttonUrl"
           color="neutral"
-          class="rounded-md bg-[var(--color-primary)] font-bold text-white hover:bg-[color:color-mix(in_srgb,var(--color-primary)_88%,black)]"
+          class="rounded-md bg-[var(--color-primary)] font-bold text-[var(--color-surface)] hover:bg-[color:color-mix(in_srgb,var(--color-primary)_88%,var(--color-text))]"
           :label="buttonLabel"
           trailing-icon="i-lucide-arrow-up-right"
         />

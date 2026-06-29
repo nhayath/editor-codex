@@ -25,7 +25,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-3"
       >
-        <div class="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-[var(--color-primary)] text-white shadow-[0_12px_24px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_28%,transparent)]">
+        <div class="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-[var(--color-primary)] text-[var(--color-surface)] shadow-[0_12px_24px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_28%,transparent)]">
           <span class="pointer-events-none absolute inset-0 bg-[var(--color-secondary)] opacity-[0.14] [mask-image:url(/backgrounds/eight-point-star.svg)] [mask-position:center] [mask-repeat:repeat] [mask-size:44px]" aria-hidden="true" />
           <img
             v-if="logoUrl"
@@ -59,7 +59,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
           color="neutral"
           label="Donate"
           trailing-icon="i-lucide-arrow-up-right"
-          class="rounded-full bg-[var(--color-secondary)] px-7 font-black text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_88%,white)]"
+          class="rounded-full bg-[var(--color-secondary)] px-7 font-black text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_88%,var(--color-surface))]"
         />
       </div>
 

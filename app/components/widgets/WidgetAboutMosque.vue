@@ -93,7 +93,7 @@ const frameStyle = computed(() =>
 const statStyle = computed(() =>
   isFilled.value
     ? { background: 'rgba(255,255,255,0.1)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)' }
-    : { background: 'color-mix(in srgb, var(--color-surface) 92%, white)', boxShadow: `inset 0 0 0 1px ${hairlineColor.value}` }
+    : { background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))', boxShadow: `inset 0 0 0 1px ${hairlineColor.value}` }
 )
 
 const ctaStyle = computed(() =>
@@ -163,23 +163,23 @@ const padded = computed(() => props.background === 'surface' ? '' : 'rounded-lg 
       <img :src="resolvedImage" :alt="title" class="absolute inset-0 size-full object-cover" :class="showImage ? '' : 'hidden'">
       <div class="absolute inset-0" :style="{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--color-text) 20%, transparent), color-mix(in srgb, var(--color-text) 78%, transparent))' }" />
       <div class="relative p-8 @xl:p-12" :class="alignClass">
-        <p class="text-sm font-semibold text-white/80">
+        <p class="text-sm font-semibold text-[color:color-mix(in_srgb,var(--color-surface)_80%,transparent)]">
           {{ eyebrow }}
         </p>
-        <h2 class="tenant-heading mt-2 text-3xl font-bold text-white @xl:text-4xl">
+        <h2 class="tenant-heading mt-2 text-3xl font-bold text-[var(--color-surface)] @xl:text-4xl">
           {{ title }}
         </h2>
-        <div class="rich-content mt-4 max-w-2xl text-white/85" :class="align === 'center' ? 'mx-auto' : ''" v-html="body" />
+        <div class="rich-content mt-4 max-w-2xl text-[color:color-mix(in_srgb,var(--color-surface)_85%,transparent)]" :class="align === 'center' ? 'mx-auto' : ''" v-html="body" />
         <div
           v-if="hasStats"
           class="mt-6 flex flex-wrap gap-3"
           :class="align === 'center' ? 'justify-center' : ''"
         >
-          <div v-for="(s, i) in stats" :key="i" class="rounded-lg bg-white/10 px-4 py-3 text-center ring-1 ring-white/20">
-            <div class="text-xl font-bold text-white">
+          <div v-for="(s, i) in stats" :key="i" class="rounded-lg bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] px-4 py-3 text-center ring-1 ring-[color:color-mix(in_srgb,var(--color-surface)_20%,transparent)]">
+            <div class="text-xl font-bold text-[var(--color-surface)]">
               {{ s.value }}
             </div>
-            <div class="text-xs text-white/75">
+            <div class="text-xs text-[color:color-mix(in_srgb,var(--color-surface)_75%,transparent)]">
               {{ s.label }}
             </div>
           </div>
@@ -187,7 +187,7 @@ const padded = computed(() => props.background === 'surface' ? '' : 'rounded-lg 
         <a
           v-if="hasCta"
           :href="ctaUrl"
-          class="mt-6 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold"
+          class="mt-6 inline-flex items-center gap-2 rounded-lg bg-[var(--color-surface)] px-5 py-2.5 text-sm font-semibold"
           :style="{ color: accentVar }"
         >
           {{ ctaLabel }}

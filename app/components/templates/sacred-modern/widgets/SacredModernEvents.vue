@@ -56,7 +56,7 @@ function dateParts(value?: string) {
         :key="event.id"
         class="grid gap-4 rounded-lg border border-[color:color-mix(in_srgb,var(--color-text)_8%,transparent)] bg-[color:color-mix(in_srgb,var(--color-bg)_58%,var(--color-surface))] p-4 @md:grid-cols-[3.75rem_1fr_auto] @md:items-center"
       >
-        <div class="grid aspect-square w-16 place-items-center rounded-lg bg-[color:color-mix(in_srgb,var(--color-secondary)_16%,white)] text-center ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)] @md:w-auto">
+        <div class="grid aspect-square w-16 place-items-center rounded-lg bg-[color:color-mix(in_srgb,var(--color-secondary)_16%,var(--color-surface))] text-center ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)] @md:w-auto">
           <span>
             <span class="block text-[0.65rem] font-black uppercase tracking-normal text-[var(--color-text-muted)]">{{ dateParts(event.date).month }}</span>
             <span class="-mt-1 block text-xl font-black text-[var(--color-primary)]">{{ dateParts(event.date).day }}</span>
@@ -77,7 +77,7 @@ function dateParts(value?: string) {
           color="neutral"
           variant="soft"
           size="xs"
-          class="w-fit rounded-md bg-[color:color-mix(in_srgb,var(--color-secondary)_14%,white)] px-3 font-bold text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_22%,white)]"
+          class="w-fit rounded-md bg-[color:color-mix(in_srgb,var(--color-secondary)_14%,var(--color-surface))] px-3 font-bold text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_22%,var(--color-surface))]"
           label="Details"
           trailing-icon="i-lucide-arrow-up-right"
         />

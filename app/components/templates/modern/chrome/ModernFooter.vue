@@ -16,7 +16,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
     <div class="tenant-container grid gap-10 @2xl:grid-cols-[1.2fr_0.8fr_0.9fr]">
       <div>
         <div class="flex items-center gap-3">
-          <div class="grid size-11 place-items-center rounded-full bg-[var(--color-primary)] text-white">
+          <div class="grid size-11 place-items-center rounded-full bg-[var(--color-primary)] text-[var(--color-surface)]">
             <IconGlyph name="islamic-mosque" class="size-5" />
           </div>
           <p class="tenant-heading text-2xl font-bold text-[var(--color-text)]">
@@ -32,7 +32,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
           icon="i-lucide-calendar-days"
           label="Plan a visit"
           size="sm"
-          class="mt-6 rounded-full bg-[var(--color-primary)] px-5 font-bold text-white"
+          class="mt-6 rounded-full bg-[var(--color-primary)] px-5 font-bold text-[var(--color-surface)]"
         />
       </div>
 

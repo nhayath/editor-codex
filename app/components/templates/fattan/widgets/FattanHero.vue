@@ -88,15 +88,15 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
 </script>
 
 <template>
-  <div class="fattan-hero @container relative isolate overflow-hidden rounded-[1.35rem] bg-[var(--color-primary)] text-white">
-    <div class="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(130%_110%_at_4%_0%,color-mix(in_srgb,var(--color-secondary)_28%,transparent)_0%,transparent_34%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_95%,black)_0%,color-mix(in_srgb,var(--color-primary)_82%,var(--color-accent))_100%)]" />
+  <div class="fattan-hero @container relative isolate overflow-hidden rounded-[1.35rem] bg-[var(--color-primary)] text-[var(--color-surface)]">
+    <div class="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(130%_110%_at_4%_0%,color-mix(in_srgb,var(--color-secondary)_28%,transparent)_0%,transparent_34%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_95%,var(--color-text))_0%,color-mix(in_srgb,var(--color-primary)_82%,var(--color-accent))_100%)]" />
     <div
       v-if="backgroundImageUrl"
       class="pointer-events-none absolute inset-0 -z-30 bg-cover bg-center opacity-[0.42] mix-blend-screen"
       :style="heroBackgroundStyle"
       aria-hidden="true"
     />
-    <div class="pointer-events-none absolute inset-0 -z-20 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-primary)_72%,black)_0%,color-mix(in_srgb,var(--color-primary)_68%,transparent)_54%,color-mix(in_srgb,var(--color-primary)_72%,black)_100%)]" />
+    <div class="pointer-events-none absolute inset-0 -z-20 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-primary)_72%,var(--color-text))_0%,color-mix(in_srgb,var(--color-primary)_68%,transparent)_54%,color-mix(in_srgb,var(--color-primary)_72%,var(--color-text))_100%)]" />
     <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.07] [mask-image:url(/backgrounds/mihrab-arches.svg)] [mask-position:top_center] [mask-repeat:repeat] [mask-size:260px]" />
     <div class="pointer-events-none absolute -right-28 -top-28 -z-10 size-[28rem] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-secondary)_38%,transparent)_0%,transparent_68%)] opacity-80" />
 
@@ -122,7 +122,7 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
         >
           <span class="fattan-live-dot size-2 shrink-0 rounded-full bg-[var(--color-secondary)]" aria-hidden="true" />
           <UIcon :name="ICONS[nextPrayer.name] ?? 'i-lucide-clock'" class="size-4 shrink-0 text-[var(--color-secondary)]" />
-          <span class="truncate text-sm font-semibold text-white/78">Next prayer</span>
+          <span class="truncate text-sm font-semibold text-[color:color-mix(in_srgb,var(--color-surface)_78%,transparent)]">Next prayer</span>
           <span class="shrink-0 text-sm font-black tabular-nums text-[var(--color-secondary)]">{{ nextPrayer.name }} {{ nextPrayer.time }}</span>
         </div>
 
@@ -134,11 +134,11 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
           <span class="min-w-0">{{ eyebrow }}</span>
         </p>
 
-        <h1 class="tenant-heading max-w-4xl text-4xl font-black leading-[1.02] tracking-normal text-white @lg:text-5xl @5xl:text-6xl">
+        <h1 class="tenant-heading max-w-4xl text-4xl font-black leading-[1.02] tracking-normal text-[var(--color-surface)] @lg:text-5xl @5xl:text-6xl">
           {{ title }}
         </h1>
 
-        <p v-if="subtitle" class="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/74 @5xl:text-lg @5xl:leading-8">
+        <p v-if="subtitle" class="mt-5 max-w-2xl text-base font-semibold leading-7 text-[color:color-mix(in_srgb,var(--color-surface)_74%,transparent)] @5xl:text-lg @5xl:leading-8">
           {{ subtitle }}
         </p>
 
@@ -146,7 +146,7 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
           <NuxtLink
             v-if="primaryLabel"
             :to="primaryUrl"
-            class="inline-flex items-center gap-2 rounded-md bg-[var(--color-secondary)] px-5 py-3 text-sm font-black text-[var(--color-primary)] shadow-[0_16px_36px_color-mix(in_srgb,var(--color-secondary)_24%,transparent)] transition hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_90%,white)]"
+            class="inline-flex items-center gap-2 rounded-md bg-[var(--color-secondary)] px-5 py-3 text-sm font-black text-[var(--color-primary)] shadow-[0_16px_36px_color-mix(in_srgb,var(--color-secondary)_24%,transparent)] transition hover:bg-[color:color-mix(in_srgb,var(--color-secondary)_90%,var(--color-surface))]"
           >
             <UIcon name="i-lucide-clock-3" class="size-4" />
             {{ primaryLabel }}
@@ -154,7 +154,7 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
           <NuxtLink
             v-if="secondaryLabel"
             :to="secondaryUrl"
-            class="inline-flex items-center gap-2 rounded-md border border-white/24 px-5 py-3 text-sm font-black text-white transition hover:border-[color:color-mix(in_srgb,var(--color-secondary)_58%,transparent)] hover:bg-white/10"
+            class="inline-flex items-center gap-2 rounded-md border border-[color:color-mix(in_srgb,var(--color-surface)_24%,transparent)] px-5 py-3 text-sm font-black text-[var(--color-surface)] transition hover:border-[color:color-mix(in_srgb,var(--color-secondary)_58%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)]"
           >
             {{ secondaryLabel }}
             <UIcon name="i-lucide-arrow-up-right" class="size-4" />
@@ -170,7 +170,7 @@ const heroBackgroundStyle = computed(() => props.backgroundImageUrl
             :alt="`${title} feature image`"
             class="absolute inset-0 h-full w-full object-cover opacity-[0.82]"
           >
-          <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_18%,transparent),color-mix(in_srgb,var(--color-primary)_46%,black))]" aria-hidden="true" />
+          <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_18%,transparent),color-mix(in_srgb,var(--color-primary)_46%,var(--color-text)))]" aria-hidden="true" />
 
         </div>
       </div>

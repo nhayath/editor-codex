@@ -68,7 +68,7 @@ const locationText = computed(() => {
             :to="primaryUrl"
             color="neutral"
             size="xl"
-            class="rounded-md bg-[var(--color-primary)] px-5 py-3 font-bold text-white shadow-[0_16px_30px_color-mix(in_srgb,var(--color-primary)_20%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--color-primary)_88%,black)] @4xl:px-7 @4xl:py-4"
+            class="rounded-md bg-[var(--color-primary)] px-5 py-3 font-bold text-[var(--color-surface)] shadow-[0_16px_30px_color-mix(in_srgb,var(--color-primary)_20%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--color-primary)_88%,var(--color-text))] @4xl:px-7 @4xl:py-4"
           >
             {{ primaryLabel }}
             <template #trailing>
@@ -83,7 +83,7 @@ const locationText = computed(() => {
             variant="ghost"
             class="gap-2 px-1 font-bold text-[var(--color-primary)] hover:bg-transparent hover:text-[var(--color-accent)] @4xl:gap-3 @4xl:px-2"
           >
-            <span class="grid size-10 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_18%,white)] text-[var(--color-primary)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_24%,transparent)] @4xl:size-12">
+            <span class="grid size-10 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_18%,var(--color-surface))] text-[var(--color-primary)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_24%,transparent)] @4xl:size-12">
               <UIcon name="i-lucide-arrow-up-right" class="size-5" />
             </span>
             {{ secondaryLabel }}

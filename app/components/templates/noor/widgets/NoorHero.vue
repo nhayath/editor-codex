@@ -77,9 +77,9 @@ const nextPrayer = computed(() => {
 </script>
 
 <template>
-  <div class="noor-hero @container relative isolate overflow-hidden rounded-lg bg-[var(--color-primary)] text-white">
+  <div class="noor-hero @container relative isolate overflow-hidden rounded-lg bg-[var(--color-primary)] text-[var(--color-surface)]">
     <!-- Layered night background -->
-    <div class="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(125%_125%_at_12%_8%,color-mix(in_srgb,var(--color-primary)_72%,black)_0%,var(--color-primary)_46%,color-mix(in_srgb,var(--color-primary)_84%,black)_100%)]" />
+    <div class="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(125%_125%_at_12%_8%,color-mix(in_srgb,var(--color-primary)_72%,var(--color-text))_0%,var(--color-primary)_46%,color-mix(in_srgb,var(--color-primary)_84%,var(--color-text))_100%)]" />
     <!-- Gold "noor" glow -->
     <div class="pointer-events-none absolute -right-28 -top-28 -z-20 size-[480px] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-secondary)_40%,transparent)_0%,transparent_66%)] opacity-70" />
     <div class="pointer-events-none absolute -bottom-32 -left-24 -z-20 size-[420px] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-accent)_28%,transparent)_0%,transparent_68%)] opacity-60" />
@@ -103,7 +103,7 @@ const nextPrayer = computed(() => {
         >
           <span class="noor-pulse size-2 shrink-0 rounded-full bg-[var(--color-secondary)]" aria-hidden="true" />
           <UIcon :name="ICONS[nextPrayer.name] ?? 'i-lucide-clock'" class="size-4 shrink-0 text-[var(--color-secondary)]" />
-          <span class="truncate text-sm font-semibold text-white/85">Next &middot; {{ nextPrayer.name }}</span>
+          <span class="truncate text-sm font-semibold text-[color:color-mix(in_srgb,var(--color-surface)_85%,transparent)]">Next &middot; {{ nextPrayer.name }}</span>
           <span class="shrink-0 text-sm font-bold tabular-nums text-[var(--color-secondary)]">{{ nextPrayer.time }}</span>
         </div>
 
@@ -115,13 +115,13 @@ const nextPrayer = computed(() => {
           <span class="min-w-0">{{ eyebrow }}</span>
         </p>
 
-        <h1 class="tenant-heading text-4xl font-bold leading-[1.06] tracking-normal text-white @lg:text-5xl @4xl:text-6xl">
+        <h1 class="tenant-heading text-4xl font-bold leading-[1.06] tracking-normal text-[var(--color-surface)] @lg:text-5xl @4xl:text-6xl">
           {{ title }}
         </h1>
 
         <p
           v-if="subtitle"
-          class="mt-5 max-w-xl text-base leading-7 text-white/72 @4xl:text-lg @4xl:leading-8"
+          class="mt-5 max-w-xl text-base leading-7 text-[color:color-mix(in_srgb,var(--color-surface)_72%,transparent)] @4xl:text-lg @4xl:leading-8"
         >
           {{ subtitle }}
         </p>
@@ -130,7 +130,7 @@ const nextPrayer = computed(() => {
           <NuxtLink
             v-if="primaryLabel"
             :to="primaryUrl"
-            class="inline-flex items-center gap-2 rounded-md bg-[var(--color-accent)] px-6 py-3.5 text-sm font-bold text-white shadow-[0_16px_34px_color-mix(in_srgb,var(--color-accent)_42%,transparent)] transition hover:bg-[color:color-mix(in_srgb,var(--color-accent)_88%,white)]"
+            class="inline-flex items-center gap-2 rounded-md bg-[var(--color-accent)] px-6 py-3.5 text-sm font-bold text-[var(--color-surface)] shadow-[0_16px_34px_color-mix(in_srgb,var(--color-accent)_42%,transparent)] transition hover:bg-[color:color-mix(in_srgb,var(--color-accent)_88%,var(--color-surface))]"
           >
             <UIcon name="i-lucide-clock" class="size-4" />
             {{ primaryLabel }}
@@ -138,7 +138,7 @@ const nextPrayer = computed(() => {
           <NuxtLink
             v-if="secondaryLabel"
             :to="secondaryUrl"
-            class="inline-flex items-center gap-2 rounded-md border border-white/25 px-6 py-3.5 text-sm font-bold text-white transition hover:border-[color:color-mix(in_srgb,var(--color-secondary)_60%,transparent)] hover:bg-white/10"
+            class="inline-flex items-center gap-2 rounded-md border border-[color:color-mix(in_srgb,var(--color-surface)_25%,transparent)] px-6 py-3.5 text-sm font-bold text-[var(--color-surface)] transition hover:border-[color:color-mix(in_srgb,var(--color-secondary)_60%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)]"
           >
             {{ secondaryLabel }}
             <UIcon name="i-lucide-arrow-up-right" class="size-4" />
@@ -176,7 +176,7 @@ const nextPrayer = computed(() => {
   width: 4px;
   height: 4px;
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--color-secondary) 90%, white);
+  background: color-mix(in srgb, var(--color-secondary) 90%, var(--color-surface));
   box-shadow: 0 0 8px color-mix(in srgb, var(--color-secondary) 70%, transparent);
   opacity: 0.45;
 }

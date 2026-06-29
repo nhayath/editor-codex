@@ -134,20 +134,20 @@ function isActive(name: string) {
 </script>
 
 <template>
-  <div class="fattan-prayer-board @container relative isolate overflow-hidden rounded-[1.35rem] border border-[color:color-mix(in_srgb,var(--color-secondary)_46%,transparent)] bg-[var(--color-primary)] p-5 text-white shadow-[0_24px_70px_color-mix(in_srgb,var(--color-primary)_28%,transparent)] @lg:p-8">
-    <div class="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(115%_100%_at_88%_0%,color-mix(in_srgb,var(--color-secondary)_22%,transparent)_0%,transparent_36%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_94%,black)_0%,color-mix(in_srgb,var(--color-primary)_82%,var(--color-accent))_100%)]" />
+  <div class="fattan-prayer-board @container relative isolate overflow-hidden rounded-[1.35rem] border border-[color:color-mix(in_srgb,var(--color-secondary)_46%,transparent)] bg-[var(--color-primary)] p-5 text-[var(--color-surface)] shadow-[0_24px_70px_color-mix(in_srgb,var(--color-primary)_28%,transparent)] @lg:p-8">
+    <div class="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(115%_100%_at_88%_0%,color-mix(in_srgb,var(--color-secondary)_22%,transparent)_0%,transparent_36%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_94%,var(--color-text))_0%,color-mix(in_srgb,var(--color-primary)_82%,var(--color-accent))_100%)]" />
     <div class="pointer-events-none absolute inset-0 -z-20 bg-[var(--color-secondary)] opacity-[0.075] [mask-image:url(/backgrounds/rosette-bloom.svg)] [mask-position:top_right] [mask-repeat:repeat] [mask-size:230px]" />
-    <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-24 bg-[linear-gradient(180deg,transparent,color-mix(in_srgb,var(--color-primary)_86%,black))]" />
+    <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-24 bg-[linear-gradient(180deg,transparent,color-mix(in_srgb,var(--color-primary)_86%,var(--color-text)))]" />
 
     <div class="grid gap-5 @3xl:grid-cols-[1fr_auto] @3xl:items-start">
       <div class="min-w-0">
         <p v-if="subtitle" class="text-sm font-black uppercase tracking-[0.16em] text-[var(--color-secondary)]">
           {{ subtitle }}
         </p>
-        <h2 class="tenant-heading mt-2 text-4xl font-black leading-none text-white @lg:text-5xl">
+        <h2 class="tenant-heading mt-2 text-4xl font-black leading-none text-[var(--color-surface)] @lg:text-5xl">
           {{ title }}
         </h2>
-        <p class="mt-3 text-sm font-semibold leading-6 text-white/70 @lg:text-base">
+        <p class="mt-3 text-sm font-semibold leading-6 text-[color:color-mix(in_srgb,var(--color-surface)_70%,transparent)] @lg:text-base">
           <span v-if="featureDate">{{ featureDate }}</span>
           <span v-if="featureDate && hijriDate" class="px-2 text-[var(--color-secondary)]">|</span>
           <span v-if="hijriDate">{{ hijriDate }}</span>
@@ -156,9 +156,9 @@ function isActive(name: string) {
 
       <div
         v-if="nextPrayer"
-        class="w-full rounded-2xl border border-[color:color-mix(in_srgb,var(--color-secondary)_36%,transparent)] bg-white/[0.075] p-4 shadow-inner backdrop-blur @3xl:w-auto @3xl:min-w-64"
+        class="w-full rounded-2xl border border-[color:color-mix(in_srgb,var(--color-secondary)_36%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_7.5%,transparent)] p-4 shadow-inner backdrop-blur @3xl:w-auto @3xl:min-w-64"
       >
-        <div class="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/58">
+        <div class="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[color:color-mix(in_srgb,var(--color-surface)_58%,transparent)]">
           <span class="fattan-countdown-dot size-2 rounded-full bg-[var(--color-secondary)]" aria-hidden="true" />
           Next prayer
         </div>
@@ -167,12 +167,12 @@ function isActive(name: string) {
             <p class="tenant-heading text-3xl font-black text-[var(--color-secondary)]">
               {{ nextPrayer.name }}
             </p>
-            <p class="mt-1 text-sm font-semibold text-white/62">
+            <p class="mt-1 text-sm font-semibold text-[color:color-mix(in_srgb,var(--color-surface)_62%,transparent)]">
               {{ nextPrayer.dayOffset ? 'Tomorrow' : 'Today' }}
             </p>
           </div>
           <div class="text-right">
-            <p class="tenant-heading text-4xl font-black tabular-nums text-white">
+            <p class="tenant-heading text-4xl font-black tabular-nums text-[var(--color-surface)]">
               {{ nextPrayer.time }}
             </p>
             <p class="mt-1 text-sm font-black text-[var(--color-secondary)]">
@@ -184,15 +184,15 @@ function isActive(name: string) {
     </div>
 
     <div
-      class="mt-8 grid gap-3 rounded-2xl bg-white/[0.045] p-3 backdrop-blur @md:grid-cols-2 @4xl:gap-3"
+      class="mt-8 grid gap-3 rounded-2xl bg-[color:color-mix(in_srgb,var(--color-surface)_4.5%,transparent)] p-3 backdrop-blur @md:grid-cols-2 @4xl:gap-3"
       :class="showSunrise ? '@4xl:grid-cols-6' : '@4xl:grid-cols-5'"
     >
       <article
         v-for="row in rows"
         :key="row.name"
         class="fattan-prayer-cell relative min-h-40 rounded-2xl border p-4 transition @lg:min-h-44 @lg:p-5"
-        :class="isActive(row.name) ? 'fattan-prayer-cell-active bg-[color:color-mix(in_srgb,var(--color-surface)_96%,white)] text-[var(--color-primary)]' : 'border-white/10 bg-white/[0.035] text-white'"
-        :style="isActive(row.name) ? { borderColor: 'color-mix(in srgb, var(--color-secondary) 76%, white)' } : undefined"
+        :class="isActive(row.name) ? 'fattan-prayer-cell-active bg-[color:color-mix(in_srgb,var(--color-surface)_96%,var(--color-surface))] text-[var(--color-primary)]' : 'border-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_3.5%,transparent)] text-[var(--color-surface)]'"
+        :style="isActive(row.name) ? { borderColor: 'color-mix(in srgb, var(--color-secondary) 76%, var(--color-surface))' } : undefined"
       >
         <div class="flex items-start justify-between gap-3">
           <IconGlyph
@@ -214,14 +214,14 @@ function isActive(name: string) {
         </p>
         <p
           class="mt-1 text-sm font-black"
-          :class="isActive(row.name) ? 'text-[var(--color-primary)]/68' : 'text-white/60'"
+          :class="isActive(row.name) ? 'text-[var(--color-primary)]/68' : 'text-[color:color-mix(in_srgb,var(--color-surface)_60%,transparent)]'"
         >
           {{ meridiem(row.time) }}
         </p>
         <p
           v-if="showIqamah && row.iqamah"
           class="mt-3 text-xs font-semibold"
-          :class="isActive(row.name) ? 'text-[var(--color-primary)]/58' : 'text-white/46'"
+          :class="isActive(row.name) ? 'text-[var(--color-primary)]/58' : 'text-[color:color-mix(in_srgb,var(--color-surface)_46%,transparent)]'"
         >
           Iqamah {{ row.iqamah }}
         </p>

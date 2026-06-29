@@ -74,11 +74,11 @@ const centered = computed(() => props.align === 'center')
 function buttonClass(index: number, light: boolean) {
   if (index === 0) {
     return light
-      ? 'bg-white text-[var(--color-primary)] hover:bg-white/90'
-      : 'bg-[var(--color-primary)] text-white hover:opacity-90'
+      ? 'bg-[var(--color-surface)] text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-surface)_90%,transparent)]'
+      : 'bg-[var(--color-primary)] text-[var(--color-surface)] hover:opacity-90'
   }
   return light
-    ? 'border border-white/40 text-white hover:bg-white/10'
+    ? 'border border-[color:color-mix(in_srgb,var(--color-surface)_40%,transparent)] text-[var(--color-surface)] hover:bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)]'
     : 'border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[color:color-mix(in_srgb,var(--color-primary)_10%,transparent)]'
 }
 </script>
@@ -87,7 +87,7 @@ function buttonClass(index: number, light: boolean) {
   <!-- IMMERSIVE: full-bleed background image, tall, text on top -->
   <div
     v-if="variant === 'immersive'"
-    class="relative isolate min-h-[620px] overflow-hidden rounded-lg bg-[var(--color-primary)] text-white"
+    class="relative isolate min-h-[620px] overflow-hidden rounded-lg bg-[var(--color-primary)] text-[var(--color-surface)]"
   >
     <img
       v-if="imageUrl"
@@ -95,21 +95,21 @@ function buttonClass(index: number, light: boolean) {
       :alt="title"
       class="absolute inset-0 -z-20 h-full w-full object-cover"
     >
-    <div class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-primary)_96%,black)_0%,color-mix(in_srgb,var(--color-primary)_76%,transparent)_48%,color-mix(in_srgb,var(--color-accent)_22%,transparent)_100%),linear-gradient(180deg,transparent_0%,color-mix(in_srgb,var(--color-primary)_90%,black)_100%)]" />
+    <div class="absolute inset-0 -z-10 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-primary)_96%,var(--color-text))_0%,color-mix(in_srgb,var(--color-primary)_76%,transparent)_48%,color-mix(in_srgb,var(--color-accent)_22%,transparent)_100%),linear-gradient(180deg,transparent_0%,color-mix(in_srgb,var(--color-primary)_90%,var(--color-text))_100%)]" />
     <div class="absolute inset-0 -z-10 opacity-30 [background-image:linear-gradient(45deg,color-mix(in_srgb,var(--color-secondary)_28%,transparent)_25%,transparent_25%),linear-gradient(-45deg,color-mix(in_srgb,var(--color-secondary)_20%,transparent)_25%,transparent_25%)] [background-size:28px_28px]" />
 
     <div class="flex min-h-[620px] max-w-3xl flex-col justify-end p-6 @lg:p-10 @2xl:p-14">
       <p
         v-if="eyebrow"
-        class="mb-5 inline-flex w-fit items-center gap-2 rounded-md bg-[var(--color-accent)] px-3 py-2 text-sm font-bold text-white shadow-[0_12px_30px_rgba(0,0,0,0.18)]"
+        class="mb-5 inline-flex w-fit items-center gap-2 rounded-md bg-[var(--color-accent)] px-3 py-2 text-sm font-bold text-[var(--color-surface)] shadow-[0_12px_30px_rgba(0,0,0,0.18)]"
       >
         <IconGlyph name="islamic-mosque" class="size-4" />
         {{ eyebrow }}
       </p>
-      <h1 class="tenant-heading text-5xl font-bold leading-[1.02] tracking-normal text-white @lg:text-6xl @2xl:text-7xl">
+      <h1 class="tenant-heading text-5xl font-bold leading-[1.02] tracking-normal text-[var(--color-surface)] @lg:text-6xl @2xl:text-7xl">
         {{ title }}
       </h1>
-      <p class="mt-6 max-w-2xl text-lg leading-8 text-white/78">
+      <p class="mt-6 max-w-2xl text-lg leading-8 text-[color:color-mix(in_srgb,var(--color-surface)_78%,transparent)]">
         {{ subtitle }}
       </p>
       <div
@@ -124,7 +124,7 @@ function buttonClass(index: number, light: boolean) {
           :variant="index === 0 ? 'solid' : 'outline'"
           size="lg"
           class="font-bold"
-          :class="index === 0 ? 'bg-[#8FD6C1] text-[#16213E] hover:bg-[var(--color-secondary)]' : 'border-white/20 bg-white/10 text-white hover:bg-white/20'"
+          :class="index === 0 ? 'bg-[#8FD6C1] text-[#16213E] hover:bg-[var(--color-secondary)]' : 'border-[color:color-mix(in_srgb,var(--color-surface)_20%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] text-[var(--color-surface)] hover:bg-[color:color-mix(in_srgb,var(--color-surface)_20%,transparent)]'"
         >
           <template #leading>
             <IconGlyph :name="index === 0 ? 'islamic-prayer-times' : 'islamic-calendar'" class="size-5" />
@@ -163,7 +163,7 @@ function buttonClass(index: number, light: boolean) {
           </NuxtLink>
         </div>
       </div>
-      <div class="relative order-first min-h-56 bg-[color:color-mix(in_srgb,var(--color-primary)_12%,white)] @xl:order-none @xl:min-h-[440px]">
+      <div class="relative order-first min-h-56 bg-[color:color-mix(in_srgb,var(--color-primary)_12%,var(--color-surface))] @xl:order-none @xl:min-h-[440px]">
         <img
           v-if="imageUrl"
           :src="imageUrl"
@@ -177,7 +177,7 @@ function buttonClass(index: number, light: boolean) {
   <!-- SPOTLIGHT: image-dominant with a floating text card -->
   <div
     v-else-if="variant === 'with-image'"
-    class="@container relative isolate min-h-[460px] overflow-hidden rounded-lg bg-[color:color-mix(in_srgb,var(--color-primary)_14%,white)]"
+    class="@container relative isolate min-h-[460px] overflow-hidden rounded-lg bg-[color:color-mix(in_srgb,var(--color-primary)_14%,var(--color-surface))]"
   >
     <img
       v-if="imageUrl"
@@ -186,7 +186,7 @@ function buttonClass(index: number, light: boolean) {
       class="absolute inset-0 -z-10 h-full w-full object-cover"
     >
     <div class="flex min-h-[460px] items-center p-5 @lg:p-10">
-      <div class="w-full max-w-md rounded-lg bg-[var(--color-surface)]/95 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)] backdrop-blur-sm @lg:p-8">
+      <div class="w-full max-w-md rounded-lg bg-[color:color-mix(in_srgb,var(--color-surface)_95%,transparent)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)] backdrop-blur-sm @lg:p-8">
         <p v-if="eyebrow" class="text-sm font-bold uppercase tracking-wide text-[var(--color-primary)]">
           {{ eyebrow }}
         </p>
@@ -223,13 +223,13 @@ function buttonClass(index: number, light: boolean) {
     </template>
     <div class="flex flex-col items-start gap-4 px-6 py-7 @xl:flex-row @xl:items-center @xl:justify-between @xl:px-10">
       <div class="min-w-0">
-        <p v-if="eyebrow" class="text-xs font-bold uppercase tracking-wide" :class="useLightText ? 'text-white/80' : 'text-[var(--color-primary)]'">
+        <p v-if="eyebrow" class="text-xs font-bold uppercase tracking-wide" :class="useLightText ? 'text-[color:color-mix(in_srgb,var(--color-surface)_80%,transparent)]' : 'text-[var(--color-primary)]'">
           {{ eyebrow }}
         </p>
-        <h1 class="tenant-heading text-2xl font-bold tracking-normal @xl:text-3xl" :class="useLightText ? 'text-white' : 'text-[var(--color-text)]'">
+        <h1 class="tenant-heading text-2xl font-bold tracking-normal @xl:text-3xl" :class="useLightText ? 'text-[var(--color-surface)]' : 'text-[var(--color-text)]'">
           {{ title }}
         </h1>
-        <p v-if="subtitle" class="mt-1 text-sm leading-6" :class="useLightText ? 'text-white/80' : 'text-[var(--color-text-muted)]'">
+        <p v-if="subtitle" class="mt-1 text-sm leading-6" :class="useLightText ? 'text-[color:color-mix(in_srgb,var(--color-surface)_80%,transparent)]' : 'text-[var(--color-text-muted)]'">
           {{ subtitle }}
         </p>
       </div>
@@ -262,7 +262,7 @@ function buttonClass(index: number, light: boolean) {
           <span
             v-if="eyebrow"
             class="inline-flex w-fit items-center gap-2 rounded-md px-3 py-1.5 text-sm font-bold"
-            :class="useLightText ? 'bg-white/15 text-white' : 'bg-[color:color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-[var(--color-primary)]'"
+            :class="useLightText ? 'bg-[color:color-mix(in_srgb,var(--color-surface)_15%,transparent)] text-[var(--color-surface)]' : 'bg-[color:color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-[var(--color-primary)]'"
           >
             {{ eyebrow }}
           </span>
@@ -270,21 +270,21 @@ function buttonClass(index: number, light: boolean) {
         <p
           v-else-if="eyebrow"
           class="text-sm font-bold uppercase tracking-wide"
-          :class="useLightText ? 'text-white/80' : 'text-[var(--color-primary)]'"
+          :class="useLightText ? 'text-[color:color-mix(in_srgb,var(--color-surface)_80%,transparent)]' : 'text-[var(--color-primary)]'"
         >
           {{ eyebrow }}
         </p>
 
         <h1
           class="tenant-heading text-4xl font-bold tracking-normal @md:text-5xl @xl:text-6xl"
-          :class="useLightText ? 'text-white' : 'text-[var(--color-text)]'"
+          :class="useLightText ? 'text-[var(--color-surface)]' : 'text-[var(--color-text)]'"
         >
           {{ title }}
         </h1>
         <p
           v-if="subtitle"
           class="max-w-2xl text-lg leading-8"
-          :class="useLightText ? 'text-white/80' : 'text-[var(--color-text-muted)]'"
+          :class="useLightText ? 'text-[color:color-mix(in_srgb,var(--color-surface)_80%,transparent)]' : 'text-[var(--color-text-muted)]'"
         >
           {{ subtitle }}
         </p>

@@ -316,13 +316,13 @@ function slideHref(item: Slide) {
             <p v-if="item.eyebrow" class="text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--color-secondary)">
               {{ item.eyebrow }}
             </p>
-            <h3 v-if="item.title" class="tenant-heading text-2xl font-bold text-white @xl:text-4xl">
+            <h3 v-if="item.title" class="tenant-heading text-2xl font-bold text-[var(--color-surface)] @xl:text-4xl">
               {{ item.title }}
             </h3>
-            <p v-if="item.arabic" dir="rtl" lang="ar" class="tenant-heading text-2xl leading-loose text-white @md:text-3xl">
+            <p v-if="item.arabic" dir="rtl" lang="ar" class="tenant-heading text-2xl leading-loose text-[var(--color-surface)] @md:text-3xl">
               {{ item.arabic }}
             </p>
-            <p v-if="item.translation" class="leading-7 text-white/75">
+            <p v-if="item.translation" class="leading-7 text-[color:color-mix(in_srgb,var(--color-surface)_75%,transparent)]">
               &ldquo;{{ item.translation }}&rdquo;
             </p>
             <p v-if="item.reference" class="text-sm font-semibold" style="color: var(--color-secondary)">
@@ -331,7 +331,7 @@ function slideHref(item: Slide) {
             <a
               v-if="showCta && item.link"
               :href="item.link"
-              class="mt-1 inline-flex w-fit items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/25"
+              class="mt-1 inline-flex w-fit items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[var(--color-surface)] transition-colors hover:bg-[color:color-mix(in_srgb,var(--color-surface)_25%,transparent)]"
               style="background: rgba(255,255,255,0.16)"
             >
               {{ item.buttonLabel || 'Learn more' }}
@@ -375,21 +375,21 @@ function slideHref(item: Slide) {
                     class="grid size-16 shrink-0 place-items-center rounded-lg @sm:size-20"
                     style="background: rgba(255,255,255,0.16)"
                   >
-                    <UIcon name="i-lucide-calendar-days" class="size-7 text-white" />
+                    <UIcon name="i-lucide-calendar-days" class="size-7 text-[var(--color-surface)]" />
                   </div>
                   <div class="min-w-0">
                     <p v-if="latestEvent.category" class="text-xs font-semibold uppercase tracking-wide" style="color: var(--color-secondary)">
                       {{ latestEvent.category }}
                     </p>
-                    <h4 class="mt-0.5 truncate text-base font-bold text-white @sm:text-lg">
+                    <h4 class="mt-0.5 truncate text-base font-bold text-[var(--color-surface)] @sm:text-lg">
                       {{ latestEvent.title }}
                     </h4>
-                    <p v-if="latestEvent.description" class="mt-1 line-clamp-2 text-sm text-white/70">
+                    <p v-if="latestEvent.description" class="mt-1 line-clamp-2 text-sm text-[color:color-mix(in_srgb,var(--color-surface)_70%,transparent)]">
                       {{ latestEvent.description }}
                     </p>
                   </div>
                 </div>
-                <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/70">
+                <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[color:color-mix(in_srgb,var(--color-surface)_70%,transparent)]">
                   <span v-if="latestEvent.date" class="flex items-center gap-1.5">
                     <UIcon name="i-lucide-calendar-days" class="size-4" style="color: var(--color-secondary)" />
                     {{ eventDate(latestEvent.date) }}
@@ -400,7 +400,7 @@ function slideHref(item: Slide) {
                   </span>
                 </div>
               </template>
-              <p v-else class="text-sm text-white/70">
+              <p v-else class="text-sm text-[color:color-mix(in_srgb,var(--color-surface)_70%,transparent)]">
                 No upcoming events.
               </p>
             </div>
@@ -496,17 +496,17 @@ function slideHref(item: Slide) {
           class="absolute inset-0 h-full w-full object-cover"
         >
         <div class="absolute inset-0 bg-[color:color-mix(in_srgb,var(--color-primary)_70%,transparent)]" />
-        <div class="relative flex min-h-96 max-w-2xl flex-col justify-end p-8 text-white">
+        <div class="relative flex min-h-96 max-w-2xl flex-col justify-end p-8 text-[var(--color-surface)]">
           <h3 class="tenant-heading text-4xl font-bold">
             {{ item.title }}
           </h3>
-          <p class="mt-3 text-lg text-white/85">
+          <p class="mt-3 text-lg text-[color:color-mix(in_srgb,var(--color-surface)_85%,transparent)]">
             {{ item.subtitle }}
           </p>
           <a
             v-if="slideHref(item)"
             :href="slideHref(item)"
-            class="mt-5 inline-flex w-fit items-center gap-2 rounded-lg bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/30"
+            class="mt-5 inline-flex w-fit items-center gap-2 rounded-lg bg-[color:color-mix(in_srgb,var(--color-surface)_20%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--color-surface)] backdrop-blur transition hover:bg-[color:color-mix(in_srgb,var(--color-surface)_30%,transparent)]"
           >
             {{ item.buttonLabel || 'Learn more' }}
             <UIcon name="i-lucide-arrow-right" class="size-4" />

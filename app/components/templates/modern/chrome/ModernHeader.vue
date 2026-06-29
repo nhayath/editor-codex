@@ -39,7 +39,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center justify-center gap-3"
       >
-        <div class="grid size-11 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--color-primary)] text-white shadow-[0_12px_30px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]">
+        <div class="grid size-11 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--color-primary)] text-[var(--color-surface)] shadow-[0_12px_30px_color-mix(in_srgb,var(--color-primary)_18%,transparent)]">
           <img
             v-if="logoUrl"
             :src="logoUrl"
@@ -73,7 +73,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
           icon="i-lucide-heart-handshake"
           label="Donate"
           size="sm"
-          class="hidden rounded-full bg-[var(--color-primary)] px-5 font-bold text-white hover:bg-[color:color-mix(in_srgb,var(--color-primary)_88%,black)] @4xl:inline-flex"
+          class="hidden rounded-full bg-[var(--color-primary)] px-5 font-bold text-[var(--color-surface)] hover:bg-[color:color-mix(in_srgb,var(--color-primary)_88%,var(--color-text))] @4xl:inline-flex"
         />
 
         <UButton
@@ -110,7 +110,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         size="sm"
         icon="i-lucide-heart-handshake"
         label="Donate"
-        class="mt-2 justify-center rounded-full bg-[var(--color-primary)] font-bold text-white"
+        class="mt-2 justify-center rounded-full bg-[var(--color-primary)] font-bold text-[var(--color-surface)]"
         @click="menuOpen = false"
       />
     </nav>

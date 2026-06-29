@@ -50,7 +50,7 @@ const pathways = computed(() => parsePipeRows(props.items, 4)
           class="group relative min-h-48 overflow-hidden rounded-lg border border-[color:color-mix(in_srgb,var(--color-text)_8%,transparent)] bg-[var(--color-surface)] p-5 shadow-[0_10px_24px_color-mix(in_srgb,var(--color-text)_5%,transparent)] transition hover:-translate-y-1 hover:border-[color:color-mix(in_srgb,var(--color-secondary)_34%,transparent)] hover:shadow-[0_18px_38px_color-mix(in_srgb,var(--color-primary)_12%,transparent)]"
         >
           <span class="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_10%,transparent)]" aria-hidden="true" />
-          <span class="relative grid size-12 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_16%,white)] text-[var(--color-primary)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)]">
+          <span class="relative grid size-12 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_16%,var(--color-surface))] text-[var(--color-primary)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)]">
             <UIcon :name="item.icon" class="size-5" />
           </span>
           <span class="mt-6 block text-xs font-black uppercase tracking-normal text-[var(--color-secondary)]">

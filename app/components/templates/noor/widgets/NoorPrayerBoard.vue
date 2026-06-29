@@ -95,9 +95,9 @@ const countdownLabel = computed(() => {
 </script>
 
 <template>
-  <div class="noor-board @container relative isolate h-full overflow-hidden rounded-lg bg-[var(--color-primary)] p-6 text-white @lg:p-7">
+  <div class="noor-board @container relative isolate h-full overflow-hidden rounded-lg bg-[var(--color-primary)] p-6 text-[var(--color-surface)] @lg:p-7">
     <!-- Layered navy backdrop + gold glow + arabesque wash -->
-    <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(120%_120%_at_85%_0%,color-mix(in_srgb,var(--color-primary)_72%,black)_0%,var(--color-primary)_52%,color-mix(in_srgb,var(--color-primary)_86%,black)_100%)]" />
+    <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(120%_120%_at_85%_0%,color-mix(in_srgb,var(--color-primary)_72%,var(--color-text))_0%,var(--color-primary)_52%,color-mix(in_srgb,var(--color-primary)_86%,var(--color-text))_100%)]" />
     <div class="pointer-events-none absolute -right-20 -top-24 -z-10 size-80 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-secondary)_34%,transparent)_0%,transparent_68%)] opacity-70" />
     <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.06] [mask-image:url(/backgrounds/rosette-bloom.svg)] [mask-position:top_right] [mask-repeat:repeat] [mask-size:200px]" />
 
@@ -107,7 +107,7 @@ const countdownLabel = computed(() => {
         <p v-if="prayerTimes?.date || subtitle" class="text-sm font-semibold text-[var(--color-secondary)]">
           {{ subtitle || prayerTimes?.date }}
         </p>
-        <h2 class="tenant-heading text-3xl font-bold text-white">
+        <h2 class="tenant-heading text-3xl font-bold text-[var(--color-surface)]">
           {{ title }}
         </h2>
       </div>
@@ -116,7 +116,7 @@ const countdownLabel = computed(() => {
         class="flex shrink-0 items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_38%,transparent)] bg-[color:color-mix(in_srgb,black_24%,transparent)] px-3.5 py-1.5"
       >
         <span class="noor-board-pulse size-1.5 rounded-full bg-[var(--color-secondary)]" aria-hidden="true" />
-        <span class="text-xs font-semibold text-white/75">Next in</span>
+        <span class="text-xs font-semibold text-[color:color-mix(in_srgb,var(--color-surface)_75%,transparent)]">Next in</span>
         <span class="text-xs font-bold tabular-nums text-[var(--color-secondary)]">{{ countdownLabel }}</span>
       </div>
     </div>
@@ -145,11 +145,11 @@ const countdownLabel = computed(() => {
             :style="{ color: isActive(row.name) ? 'var(--color-secondary)' : 'rgba(255,255,255,0.45)' }"
           />
         </div>
-        <span class="text-2xl font-bold tabular-nums text-white @lg:text-[1.65rem]">{{ row.time || '--:--' }}</span>
+        <span class="text-2xl font-bold tabular-nums text-[var(--color-surface)] @lg:text-[1.65rem]">{{ row.time || '--:--' }}</span>
         <span
           v-if="showIqamah && row.iqamah"
           class="text-xs font-medium tabular-nums"
-          :style="{ color: isActive(row.name) ? 'color-mix(in srgb, var(--color-secondary) 85%, white)' : 'rgba(255,255,255,0.5)' }"
+          :style="{ color: isActive(row.name) ? 'color-mix(in srgb, var(--color-secondary) 85%, var(--color-surface))' : 'color-mix(in srgb, var(--color-surface) 50%, transparent)' }"
         >
           Iqamah {{ row.iqamah }}
         </span>

@@ -25,7 +25,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
         :to="`/site/${tenant?.slug ?? ''}`"
         class="flex min-w-0 items-center gap-3"
       >
-        <div class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-[var(--color-primary)] text-white">
+        <div class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-[var(--color-primary)] text-[var(--color-surface)]">
           <img
             v-if="logoUrl"
             :src="logoUrl"
@@ -59,7 +59,7 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
           icon="i-lucide-mail"
           label="Contact"
           size="sm"
-          class="bg-[var(--color-accent)] text-white hover:bg-[color:color-mix(in_srgb,var(--color-accent)_86%,black)]"
+          class="bg-[var(--color-accent)] text-[var(--color-surface)] hover:bg-[color:color-mix(in_srgb,var(--color-accent)_86%,var(--color-text))]"
         />
       </div>
 

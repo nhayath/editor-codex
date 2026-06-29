@@ -16,7 +16,7 @@ const footerLinks = computed(() => getTenantFooterLinks(props.tenant))
     <div class="tenant-container grid gap-8 @xl:grid-cols-[1fr_auto]">
       <div>
         <div class="flex items-center gap-3">
-          <div class="grid size-10 place-items-center rounded-md bg-[var(--color-primary)] text-white">
+          <div class="grid size-10 place-items-center rounded-md bg-[var(--color-primary)] text-[var(--color-surface)]">
             <IconGlyph name="islamic-mosque" class="size-5" />
           </div>
           <p class="tenant-heading text-xl font-bold text-[var(--color-text)]">

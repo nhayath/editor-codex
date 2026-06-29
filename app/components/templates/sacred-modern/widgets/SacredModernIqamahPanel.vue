@@ -106,11 +106,11 @@ const isFinalMinute = computed(() => {
 <template>
   <section
     v-if="nextIqamah"
-    class="sacred-modern-iqamah-panel @container relative isolate overflow-hidden rounded-lg border border-[color:color-mix(in_srgb,var(--color-secondary)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--color-primary)_94%,black)] p-4 text-white shadow-[0_22px_56px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] @md:p-5"
+    class="sacred-modern-iqamah-panel @container relative isolate overflow-hidden rounded-lg border border-[color:color-mix(in_srgb,var(--color-secondary)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--color-primary)_94%,var(--color-text))] p-4 text-[var(--color-surface)] shadow-[0_22px_56px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] @md:p-5"
     :class="{ 'sacred-modern-iqamah-panel-urgent': isFinalMinute }"
     aria-live="polite"
   >
-    <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_8%_12%,color-mix(in_srgb,var(--color-secondary)_20%,transparent),transparent_32%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_95%,black),var(--color-primary))]" />
+    <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_8%_12%,color-mix(in_srgb,var(--color-secondary)_20%,transparent),transparent_32%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_95%,var(--color-text)),var(--color-primary))]" />
     <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.08] [mask-image:url(/backgrounds/girih-diamonds.svg)] [mask-position:center] [mask-repeat:repeat] [mask-size:220px]" />
 
     <div class="grid gap-4 @md:grid-cols-[auto_1fr_auto] @md:items-center">
@@ -122,23 +122,23 @@ const isFinalMinute = computed(() => {
           <p class="text-[0.68rem] font-black uppercase tracking-normal text-[var(--color-secondary)]">
             {{ label }}
           </p>
-          <h2 class="tenant-heading mt-0.5 text-2xl font-bold leading-none text-white @md:text-3xl">
+          <h2 class="tenant-heading mt-0.5 text-2xl font-bold leading-none text-[var(--color-surface)] @md:text-3xl">
             {{ nextIqamah.name }}
           </h2>
         </div>
       </div>
 
-      <div class="grid gap-2 border-y border-white/10 py-4 @md:grid-cols-2 @md:border-x @md:border-y-0 @md:px-6 @md:py-0">
+      <div class="grid gap-2 border-y border-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] py-4 @md:grid-cols-2 @md:border-x @md:border-y-0 @md:px-6 @md:py-0">
         <div>
-          <p class="text-xs font-bold uppercase tracking-normal text-white/50">
+          <p class="text-xs font-bold uppercase tracking-normal text-[color:color-mix(in_srgb,var(--color-surface)_50%,transparent)]">
             Prayer begins
           </p>
-          <p class="mt-1 text-2xl font-black tabular-nums text-white">
+          <p class="mt-1 text-2xl font-black tabular-nums text-[var(--color-surface)]">
             {{ nextIqamah.time || '--:--' }}
           </p>
         </div>
         <div>
-          <p class="text-xs font-bold uppercase tracking-normal text-white/50">
+          <p class="text-xs font-bold uppercase tracking-normal text-[color:color-mix(in_srgb,var(--color-surface)_50%,transparent)]">
             Iqamah
           </p>
           <p class="mt-1 text-2xl font-black tabular-nums text-[var(--color-secondary)]">
@@ -148,7 +148,7 @@ const isFinalMinute = computed(() => {
       </div>
 
       <div class="rounded-md bg-[color:color-mix(in_srgb,var(--color-secondary)_14%,transparent)] px-4 py-3 ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)] @md:min-w-44 @md:text-right">
-        <p class="text-xs font-bold uppercase tracking-normal text-white/64">
+        <p class="text-xs font-bold uppercase tracking-normal text-[color:color-mix(in_srgb,var(--color-surface)_64%,transparent)]">
           {{ countdownLabel }}
         </p>
         <p class="mt-1 text-3xl font-black tabular-nums text-[var(--color-secondary)] @md:text-4xl">

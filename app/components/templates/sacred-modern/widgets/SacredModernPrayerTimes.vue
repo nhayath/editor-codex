@@ -148,8 +148,8 @@ const jummahRows = computed(() => {
 </script>
 
 <template>
-  <div class="sacred-modern-prayer-board @container relative isolate flex h-full flex-col overflow-hidden rounded-lg bg-[var(--color-primary)] text-white shadow-[0_22px_58px_color-mix(in_srgb,var(--color-primary)_20%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_28%,transparent)]">
-    <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_92%_0%,color-mix(in_srgb,var(--color-secondary)_20%,transparent),transparent_30%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_94%,black),var(--color-primary))]" />
+  <div class="sacred-modern-prayer-board @container relative isolate flex h-full flex-col overflow-hidden rounded-lg bg-[var(--color-primary)] text-[var(--color-surface)] shadow-[0_22px_58px_color-mix(in_srgb,var(--color-primary)_20%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_28%,transparent)]">
+    <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_92%_0%,color-mix(in_srgb,var(--color-secondary)_20%,transparent),transparent_30%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_94%,var(--color-text)),var(--color-primary))]" />
     <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.075] [mask-image:url(/backgrounds/girih-diamonds.svg)] [mask-position:top_right] [mask-repeat:repeat] [mask-size:240px]" />
 
     <div class="flex-1 p-5 @md:p-6 @2xl:p-9">
@@ -158,14 +158,14 @@ const jummahRows = computed(() => {
           <h2 class="tenant-heading text-3xl font-bold leading-tight text-[var(--color-secondary)] @md:text-4xl">
             {{ title }}
           </h2>
-          <p class="mt-1 text-sm font-semibold text-white/62 @md:text-base">
+          <p class="mt-1 text-sm font-semibold text-[color:color-mix(in_srgb,var(--color-surface)_62%,transparent)] @md:text-base">
             {{ featureDate }} / {{ hijriDate }}
           </p>
         </div>
 
         <div
           v-if="showCountdown && nextPrayer"
-          class="sacred-modern-countdown inline-flex w-fit max-w-full items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_36%,transparent)] bg-[color:color-mix(in_srgb,black_18%,transparent)] px-4 py-2 text-sm font-bold text-white/90"
+          class="sacred-modern-countdown inline-flex w-fit max-w-full items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_36%,transparent)] bg-[color:color-mix(in_srgb,black_18%,transparent)] px-4 py-2 text-sm font-bold text-[color:color-mix(in_srgb,var(--color-surface)_90%,transparent)]"
           :class="{ 'sacred-modern-countdown-urgent': isFinalMinute }"
           aria-live="polite"
         >
@@ -180,7 +180,7 @@ const jummahRows = computed(() => {
           v-for="row in featureRows"
           :key="row.name"
           class="sacred-modern-prayer-cell relative grid min-h-32 place-items-center rounded-xl border p-4 text-center transition @2xl:min-h-36 @2xl:px-2 @5xl:px-3"
-          :class="row.name === nextPrayer?.name ? 'sacred-modern-prayer-cell-active border-[color:color-mix(in_srgb,var(--color-secondary)_58%,transparent)] bg-[var(--color-surface)] text-[var(--color-primary)] shadow-[0_18px_34px_rgba(0,0,0,0.2)]' : 'border-white/10 bg-white/[0.035] text-white/82'"
+          :class="row.name === nextPrayer?.name ? 'sacred-modern-prayer-cell-active border-[color:color-mix(in_srgb,var(--color-secondary)_58%,transparent)] bg-[var(--color-surface)] text-[var(--color-primary)] shadow-[0_18px_34px_rgba(0,0,0,0.2)]' : 'border-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_3.5%,transparent)] text-[color:color-mix(in_srgb,var(--color-surface)_82%,transparent)]'"
         >
           <span
             v-if="row.name === nextPrayer?.name"
@@ -210,7 +210,7 @@ const jummahRows = computed(() => {
       </div>
     </div>
 
-    <div class="mt-auto grid gap-4 border-t border-white/10 bg-white/10 p-5 @2xl:grid-cols-[1fr_auto] @2xl:items-center @2xl:px-9">
+    <div class="mt-auto grid gap-4 border-t border-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] p-5 @2xl:grid-cols-[1fr_auto] @2xl:items-center @2xl:px-9">
       <div class="flex items-center gap-4">
         <span class="grid size-12 shrink-0 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_24%,transparent)] text-[var(--color-secondary)]">
           <IconGlyph name="islamic-quran" class="size-6" />
@@ -224,12 +224,12 @@ const jummahRows = computed(() => {
         <div
           v-for="item in jummahRows"
           :key="item.id ?? item.label"
-          class="rounded-2xl border border-white/12 bg-white/10 px-5 py-4 text-center shadow-inner"
+          class="rounded-2xl border border-[color:color-mix(in_srgb,var(--color-surface)_12%,transparent)] bg-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] px-5 py-4 text-center shadow-inner"
         >
-          <p class="text-[0.65rem] font-bold uppercase tracking-normal text-white/44">
+          <p class="text-[0.65rem] font-bold uppercase tracking-normal text-[color:color-mix(in_srgb,var(--color-surface)_44%,transparent)]">
             {{ item.label || "Jumu'ah" }}
           </p>
-          <p class="mt-1 text-xl font-bold text-white">
+          <p class="mt-1 text-xl font-bold text-[var(--color-surface)]">
             {{ item.time }}
           </p>
         </div>

@@ -224,7 +224,7 @@ onBeforeUnmount(() => {
         <img v-else :src="image.src" :alt="image.alt" class="absolute inset-0 size-full object-cover">
         <figcaption
           v-if="showCaptions && image.caption"
-          class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-10 text-sm font-medium text-white"
+          class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[color:color-mix(in_srgb,black_80%,transparent)] to-transparent p-4 pt-10 text-sm font-medium text-[var(--color-surface)]"
         >
           {{ image.caption }}
         </figcaption>
@@ -246,7 +246,7 @@ onBeforeUnmount(() => {
         <img v-else :src="featuredImage.src" :alt="featuredImage.alt" class="absolute inset-0 size-full object-cover">
         <figcaption
           v-if="showCaptions && featuredImage.caption"
-          class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-16 text-base font-semibold text-white"
+          class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[color:color-mix(in_srgb,black_80%,transparent)] to-transparent p-6 pt-16 text-base font-semibold text-[var(--color-surface)]"
         >
           {{ featuredImage.caption }}
         </figcaption>
@@ -269,7 +269,7 @@ onBeforeUnmount(() => {
           <img v-else :src="image.src" :alt="image.alt" class="absolute inset-0 size-full object-cover">
           <figcaption
             v-if="showCaptions && image.caption"
-            class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8 text-xs font-medium text-white"
+            class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[color:color-mix(in_srgb,black_80%,transparent)] to-transparent p-3 pt-8 text-xs font-medium text-[var(--color-surface)]"
           >
             {{ image.caption }}
           </figcaption>
@@ -339,7 +339,7 @@ onBeforeUnmount(() => {
         <button
           ref="closeButton"
           type="button"
-          class="absolute right-4 top-4 grid size-11 place-items-center rounded-full bg-white/12 text-white transition hover:bg-white/20"
+          class="absolute right-4 top-4 grid size-11 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-surface)_12%,transparent)] text-[var(--color-surface)] transition hover:bg-[color:color-mix(in_srgb,var(--color-surface)_20%,transparent)]"
           aria-label="Close image viewer"
           @click="closeLightbox"
         >
@@ -349,7 +349,7 @@ onBeforeUnmount(() => {
         <button
           v-if="images.length > 1"
           type="button"
-          class="absolute left-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/12 text-white transition hover:bg-white/20 @xl:left-6"
+          class="absolute left-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-surface)_12%,transparent)] text-[var(--color-surface)] transition hover:bg-[color:color-mix(in_srgb,var(--color-surface)_20%,transparent)] @xl:left-6"
           aria-label="Previous image"
           @click="showPrevious"
         >
@@ -358,7 +358,7 @@ onBeforeUnmount(() => {
 
         <figure class="grid max-h-[88vh] max-w-6xl gap-3">
           <img :src="activeImage.src" :alt="activeImage.alt" class="max-h-[78vh] max-w-full rounded-lg object-contain">
-          <figcaption v-if="activeImage.caption" class="text-center text-sm text-white/80">
+          <figcaption v-if="activeImage.caption" class="text-center text-sm text-[color:color-mix(in_srgb,var(--color-surface)_80%,transparent)]">
             {{ activeImage.caption }}
           </figcaption>
         </figure>
@@ -366,7 +366,7 @@ onBeforeUnmount(() => {
         <button
           v-if="images.length > 1"
           type="button"
-          class="absolute right-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/12 text-white transition hover:bg-white/20 @xl:right-6"
+          class="absolute right-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-surface)_12%,transparent)] text-[var(--color-surface)] transition hover:bg-[color:color-mix(in_srgb,var(--color-surface)_20%,transparent)] @xl:right-6"
           aria-label="Next image"
           @click="showNext"
         >

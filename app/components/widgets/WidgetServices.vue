@@ -89,7 +89,7 @@ const cardStyle = computed(() => isFilled.value
 
 const iconTileStyle = computed(() => isFilled.value
   ? { background: 'rgba(255,255,255,0.16)', color: '#fff' }
-  : { background: 'color-mix(in srgb, var(--color-primary) 12%, white)', color: accentVar.value })
+  : { background: 'color-mix(in srgb, var(--color-primary) 12%, var(--color-surface))', color: accentVar.value })
 
 // Overlay cards always render white text, so an image-less card needs a dark
 // enough fill for that text to stay legible (a light icon tile would not).
@@ -332,16 +332,16 @@ const rest = computed(() => services.value.slice(1))
           >
             <IconGlyph :name="service.icon" class="size-4" />
           </div>
-          <h3 class="mt-3 font-semibold text-white">
+          <h3 class="mt-3 font-semibold text-[var(--color-surface)]">
             {{ service.title }}
           </h3>
-          <p v-if="showDescription" class="mt-1 text-sm leading-6 text-white/80">
+          <p v-if="showDescription" class="mt-1 text-sm leading-6 text-[color:color-mix(in_srgb,var(--color-surface)_80%,transparent)]">
             {{ service.description }}
           </p>
           <a
             v-if="showCta && service.link"
             :href="service.link"
-            class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-white"
+            class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-surface)]"
           >
             Learn more
             <UIcon name="i-lucide-arrow-right" class="size-4" />
