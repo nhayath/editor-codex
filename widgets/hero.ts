@@ -42,6 +42,21 @@ export const heroWidget: WidgetDefinition = {
       { key: 'variant', value: imagePanelVariants },
       { key: 'background', value: 'image' }
     ] },
+    { key: 'texture', label: 'Texture', type: 'pattern-select', default: 'eight-point-star', group: 'Content', showWhen: { key: 'variant', value: 'immersive' }, options: [
+      { label: 'None', value: 'none' },
+      { label: 'Eight-point stars', value: 'eight-point-star' },
+      { label: 'Girih diamonds', value: 'girih-diamonds' },
+      { label: 'Arabesque vines', value: 'arabesque-vines' },
+      { label: 'Rosette bloom', value: 'rosette-bloom' },
+      { label: 'Palm-leaf fan', value: 'palm-leaf-fan' },
+      { label: 'Mihrab arches', value: 'mihrab-arches' },
+      { label: 'Ramadan lanterns', value: 'ramadan-crescent-lantern' },
+      { label: 'Eid al-Fitr stars', value: 'eid-fitr-stars' },
+      { label: 'Eid al-Adha arches', value: 'eid-adha-arches' },
+      { label: 'Laylat al-Qadr night', value: 'laylat-qadr-night' },
+      { label: 'Hajj tawaf rings', value: 'hajj-tawaf-rings' },
+      { label: 'Jumuah lines', value: 'jumuah-lines' }
+    ] },
     { key: 'primaryLabel', label: 'Primary button', type: 'text', default: 'View prayer times', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: buttonVariants } },
     { key: 'primaryUrl', label: 'Primary URL', type: 'url', default: '#prayer-times', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: buttonVariants } },
     { key: 'secondaryLabel', label: 'Secondary button', type: 'text', default: 'Upcoming events', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: ['with-image', 'with-buttons', 'split', 'immersive'] } },

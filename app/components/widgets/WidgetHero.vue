@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { CSSProperties } from 'vue'
+import { pageBackgroundPatterns } from '~/composables/usePageBackground'
+
 const props = withDefaults(defineProps<{
   eyebrow?: string
   title?: string
@@ -17,6 +20,7 @@ const props = withDefaults(defineProps<{
   overlay?: boolean
   overlayOpacity?: number
   textTone?: string
+  texture?: string
 }>(), {
   eyebrow: 'Welcome to',
   title: 'Mosque',
@@ -34,7 +38,8 @@ const props = withDefaults(defineProps<{
   gradientTo: '#134e4a',
   overlay: true,
   overlayOpacity: 50,
-  textTone: 'light'
+  textTone: 'light',
+  texture: 'eight-point-star'
 })
 
 interface HeroLink { label: string; to: string }
@@ -69,6 +74,21 @@ const bgWrapperClass = computed(() => [
 
 const centered = computed(() => props.align === 'center')
 
+const texturePattern = computed(() => {
+  if (props.texture === 'none') return null
+  return pageBackgroundPatterns.find(pattern => pattern.id === (props.texture || 'eight-point-star'))
+    ?? pageBackgroundPatterns.find(pattern => pattern.id === 'eight-point-star')
+    ?? null
+})
+
+const textureStyle = computed(() => {
+  if (!texturePattern.value) return {}
+  return {
+    maskImage: `url("${texturePattern.value.url}")`,
+    WebkitMaskImage: `url("${texturePattern.value.url}")`
+  } satisfies CSSProperties
+})
+
 // Button styling shared across the non-immersive variants.
 // `light` = sitting on a dark surface, so use light-on-dark button colors.
 function buttonClass(index: number, light: boolean) {
@@ -96,7 +116,12 @@ function buttonClass(index: number, light: boolean) {
       class="absolute inset-0 -z-20 h-full w-full scale-[1.02] object-cover object-[72%_center]"
     >
     <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_78%_28%,color-mix(in_srgb,var(--color-accent)_18%,transparent),transparent_34%),linear-gradient(90deg,color-mix(in_srgb,var(--color-primary)_90%,var(--color-text))_0%,color-mix(in_srgb,var(--color-primary)_58%,transparent)_38%,transparent_78%),linear-gradient(180deg,transparent_35%,color-mix(in_srgb,var(--color-primary)_72%,var(--color-text))_100%)]" />
-    <div class="absolute inset-0 -z-10 opacity-10 mix-blend-soft-light [background-image:linear-gradient(45deg,color-mix(in_srgb,var(--color-surface)_42%,transparent)_25%,transparent_25%),linear-gradient(-45deg,color-mix(in_srgb,var(--color-surface)_34%,transparent)_25%,transparent_25%)] [background-size:72px_72px]" />
+    <div
+      v-if="texturePattern"
+      class="absolute inset-0 -z-10 bg-[color:color-mix(in_srgb,var(--color-surface)_60%,transparent)] opacity-12 mix-blend-soft-light [mask-position:center] [mask-repeat:repeat] [mask-size:92px]"
+      :style="textureStyle"
+      aria-hidden="true"
+    />
     <div class="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-black/20 to-transparent" />
 
     <div class="mx-auto flex min-h-[560px] w-[min(1120px,calc(100%-2rem))] flex-col justify-end p-6 @lg:p-10 @2xl:p-14 @4xl:min-h-[720px]">

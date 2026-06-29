@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WidgetPropSchema } from '~~/types/widget'
+import { pageBackgroundPatterns } from '~/composables/usePageBackground'
 
 const props = defineProps<{
   field: WidgetPropSchema
@@ -38,6 +39,30 @@ const selectValue = computed({
 })
 
 const selectItems = computed(() => (props.field.options ?? []) as any[])
+
+const patternItems = computed(() => {
+  const options = props.field.options?.length
+    ? props.field.options
+    : pageBackgroundPatterns.map(pattern => ({ label: pattern.name, value: pattern.id }))
+
+  return options.map((option) => {
+    const id = String(option.value)
+    const pattern = pageBackgroundPatterns.find(item => item.id === id)
+    return {
+      ...option,
+      value: id,
+      url: pattern?.url ?? '',
+      description: pattern?.description ?? ''
+    }
+  })
+})
+
+function patternMaskStyle(url: string) {
+  return {
+    maskImage: `url("${url}")`,
+    WebkitMaskImage: `url("${url}")`
+  }
+}
 
 function matchesCondition(condition: { key: string; value: unknown }) {
   const current = props.values?.[condition.key]
@@ -139,6 +164,48 @@ const richtextBubble = [
       :placeholder="field.placeholder"
       class="w-full"
     />
+
+    <div
+      v-else-if="field.type === 'pattern-select'"
+      class="grid grid-cols-2 gap-2"
+    >
+      <button
+        v-for="item in patternItems"
+        :key="item.value"
+        type="button"
+        class="group min-w-0 overflow-hidden rounded-md border border-muted bg-default text-left transition hover:border-primary focus-visible:outline-2 focus-visible:outline-primary"
+        :class="stringValue === item.value ? 'ring-2 ring-primary' : ''"
+        :title="String(item.label)"
+        :aria-pressed="stringValue === item.value"
+        @click="stringValue = item.value"
+      >
+        <span class="relative block h-16 overflow-hidden bg-elevated">
+          <span
+            v-if="item.value === 'none'"
+            class="absolute inset-0 bg-[linear-gradient(135deg,transparent_47%,color-mix(in_srgb,var(--ui-border-muted)_80%,transparent)_48%,color-mix(in_srgb,var(--ui-border-muted)_80%,transparent)_52%,transparent_53%)]"
+          />
+          <span
+            v-else
+            class="absolute inset-0 bg-primary opacity-35 [mask-position:center] [mask-repeat:repeat] [mask-size:48px]"
+            :style="patternMaskStyle(item.url)"
+          />
+          <UIcon
+            v-if="stringValue === item.value"
+            name="i-lucide-check"
+            class="absolute right-1.5 top-1.5 size-4 rounded-full bg-primary p-0.5 text-inverted"
+          />
+        </span>
+        <span class="block min-w-0 px-2 py-1.5">
+          <span class="block truncate text-xs font-semibold text-default">{{ item.label }}</span>
+          <span
+            v-if="item.description"
+            class="mt-0.5 block truncate text-[11px] text-muted"
+          >
+            {{ item.description }}
+          </span>
+        </span>
+      </button>
+    </div>
 
     <UColorPicker
       v-else-if="field.type === 'color'"

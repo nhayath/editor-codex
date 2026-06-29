@@ -45,6 +45,42 @@ export const pageBackgroundPatterns: PageBackgroundPattern[] = [
     name: 'Mihrab arches',
     description: 'A calm architectural rhythm',
     url: '/backgrounds/mihrab-arches.svg'
+  },
+  {
+    id: 'ramadan-crescent-lantern',
+    name: 'Ramadan lanterns',
+    description: 'Crescent moons and lantern glow',
+    url: '/backgrounds/ramadan-crescent-lantern.svg'
+  },
+  {
+    id: 'eid-fitr-stars',
+    name: 'Eid al-Fitr stars',
+    description: 'Celebratory stars and crescents',
+    url: '/backgrounds/eid-fitr-stars.svg'
+  },
+  {
+    id: 'eid-adha-arches',
+    name: 'Eid al-Adha arches',
+    description: 'Festival arches and gathering motifs',
+    url: '/backgrounds/eid-adha-arches.svg'
+  },
+  {
+    id: 'laylat-qadr-night',
+    name: 'Laylat al-Qadr night',
+    description: 'Night stars with a quiet crescent',
+    url: '/backgrounds/laylat-qadr-night.svg'
+  },
+  {
+    id: 'hajj-tawaf-rings',
+    name: 'Hajj tawaf rings',
+    description: 'Circular movement and unity',
+    url: '/backgrounds/hajj-tawaf-rings.svg'
+  },
+  {
+    id: 'jumuah-lines',
+    name: 'Jumuah lines',
+    description: 'Ordered rows for Friday prayer',
+    url: '/backgrounds/jumuah-lines.svg'
   }
 ]
 

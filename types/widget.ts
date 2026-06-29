@@ -7,6 +7,7 @@ export type WidgetPropType =
   | 'number'
   | 'toggle'
   | 'select'
+  | 'pattern-select'
   | 'color'
   | 'image'
   | 'images'
