@@ -66,6 +66,9 @@ export const heroWidget: WidgetDefinition = {
       { label: 'Hajj tawaf rings', value: 'hajj-tawaf-rings' },
       { label: 'Jumuah lines', value: 'jumuah-lines' }
     ] },
+    { key: 'spotlightCardBg', label: 'Card background', type: 'color', default: '#16213E', group: 'Card', showWhen: { key: 'variant', value: 'with-image' } },
+    { key: 'spotlightCardOpacity', label: 'Card opacity (0-100)', type: 'number', default: 72, group: 'Card', span: 'half', showWhen: { key: 'variant', value: 'with-image' } },
+    { key: 'spotlightCardBlur', label: 'Card blur', type: 'number', default: 8, group: 'Card', span: 'half', showWhen: { key: 'variant', value: 'with-image' } },
     { key: 'primaryLabel', label: 'Primary button', type: 'text', default: 'View prayer times', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: buttonVariants } },
     { key: 'primaryUrl', label: 'Primary URL', type: 'url', default: '#prayer-times', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: buttonVariants } },
     { key: 'secondaryLabel', label: 'Secondary button', type: 'text', default: 'Upcoming events', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: ['with-image', 'with-buttons', 'split', 'immersive'] } },

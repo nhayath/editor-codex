@@ -21,6 +21,9 @@ const props = withDefaults(defineProps<{
   overlayOpacity?: number
   textTone?: string
   texture?: string
+  spotlightCardBg?: string
+  spotlightCardOpacity?: number
+  spotlightCardBlur?: number
 }>(), {
   eyebrow: 'Welcome to',
   title: 'Mosque',
@@ -39,7 +42,10 @@ const props = withDefaults(defineProps<{
   overlay: true,
   overlayOpacity: 50,
   textTone: 'light',
-  texture: 'eight-point-star'
+  texture: 'eight-point-star',
+  spotlightCardBg: '#16213E',
+  spotlightCardOpacity: 72,
+  spotlightCardBlur: 8
 })
 
 interface HeroLink { label: string; to: string }
@@ -94,6 +100,17 @@ const textureStyle = computed(() => {
 })
 
 const textureLayerClass = 'absolute inset-0 bg-[color:color-mix(in_srgb,var(--color-surface)_60%,transparent)] opacity-12 mix-blend-soft-light [mask-position:center] [mask-repeat:repeat] [mask-size:92px]'
+
+const spotlightCardStyle = computed(() => {
+  const opacity = Math.min(Math.max(props.spotlightCardOpacity, 0), 100)
+  const blur = Math.min(Math.max(props.spotlightCardBlur, 0), 32)
+
+  return {
+    backgroundColor: `color-mix(in srgb, ${props.spotlightCardBg} ${opacity}%, transparent)`,
+    backdropFilter: `blur(${blur}px)`,
+    WebkitBackdropFilter: `blur(${blur}px)`
+  } satisfies CSSProperties
+})
 
 // Button styling shared across the non-immersive variants.
 // `light` = sitting on a dark surface, so use light-on-dark button colors.
@@ -255,8 +272,9 @@ function buttonClass(index: number, light: boolean) {
     />
     <div class="flex min-h-[460px] items-center p-5 @lg:p-10">
       <div
-        class="w-full max-w-md rounded-lg p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] ring-1 backdrop-blur-sm @lg:p-8"
-        :class="useImageLightText ? 'bg-[color:color-mix(in_srgb,var(--color-text)_58%,transparent)] text-[var(--color-surface)] ring-[color:color-mix(in_srgb,var(--color-surface)_14%,transparent)]' : 'bg-[color:color-mix(in_srgb,var(--color-surface)_95%,transparent)] text-[var(--color-text)] ring-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)]'"
+        class="w-full max-w-md rounded-lg p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] ring-1 @lg:p-8"
+        :class="useImageLightText ? 'text-[var(--color-surface)] ring-[color:color-mix(in_srgb,var(--color-surface)_14%,transparent)]' : 'text-[var(--color-text)] ring-[color:color-mix(in_srgb,var(--color-text)_10%,transparent)]'"
+        :style="spotlightCardStyle"
       >
         <p
           v-if="eyebrow"
