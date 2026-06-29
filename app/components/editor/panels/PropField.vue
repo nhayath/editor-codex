@@ -167,7 +167,7 @@ const richtextBubble = [
 
     <div
       v-else-if="field.type === 'pattern-select'"
-      class="grid grid-cols-2 gap-2"
+      class="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto pr-1"
     >
       <button
         v-for="item in patternItems"

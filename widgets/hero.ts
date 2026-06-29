@@ -6,6 +6,10 @@ const imagePanelVariants = ['with-image', 'split', 'immersive']
 const buttonVariants = ['with-image', 'with-buttons', 'split', 'immersive', 'banner']
 // Variants whose look is driven by a chosen background (solid/gradient/image).
 const backgroundVariants = ['simple', 'with-buttons', 'banner']
+const imageControlConditions = [
+  { key: 'variant', value: imagePanelVariants },
+  { key: 'background', value: 'image' }
+]
 
 export const heroWidget: WidgetDefinition = {
   id: 'hero',
@@ -38,11 +42,16 @@ export const heroWidget: WidgetDefinition = {
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
     ] },
-    { key: 'imageUrl', label: 'Image', type: 'image', default: '', group: 'Content', showWhen: [
-      { key: 'variant', value: imagePanelVariants },
-      { key: 'background', value: 'image' }
+    { key: 'imageUrl', label: 'Image', type: 'image', default: '', group: 'Image', showWhen: imageControlConditions },
+    { key: 'overlayOpacity', label: 'Darkness (0-100)', type: 'number', default: 50, group: 'Image', span: 'half', showWhen: imageControlConditions },
+    { key: 'textTone', label: 'Text colour', type: 'select', default: 'light', group: 'Image', span: 'half', options: [
+      { label: 'Light text', value: 'light' },
+      { label: 'Dark text', value: 'dark' }
+    ], showWhen: [
+      ...imageControlConditions,
+      { key: 'background', value: ['solid', 'gradient'] }
     ] },
-    { key: 'texture', label: 'Texture', type: 'pattern-select', default: 'eight-point-star', group: 'Content', showWhen: { key: 'variant', value: 'immersive' }, options: [
+    { key: 'texture', label: 'Pattern', type: 'pattern-select', default: 'eight-point-star', group: 'Texture', groupDefaultOpen: false, showWhen: imageControlConditions, options: [
       { label: 'None', value: 'none' },
       { label: 'Eight-point stars', value: 'eight-point-star' },
       { label: 'Girih diamonds', value: 'girih-diamonds' },
@@ -70,11 +79,6 @@ export const heroWidget: WidgetDefinition = {
     { key: 'bgColor', label: 'Background colour', type: 'color', default: '#0f766e', group: 'Background', showWhen: { key: 'background', value: 'solid' } },
     { key: 'gradientFrom', label: 'Gradient start', type: 'color', default: '#0f766e', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
     { key: 'gradientTo', label: 'Gradient end', type: 'color', default: '#134e4a', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
-    { key: 'overlay', label: 'Darken image', type: 'toggle', default: true, group: 'Background', span: 'half', showWhen: { key: 'background', value: 'image' } },
-    { key: 'overlayOpacity', label: 'Darkness (0-100)', type: 'number', default: 50, group: 'Background', span: 'half', showWhen: { key: 'background', value: 'image' } },
-    { key: 'textTone', label: 'Text colour', type: 'select', default: 'light', group: 'Background', options: [
-      { label: 'Light text', value: 'light' },
-      { label: 'Dark text', value: 'dark' }
-    ], showWhen: { key: 'background', value: ['solid', 'gradient', 'image'] } }
+    { key: 'overlay', label: 'Darken image', type: 'toggle', default: true, group: 'Background', span: 'half', showWhen: { key: 'background', value: 'image' } }
   ]
 }
