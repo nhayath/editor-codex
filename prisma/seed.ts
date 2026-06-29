@@ -274,6 +274,19 @@ const prayerRows = [
   { date: '2026-06-30', fajr: '02:56', sunrise: '04:45', dhuhr: '13:11', asr: '17:29', maghrib: '21:26', isha: '22:45', fajrIqamah: '03:15', dhuhrIqamah: '13:30', asrIqamah: '18:00', maghribIqamah: '21:31', ishaIqamah: '23:00' }
 ]
 
+const birminghamEventImages = [
+  '/templates/mosque-hero-1.svg',
+  '/templates/mosque-hero-2.svg',
+  '/templates/mosque-hero-3.svg',
+  '/templates/sacred-modern-courtyard.webp'
+]
+
+const birminghamAnnouncementImages = [
+  '/templates/mosque-hero-3.svg',
+  '/templates/mosque-hero-1.svg',
+  '/templates/mosque-hero-2.svg'
+]
+
 async function main() {
   await prisma.mediaAsset.deleteMany()
   await prisma.footerLink.deleteMany()
@@ -345,21 +358,29 @@ async function main() {
       ]
     })
 
+    const eventRows = [
+      { tenantId: tenant.id, title: 'Quran circle', description: 'Weekly recitation and reflection for adults.', date: '2026-06-19', location: 'Education room', category: 'Education' },
+      { tenantId: tenant.id, title: 'Youth night', description: 'Discussion, activities, and food for young people.', date: '2026-06-21', location: 'Community hall', category: 'Youth' },
+      { tenantId: tenant.id, title: 'Family open day', description: 'Meet the team and learn about mosque services.', date: '2026-06-27', location: 'Main hall', category: 'Community' },
+      { tenantId: tenant.id, title: 'New Muslim support', description: 'A welcoming session for new Muslims and guests.', date: '2026-07-02', location: 'Library', category: 'Support' }
+    ].map((eventRow, i) => seed.tenant.slug === 'birmingham-central'
+      ? { ...eventRow, imageUrl: birminghamEventImages[i] }
+      : eventRow)
+
     await prisma.event.createMany({
-      data: [
-        { tenantId: tenant.id, title: 'Quran circle', description: 'Weekly recitation and reflection for adults.', date: '2026-06-19', location: 'Education room', category: 'Education' },
-        { tenantId: tenant.id, title: 'Youth night', description: 'Discussion, activities, and food for young people.', date: '2026-06-21', location: 'Community hall', category: 'Youth' },
-        { tenantId: tenant.id, title: 'Family open day', description: 'Meet the team and learn about mosque services.', date: '2026-06-27', location: 'Main hall', category: 'Community' },
-        { tenantId: tenant.id, title: 'New Muslim support', description: 'A welcoming session for new Muslims and guests.', date: '2026-07-02', location: 'Library', category: 'Support' }
-      ]
+      data: eventRows
     })
 
+    const announcementRows = [
+      { tenantId: tenant.id, title: 'Summer timetable now live', content: 'Prayer times have been updated for the summer period.', priority: 'NORMAL', isPinned: true },
+      { tenantId: tenant.id, title: 'Car park notice', content: 'Please use nearby public parking for Friday prayers where possible.', priority: 'URGENT', isPinned: true },
+      { tenantId: tenant.id, title: 'Volunteer rota', content: 'New volunteer slots are available for weekend programmes.', priority: 'NORMAL', isPinned: false }
+    ].map((announcementRow, i) => seed.tenant.slug === 'birmingham-central'
+      ? { ...announcementRow, imageUrl: birminghamAnnouncementImages[i] }
+      : announcementRow)
+
     await prisma.announcement.createMany({
-      data: [
-        { tenantId: tenant.id, title: 'Summer timetable now live', content: 'Prayer times have been updated for the summer period.', priority: 'NORMAL', isPinned: true },
-        { tenantId: tenant.id, title: 'Car park notice', content: 'Please use nearby public parking for Friday prayers where possible.', priority: 'URGENT', isPinned: true },
-        { tenantId: tenant.id, title: 'Volunteer rota', content: 'New volunteer slots are available for weekend programmes.', priority: 'NORMAL', isPinned: false }
-      ]
+      data: announcementRows
     })
 
     await prisma.donationCampaign.createMany({

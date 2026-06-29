@@ -9,6 +9,7 @@ const props = withDefaults(defineProps<{
   background?: string
   align?: string
   columns?: string
+  showImage?: boolean
   showIcon?: boolean
   showPriorityBadge?: boolean
   showContent?: boolean
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<{
   background: 'surface',
   align: 'left',
   columns: '3',
+  showImage: true,
   showIcon: true,
   showPriorityBadge: true,
   showContent: true,
@@ -33,6 +35,7 @@ interface Item {
   id: string
   title: string
   content?: string
+  imageUrl?: string
   priority?: string
   isPinned?: boolean
   isUrgent: boolean
@@ -50,6 +53,7 @@ const items = computed<Item[]>(() => {
         id: item.id ?? String(i),
         title: item.title,
         content: item.content,
+        imageUrl: item.imageUrl,
         priority: item.priority,
         isPinned: item.isPinned,
         isUrgent,
@@ -113,6 +117,10 @@ const rootClass = computed(() => {
 
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 const cardGridClass = computed(() => props.columns === '2' ? '@xl:grid-cols-2' : '@xl:grid-cols-3')
+
+function hasImage(item?: Item | null) {
+  return props.showImage && !!item?.imageUrl
+}
 
 function badgeStyle(item: Item) {
   if (item.isUrgent) {
@@ -220,28 +228,36 @@ function badgeStyle(item: Item) {
       <!-- Feature: top notice spotlighted, the rest listed -->
       <template v-else-if="variant === 'feature'">
         <div
-          class="rounded-lg p-5"
+          class="overflow-hidden rounded-lg"
           :style="isFilled
             ? { background: 'rgba(255,255,255,0.12)' }
             : { background: `color-mix(in srgb, ${accentVar} 7%, var(--color-surface))`, boxShadow: `inset 0 0 0 1px ${hairlineColor}` }"
         >
-          <div class="flex items-start justify-between gap-3">
-            <h3 class="text-xl font-bold" :style="{ color: headingColor }">
-              {{ topItem?.title }}
-            </h3>
-            <span
-              v-if="showPriorityBadge && topItem?.badge"
-              class="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
-              :style="badgeStyle(topItem)"
-            >{{ topItem.badge }}</span>
-          </div>
-          <p
-            v-if="showContent && topItem?.content"
-            class="mt-2 text-sm leading-6"
-            :style="{ color: mutedColor }"
+          <img
+            v-if="hasImage(topItem)"
+            :src="topItem?.imageUrl"
+            :alt="topItem?.title"
+            class="aspect-[16/7] w-full object-cover"
           >
-            {{ topItem.content }}
-          </p>
+          <div class="p-5">
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="text-xl font-bold" :style="{ color: headingColor }">
+                {{ topItem?.title }}
+              </h3>
+              <span
+                v-if="showPriorityBadge && topItem?.badge"
+                class="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
+                :style="badgeStyle(topItem)"
+              >{{ topItem.badge }}</span>
+            </div>
+            <p
+              v-if="showContent && topItem?.content"
+              class="mt-2 text-sm leading-6"
+              :style="{ color: mutedColor }"
+            >
+              {{ topItem.content }}
+            </p>
+          </div>
         </div>
         <ul v-if="restItems.length" class="mt-3">
           <li
@@ -251,7 +267,13 @@ function badgeStyle(item: Item) {
             :class="i > 0 ? 'border-t' : ''"
             :style="{ borderColor: hairlineColor }"
           >
-            <div>
+            <img
+              v-if="hasImage(item)"
+              :src="item.imageUrl"
+              :alt="item.title"
+              class="size-14 shrink-0 rounded-md object-cover"
+            >
+            <div class="min-w-0 flex-1">
               <p class="font-semibold leading-tight" :style="{ color: headingColor }">
                 {{ item.title }}
               </p>
@@ -279,25 +301,34 @@ function badgeStyle(item: Item) {
             v-for="item in items"
             :key="item.id"
             class="rounded-lg p-5"
+            :class="hasImage(item) ? 'grid gap-4 @md:grid-cols-[8rem_1fr] @md:items-start' : ''"
             :style="cardSurfaceStyle"
           >
-            <div class="flex items-start justify-between gap-3">
-              <h3 class="font-semibold" :style="{ color: headingColor }">
-                {{ item.title }}
-              </h3>
-              <span
-                v-if="showPriorityBadge && item.badge"
-                class="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold"
-                :style="badgeStyle(item)"
-              >{{ item.badge }}</span>
-            </div>
-            <p
-              v-if="showContent && item.content"
-              class="mt-3 text-sm leading-6"
-              :style="{ color: mutedColor }"
+            <img
+              v-if="hasImage(item)"
+              :src="item.imageUrl"
+              :alt="item.title"
+              class="aspect-[4/3] w-full rounded-md object-cover"
             >
-              {{ item.content }}
-            </p>
+            <div>
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="font-semibold" :style="{ color: headingColor }">
+                  {{ item.title }}
+                </h3>
+                <span
+                  v-if="showPriorityBadge && item.badge"
+                  class="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                  :style="badgeStyle(item)"
+                >{{ item.badge }}</span>
+              </div>
+              <p
+                v-if="showContent && item.content"
+                class="mt-3 text-sm leading-6"
+                :style="{ color: mutedColor }"
+              >
+                {{ item.content }}
+              </p>
+            </div>
           </article>
         </div>
       </template>
@@ -308,26 +339,34 @@ function badgeStyle(item: Item) {
           <article
             v-for="item in items"
             :key="item.id"
-            class="rounded-lg p-5"
+            class="overflow-hidden rounded-lg"
             :style="cardSurfaceStyle"
           >
-            <div class="flex items-start justify-between gap-3">
-              <h3 class="font-semibold" :style="{ color: headingColor }">
-                {{ item.title }}
-              </h3>
-              <span
-                v-if="showPriorityBadge && item.badge"
-                class="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold"
-                :style="badgeStyle(item)"
-              >{{ item.badge }}</span>
-            </div>
-            <p
-              v-if="showContent && item.content"
-              class="mt-3 text-sm leading-6"
-              :style="{ color: mutedColor }"
+            <img
+              v-if="hasImage(item)"
+              :src="item.imageUrl"
+              :alt="item.title"
+              class="aspect-[4/3] w-full object-cover"
             >
-              {{ item.content }}
-            </p>
+            <div class="p-5">
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="font-semibold" :style="{ color: headingColor }">
+                  {{ item.title }}
+                </h3>
+                <span
+                  v-if="showPriorityBadge && item.badge"
+                  class="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                  :style="badgeStyle(item)"
+                >{{ item.badge }}</span>
+              </div>
+              <p
+                v-if="showContent && item.content"
+                class="mt-3 text-sm leading-6"
+                :style="{ color: mutedColor }"
+              >
+                {{ item.content }}
+              </p>
+            </div>
           </article>
         </div>
       </template>

@@ -3,6 +3,7 @@ const props = withDefaults(defineProps<{
   title?: string
   subtitle?: string
   buttonLabel?: string
+  imageUrl?: string
   variant?: string
   eyebrow?: string
   accent?: string
@@ -18,18 +19,19 @@ const props = withDefaults(defineProps<{
   amountQueryParam?: string
   data?: Record<string, any>
 }>(), {
-  title: 'Support your mosque',
-  subtitle: 'Your donations help sustain worship, education, and community support.',
-  buttonLabel: 'Donate now',
+  title: 'Quick Donate',
+  subtitle: 'Your contribution will help us to maintain and develop the wide range of services we offer.',
+  buttonLabel: 'Donate',
+  imageUrl: '/uploads/cmqvigb8x0001a85rnwf799wo/donation-box-7eff6832-27a0-4d13-8bba-c1990c82f698.png',
   variant: 'banner',
   eyebrow: 'Giving',
   accent: 'primary',
-  background: 'solid',
+  background: 'surface',
   align: 'left',
-  showProgress: true,
-  showRaised: true,
-  showAmounts: false,
-  presetAmounts: '10,25,50,100',
+  showProgress: false,
+  showRaised: false,
+  showAmounts: true,
+  presetAmounts: '30,50,100',
   allowCustomAmount: true,
   frequencyToggle: false,
   currencySymbol: '£',
@@ -44,6 +46,7 @@ interface Campaign {
   goal?: number
   raised?: number
   paymentUrl?: string
+  imageUrl?: string
   isFeatured?: boolean
 }
 
@@ -67,6 +70,12 @@ const presets = computed<number[]>(() =>
     .map(part => Number(part.trim()))
     .filter(n => Number.isFinite(n) && n > 0)
 )
+
+watch(presets, (amounts) => {
+  if (props.showAmounts && selectedAmount.value === null && amounts.length) {
+    selectedAmount.value = amounts[0]
+  }
+}, { immediate: true })
 
 function selectPreset(amount: number) {
   selectedAmount.value = amount
@@ -119,6 +128,11 @@ const accentVar = computed(() => {
 const isFilled = computed(() => props.background !== 'surface')
 
 const containerStyle = computed(() => {
+  if (props.variant === 'banner' && props.background === 'surface') {
+    return {
+      background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))'
+    }
+  }
   if (props.background === 'surface') {
     return {
       background: 'var(--color-surface)',
@@ -139,6 +153,7 @@ const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)'
 const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
 const trackColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.2)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
 const barColor = computed(() => isFilled.value ? '#fff' : accentVar.value)
+const bannerImageUrl = computed(() => props.imageUrl || featured.value?.imageUrl || '')
 // Cards/panels sit on a tint of the card surface.
 const panelStyle = computed(() =>
   isFilled.value
@@ -157,13 +172,36 @@ const pickerColors = computed(() => ({
   border: hairlineColor.value,
   muted: mutedColor.value
 }))
+
+const rootClass = computed(() => [
+  '@container relative isolate h-full overflow-hidden',
+  props.variant === 'banner' ? 'px-5 py-8 @md:px-7 @xl:px-8 @xl:py-10' : 'rounded-lg p-6'
+])
+
+const bannerButtonStyle = computed(() => ({
+  background: accentVar.value,
+  color: '#fff',
+  boxShadow: `0 12px 26px color-mix(in srgb, ${accentVar.value} 20%, transparent)`
+}))
+
+function bannerAmountStyle(amount: number) {
+  const active = selectedAmount.value === amount
+  return active
+    ? { background: accentVar.value, borderColor: accentVar.value, color: '#fff' }
+    : { background: 'rgba(255,255,255,0.72)', borderColor: 'color-mix(in srgb, var(--color-text) 18%, transparent)', color: accentVar.value }
+}
 </script>
 
 <template>
   <div
-    class="@container h-full overflow-hidden rounded-lg p-6"
+    :class="rootClass"
     :style="containerStyle"
   >
+    <div
+      v-if="variant === 'banner'"
+      class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-text)] opacity-[0.035] [mask-image:url('/backgrounds/eight-point-star.svg')] [mask-position:center] [mask-repeat:repeat] [mask-size:170px]"
+      aria-hidden="true"
+    />
     <!-- Empty state -->
     <div v-if="!hasCampaigns" :class="alignClass">
       <p class="text-sm font-medium" :style="{ color: accentTextColor }">{{ eyebrow }}</p>
@@ -332,13 +370,12 @@ const pickerColors = computed(() => ({
       </UButton>
     </div>
 
-    <!-- BANNER (default / legacy fallback): featured campaign + single CTA -->
-    <div v-else class="grid gap-6 @xl:grid-cols-[1fr_auto] @xl:items-center">
+    <!-- BANNER (default): split quick-donate panel with amounts + image -->
+    <div v-else class="grid gap-8 @4xl:grid-cols-[minmax(280px,0.52fr)_minmax(0,0.88fr)] @4xl:items-center @6xl:gap-12">
       <div :class="alignClass">
-        <p class="text-sm font-medium" :style="{ color: accentTextColor }">{{ eyebrow }}</p>
-        <h2 class="tenant-heading mt-2 text-3xl font-bold" :style="{ color: headingColor }">{{ title }}</h2>
-        <p class="mt-3 max-w-2xl" :style="{ color: mutedColor }">{{ subtitle }}</p>
-        <div v-if="showProgress && featured?.goal" class="mt-4 max-w-md" :class="align === 'center' ? 'mx-auto' : ''">
+        <h2 class="tenant-heading text-3xl font-bold leading-tight @xl:text-4xl" :style="{ color: accentVar }">{{ title }}</h2>
+        <p class="mt-5 max-w-[35rem] text-base leading-8 @xl:text-lg" :style="{ color: 'var(--color-text)' }">{{ subtitle }}</p>
+        <div v-if="showProgress && featured?.goal" class="mt-6 max-w-md" :class="align === 'center' ? 'mx-auto' : ''">
           <div class="h-2 w-full overflow-hidden rounded-full" :style="{ background: trackColor }">
             <div class="h-full rounded-full" :style="{ width: pct(featured) + '%', background: barColor }" />
           </div>
@@ -346,34 +383,71 @@ const pickerColors = computed(() => ({
         <p v-if="showRaised && featured" class="mt-3 text-sm" :style="{ color: mutedColor }">
           {{ featured.title }}: {{ currencySymbol }}{{ money(featured.raised) }} raised
         </p>
-      </div>
-      <div class="flex flex-col gap-3" :class="align === 'center' ? 'items-center' : 'items-start'">
-        <DonationAmountPicker
-          v-if="showAmounts"
-          :presets="presets"
-          :selected="selectedAmount"
-          :custom="customAmount"
-          :allow-custom="allowCustomAmount"
-          :frequency-toggle="frequencyToggle"
-          :frequency="frequency"
-          :currency="currencySymbol"
-          :colors="pickerColors"
-          @select="selectPreset"
-          @custom="onCustomInput"
-          @frequency="frequency = $event"
-        />
+
+        <div v-if="showAmounts" class="mt-8 grid max-w-sm gap-4">
+          <div
+            v-if="frequencyToggle"
+            class="inline-flex w-fit rounded-full bg-white/75 p-1 ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_14%,transparent)]"
+          >
+            <button
+              v-for="opt in (['once', 'monthly'] as const)"
+              :key="opt"
+              type="button"
+              class="rounded-full px-4 py-1.5 text-sm font-bold transition"
+              :style="frequency === opt ? { background: accentVar, color: '#fff' } : { color: accentVar }"
+              @click="frequency = opt"
+            >
+              {{ opt === 'once' ? 'One-off' : 'Monthly' }}
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <button
+              v-for="amount in presets"
+              :key="amount"
+              type="button"
+              class="h-14 min-w-24 rounded-md border px-6 text-base font-black tabular-nums transition hover:-translate-y-0.5 @xl:h-16"
+              :style="bannerAmountStyle(amount)"
+              @click="selectPreset(amount)"
+            >
+              {{ currencySymbol }}{{ amount }}
+            </button>
+          </div>
+
+          <label
+            v-if="allowCustomAmount"
+            class="grid min-h-16 max-w-[18rem] grid-cols-[1fr_7rem] items-center gap-3 rounded-md border bg-white/78 px-5 py-3"
+            :style="{ borderColor: 'color-mix(in srgb, var(--color-text) 18%, transparent)', color: accentVar }"
+          >
+            <span class="text-base font-black">Other</span>
+            <input
+              :value="customAmount"
+              inputmode="decimal"
+              class="h-11 min-w-0 rounded-sm border bg-white px-3 text-base font-bold outline-none"
+              :style="{ borderColor: 'color-mix(in srgb, var(--color-text) 16%, transparent)', color: 'var(--color-text)' }"
+              @input="onCustomInput"
+            >
+          </label>
+        </div>
+
         <UButton
           :to="donateUrl(featured)"
           target="_blank"
           rel="noopener noreferrer"
           :disabled="!hasPay(featured)"
-          :color="buttonColor"
+          class="mt-6 rounded-full px-7 py-3 text-base font-black"
+          :style="bannerButtonStyle"
+          color="neutral"
           :label="buttonLabel"
+        />
+      </div>
+
+      <div v-if="bannerImageUrl" class="order-first @4xl:order-none">
+        <img
+          :src="bannerImageUrl"
+          :alt="`${title} donation image`"
+          class="aspect-[16/10] w-full object-cover @4xl:min-h-[23rem] @6xl:min-h-[28rem]"
         >
-          <template #leading>
-            <IconGlyph name="islamic-donation" class="size-4" />
-          </template>
-        </UButton>
       </div>
     </div>
   </div>

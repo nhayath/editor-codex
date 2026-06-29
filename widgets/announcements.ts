@@ -48,6 +48,7 @@ export const announcementsWidget: WidgetDefinition = {
       { label: '2', value: '2' },
       { label: '3', value: '3' }
     ] },
+    { key: 'showImage', label: 'Show images', type: 'toggle', default: true, group: 'Display', span: 'half' },
     { key: 'showIcon', label: 'Show icon', type: 'toggle', default: true, group: 'Display', span: 'half' },
     { key: 'showPriorityBadge', label: 'Show pinned/urgent badge', type: 'toggle', default: true, group: 'Display', span: 'half' },
     { key: 'showContent', label: 'Show body text', type: 'toggle', default: true, group: 'Display', span: 'half' }

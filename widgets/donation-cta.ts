@@ -21,16 +21,17 @@ export const donationCtaWidget: WidgetDefinition = {
       { label: 'Featured', value: 'featured' },
       { label: 'Compact', value: 'compact' }
     ] },
-    { key: 'title', label: 'Title', type: 'text', default: 'Support your mosque' },
-    { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'Your donations help sustain worship, education, and community support.' },
-    { key: 'buttonLabel', label: 'Button label', type: 'text', default: 'Donate now' },
+    { key: 'title', label: 'Title', type: 'text', default: 'Quick Donate' },
+    { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'Your contribution will help us to maintain and develop the wide range of services we offer.' },
+    { key: 'buttonLabel', label: 'Button label', type: 'text', default: 'Donate' },
+    { key: 'imageUrl', label: 'Image', type: 'image', default: '/uploads/cmqvigb8x0001a85rnwf799wo/donation-box-7eff6832-27a0-4d13-8bba-c1990c82f698.png', group: 'Display' },
     { key: 'eyebrow', label: 'Eyebrow', type: 'text', default: 'Giving', group: 'Display' },
     { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', span: 'half', options: [
       { label: 'Primary', value: 'primary' },
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', default: 'solid', group: 'Display', span: 'half', options: [
+    { key: 'background', label: 'Background', type: 'select', default: 'surface', group: 'Display', span: 'half', options: [
       { label: 'Surface', value: 'surface' },
       { label: 'Solid', value: 'solid' },
       { label: 'Gradient', value: 'gradient' }
@@ -39,12 +40,12 @@ export const donationCtaWidget: WidgetDefinition = {
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
     ] },
-    { key: 'showProgress', label: 'Show progress bar', type: 'toggle', default: true, group: 'Display', span: 'half' },
-    { key: 'showRaised', label: 'Show amount raised', type: 'toggle', default: true, group: 'Display', span: 'half' },
+    { key: 'showProgress', label: 'Show progress bar', type: 'toggle', default: false, group: 'Display', span: 'half' },
+    { key: 'showRaised', label: 'Show amount raised', type: 'toggle', default: false, group: 'Display', span: 'half' },
     // Donation amount selector — opt-in. Chips append the chosen amount to the
     // campaign's paymentUrl as a query param so external providers prefill it.
-    { key: 'showAmounts', label: 'Show amount selector', type: 'toggle', default: false, group: 'Donation amounts' },
-    { key: 'presetAmounts', label: 'Preset amounts (comma-separated)', type: 'text', default: '10,25,50,100', group: 'Donation amounts', showWhen: { key: 'showAmounts', value: true } },
+    { key: 'showAmounts', label: 'Show amount selector', type: 'toggle', default: true, group: 'Donation amounts' },
+    { key: 'presetAmounts', label: 'Preset amounts (comma-separated)', type: 'text', default: '30,50,100', group: 'Donation amounts', showWhen: { key: 'showAmounts', value: true } },
     { key: 'allowCustomAmount', label: 'Allow custom amount', type: 'toggle', default: true, group: 'Donation amounts', span: 'half', showWhen: { key: 'showAmounts', value: true } },
     { key: 'frequencyToggle', label: 'Offer monthly giving', type: 'toggle', default: false, group: 'Donation amounts', span: 'half', showWhen: { key: 'showAmounts', value: true } },
     { key: 'currencySymbol', label: 'Currency symbol', type: 'text', default: '£', group: 'Donation amounts', span: 'half', showWhen: { key: 'showAmounts', value: true } },

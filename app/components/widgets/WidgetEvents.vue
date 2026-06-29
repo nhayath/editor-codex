@@ -247,27 +247,35 @@ const rest = computed(() => events.value.slice(1))
         <article
           v-for="event in rest"
           :key="event.id ?? event.title"
-          class="rounded-lg p-5"
+          class="overflow-hidden rounded-lg"
           :style="cardStyle"
         >
-          <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
-            {{ event.category || 'Event' }}
-          </UBadge>
-          <h3 class="mt-3 font-semibold" :style="{ color: headingColor }">
-            {{ event.title }}
-          </h3>
-          <p v-if="showDescription" class="mt-2 text-sm leading-6" :style="{ color: mutedColor }">
-            {{ event.description }}
-          </p>
-          <div class="mt-3 grid gap-2 text-sm" :style="{ color: mutedColor }">
-            <span v-if="showDate && event.date" class="flex items-center gap-2">
-              <UIcon name="i-lucide-calendar-days" class="size-4" :style="{ color: accentTextColor }" />
-              {{ dateLabel(event) }}
-            </span>
-            <span v-if="showLocation && event.location" class="flex items-center gap-2">
-              <UIcon name="i-lucide-map-pin" class="size-4" :style="{ color: accentTextColor }" />
-              {{ event.location }}
-            </span>
+          <img
+            v-if="hasImage(event)"
+            :src="event.imageUrl"
+            :alt="event.title"
+            class="aspect-[4/3] w-full object-cover"
+          >
+          <div class="p-5">
+            <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
+              {{ event.category || 'Event' }}
+            </UBadge>
+            <h3 class="mt-3 font-semibold" :style="{ color: headingColor }">
+              {{ event.title }}
+            </h3>
+            <p v-if="showDescription" class="mt-2 text-sm leading-6" :style="{ color: mutedColor }">
+              {{ event.description }}
+            </p>
+            <div class="mt-3 grid gap-2 text-sm" :style="{ color: mutedColor }">
+              <span v-if="showDate && event.date" class="flex items-center gap-2">
+                <UIcon name="i-lucide-calendar-days" class="size-4" :style="{ color: accentTextColor }" />
+                {{ dateLabel(event) }}
+              </span>
+              <span v-if="showLocation && event.location" class="flex items-center gap-2">
+                <UIcon name="i-lucide-map-pin" class="size-4" :style="{ color: accentTextColor }" />
+                {{ event.location }}
+              </span>
+            </div>
           </div>
         </article>
       </div>
@@ -318,26 +326,35 @@ const rest = computed(() => events.value.slice(1))
         v-for="event in events"
         :key="event.id ?? event.title"
         class="rounded-lg p-5"
+        :class="hasImage(event) ? 'grid gap-4 @md:grid-cols-[8rem_1fr] @md:items-start' : ''"
         :style="cardStyle"
       >
-        <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
-          {{ event.category || 'Event' }}
-        </UBadge>
-        <h3 class="mt-3 text-lg font-semibold" :style="{ color: headingColor }">
-          {{ event.title }}
-        </h3>
-        <p v-if="showDescription" class="mt-2 text-sm leading-6" :style="{ color: mutedColor }">
-          {{ event.description }}
-        </p>
-        <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm" :style="{ color: mutedColor }">
-          <span v-if="showDate && event.date" class="flex items-center gap-2">
-            <UIcon name="i-lucide-calendar-days" class="size-4" :style="{ color: accentTextColor }" />
-            {{ dateLabel(event) }}
-          </span>
-          <span v-if="showLocation && event.location" class="flex items-center gap-2">
-            <UIcon name="i-lucide-map-pin" class="size-4" :style="{ color: accentTextColor }" />
-            {{ event.location }}
-          </span>
+        <img
+          v-if="hasImage(event)"
+          :src="event.imageUrl"
+          :alt="event.title"
+          class="aspect-[4/3] w-full rounded-md object-cover"
+        >
+        <div>
+          <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
+            {{ event.category || 'Event' }}
+          </UBadge>
+          <h3 class="mt-3 text-lg font-semibold" :style="{ color: headingColor }">
+            {{ event.title }}
+          </h3>
+          <p v-if="showDescription" class="mt-2 text-sm leading-6" :style="{ color: mutedColor }">
+            {{ event.description }}
+          </p>
+          <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm" :style="{ color: mutedColor }">
+            <span v-if="showDate && event.date" class="flex items-center gap-2">
+              <UIcon name="i-lucide-calendar-days" class="size-4" :style="{ color: accentTextColor }" />
+              {{ dateLabel(event) }}
+            </span>
+            <span v-if="showLocation && event.location" class="flex items-center gap-2">
+              <UIcon name="i-lucide-map-pin" class="size-4" :style="{ color: accentTextColor }" />
+              {{ event.location }}
+            </span>
+          </div>
         </div>
       </article>
     </div>
@@ -347,27 +364,35 @@ const rest = computed(() => events.value.slice(1))
       <article
         v-for="event in events"
         :key="event.id ?? event.title"
-        class="rounded-lg p-5"
+        class="overflow-hidden rounded-lg"
         :style="cardStyle"
       >
-        <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
-          {{ event.category || 'Event' }}
-        </UBadge>
-        <h3 class="mt-4 text-lg font-semibold" :style="{ color: headingColor }">
-          {{ event.title }}
-        </h3>
-        <p v-if="showDescription" class="mt-2 text-sm leading-6" :style="{ color: mutedColor }">
-          {{ event.description }}
-        </p>
-        <div class="mt-4 grid gap-2 text-sm" :style="{ color: mutedColor }">
-          <span v-if="showDate && event.date" class="flex items-center gap-2">
-            <UIcon name="i-lucide-calendar-days" class="size-4" :style="{ color: accentTextColor }" />
-            {{ dateLabel(event) }}
-          </span>
-          <span v-if="showLocation && event.location" class="flex items-center gap-2">
-            <UIcon name="i-lucide-map-pin" class="size-4" :style="{ color: accentTextColor }" />
-            {{ event.location }}
-          </span>
+        <img
+          v-if="hasImage(event)"
+          :src="event.imageUrl"
+          :alt="event.title"
+          class="aspect-[4/3] w-full object-cover"
+        >
+        <div class="p-5">
+          <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
+            {{ event.category || 'Event' }}
+          </UBadge>
+          <h3 class="mt-4 text-lg font-semibold" :style="{ color: headingColor }">
+            {{ event.title }}
+          </h3>
+          <p v-if="showDescription" class="mt-2 text-sm leading-6" :style="{ color: mutedColor }">
+            {{ event.description }}
+          </p>
+          <div class="mt-4 grid gap-2 text-sm" :style="{ color: mutedColor }">
+            <span v-if="showDate && event.date" class="flex items-center gap-2">
+              <UIcon name="i-lucide-calendar-days" class="size-4" :style="{ color: accentTextColor }" />
+              {{ dateLabel(event) }}
+            </span>
+            <span v-if="showLocation && event.location" class="flex items-center gap-2">
+              <UIcon name="i-lucide-map-pin" class="size-4" :style="{ color: accentTextColor }" />
+              {{ event.location }}
+            </span>
+          </div>
         </div>
       </article>
     </div>

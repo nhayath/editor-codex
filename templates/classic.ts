@@ -97,7 +97,18 @@ export const classicTemplate: TemplateDefinition = {
       required: false,
       removable: true,
       widgetId: 'donation-cta',
-      defaultProps: { variant: 'banner', title: 'Support your mosque' }
+      defaultProps: {
+        variant: 'banner',
+        title: 'Quick Donate',
+        subtitle: 'Your contribution will help us to maintain and develop the wide range of services we offer.',
+        buttonLabel: 'Donate',
+        imageUrl: '/uploads/cmqvigb8x0001a85rnwf799wo/donation-box-7eff6832-27a0-4d13-8bba-c1990c82f698.png',
+        background: 'surface',
+        showAmounts: true,
+        presetAmounts: '30,50,100',
+        showProgress: false,
+        showRaised: false
+      }
     },
     {
       id: 'about-mosque',
