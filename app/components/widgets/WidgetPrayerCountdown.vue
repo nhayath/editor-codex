@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<{
   precision: 'minutes',
   showIqamah: true,
   showIcon: true,
-  showDate: false,
+  showDate: true,
   showProgress: true,
   compact: false,
   data: () => ({})
@@ -70,6 +70,46 @@ function toSeconds(value?: string) {
   const hours = parts[0] ?? 0
   const minutes = parts[1] ?? 0
   return hours * 3600 + minutes * 60
+}
+
+function parseDate(value?: string) {
+  if (!value) return new Date()
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? new Date(`${value}T00:00:00`)
+    : new Date(value)
+  return Number.isNaN(date.getTime()) ? new Date() : date
+}
+
+function ordinal(value: number) {
+  const mod100 = value % 100
+  if (mod100 >= 11 && mod100 <= 13) return `${value}th`
+  switch (value % 10) {
+    case 1: return `${value}st`
+    case 2: return `${value}nd`
+    case 3: return `${value}rd`
+    default: return `${value}th`
+  }
+}
+
+function formatGregorianDate(date: Date) {
+  const weekday = new Intl.DateTimeFormat('en-GB', { weekday: 'long' }).format(date)
+  const month = new Intl.DateTimeFormat('en-GB', { month: 'long' }).format(date)
+  const day = Number(new Intl.DateTimeFormat('en-GB', { day: 'numeric' }).format(date))
+  const year = new Intl.DateTimeFormat('en-GB', { year: 'numeric' }).format(date)
+  return `${weekday}, the ${ordinal(day)} of ${month} ${year}`
+}
+
+function formatHijriDate(date: Date) {
+  const parts = new Intl.DateTimeFormat('en-GB-u-ca-islamic-umalqura', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).formatToParts(date)
+  const day = parts.find(part => part.type === 'day')?.value
+  const month = parts.find(part => part.type === 'month')?.value
+  const year = parts.find(part => part.type === 'year')?.value
+  if (!day || !month || !year) return ''
+  return `${ordinal(Number(day))} of ${month} ${year} AH`
 }
 
 const prayerData = computed(() => (props.data?.prayerTimes ?? {}) as Record<string, string | undefined>)
@@ -142,7 +182,13 @@ const progress = computed(() => {
   return Math.min(100, Math.max(0, ((cur - prev) / span) * 100))
 })
 
-const dateLabel = computed(() => prayerData.value.date)
+const dateLabel = computed(() => {
+  const source = prayerData.value.date
+  const date = parseDate(source)
+  const gregorian = source && Number.isNaN(new Date(source).getTime()) ? source : formatGregorianDate(date)
+  const hijri = formatHijriDate(date)
+  return hijri ? `${gregorian} / ${hijri}` : gregorian
+})
 const isFinalMinute = computed(() => {
   const value = remaining.value
   return value !== null && value < 60
@@ -196,6 +242,18 @@ const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)'
 const trackColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.25)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
 const barColor = computed(() => isFilled.value ? '#fff' : accentVar.value)
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
+const standardTextureClass = computed(() => [
+  'pointer-events-none absolute inset-0 [mask-position:center] [mask-repeat:repeat]',
+  isFilled.value
+    ? 'opacity-[0.14] mix-blend-soft-light [mask-size:108px]'
+    : 'opacity-[0.07] [mask-size:92px]'
+])
+const standardTextureStyle = computed(() => ({
+  ...textureStyle.value,
+  backgroundColor: isFilled.value
+    ? 'color-mix(in srgb, var(--color-surface) 72%, transparent)'
+    : accentVar.value
+}) satisfies CSSProperties)
 const rootClass = computed(() => {
   if (effectiveVariant.value === 'iqamah-panel') {
     return [
@@ -204,7 +262,7 @@ const rootClass = computed(() => {
     ]
   }
 
-  return '@container h-full overflow-hidden rounded-lg p-6'
+  return '@container relative isolate h-full overflow-hidden rounded-lg p-6'
 })
 const rootStyle = computed(() => effectiveVariant.value === 'iqamah-panel' ? undefined : containerStyle.value)
 
@@ -231,6 +289,12 @@ const upcoming = computed(() => {
     :class="rootClass"
     :style="rootStyle"
   >
+    <div
+      v-if="effectiveVariant !== 'iqamah-panel' && texturePattern"
+      :class="standardTextureClass"
+      :style="standardTextureStyle"
+    />
+
     <!-- Iqamah panel: Sacred Modern-inspired standalone board -->
     <template v-if="effectiveVariant === 'iqamah-panel'">
       <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_8%_12%,color-mix(in_srgb,var(--color-secondary)_20%,transparent),transparent_32%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_95%,var(--color-text)),var(--color-primary))]" />
@@ -256,6 +320,12 @@ const upcoming = computed(() => {
             <h2 class="tenant-heading mt-0.5 text-2xl font-bold leading-none text-[var(--color-surface)] @md:text-3xl">
               {{ next.name }}
             </h2>
+            <p
+              v-if="showDate && dateLabel"
+              class="mt-1 max-w-[42rem] text-xs font-semibold leading-snug text-[color:color-mix(in_srgb,var(--color-surface)_64%,transparent)]"
+            >
+              {{ dateLabel }}
+            </p>
           </div>
         </div>
 
@@ -338,30 +408,49 @@ const upcoming = computed(() => {
 
     <!-- Minimal: single inline row -->
     <template v-else-if="effectiveVariant === 'minimal'">
-      <div class="flex items-center justify-between gap-3" :class="alignClass">
-        <div class="flex items-center gap-2.5">
-          <UIcon
-            v-if="showIcon"
-            :name="next.icon"
-            class="size-5 shrink-0"
-            :style="{ color: accentTextColor }"
-          />
-          <div>
-            <p class="text-xs" :style="{ color: mutedColor }">
-              {{ contextLabel }}
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between gap-3" :class="alignClass">
+          <div class="flex min-w-0 items-center gap-2.5">
+            <UIcon
+              v-if="showIcon"
+              :name="next.icon"
+              class="size-5 shrink-0"
+              :style="{ color: accentTextColor }"
+            />
+            <div class="min-w-0">
+              <p class="text-xs" :style="{ color: mutedColor }">
+                {{ contextLabel }}
+              </p>
+              <p class="text-base font-semibold leading-tight" :style="{ color: headingColor }">
+                {{ next.name }}
+              </p>
+              <p
+                v-if="showDate && dateLabel"
+                class="mt-0.5 truncate text-[11px] font-medium leading-snug"
+                :style="{ color: mutedColor }"
+              >
+                {{ dateLabel }}
+              </p>
+            </div>
+          </div>
+          <div class="shrink-0 text-right">
+            <p class="text-xl font-bold tabular-nums leading-none" :style="{ color: headingColor }">
+              {{ countdownLabel }}
             </p>
-            <p class="text-base font-semibold leading-tight" :style="{ color: headingColor }">
-              {{ next.name }}
+            <p class="mt-1 text-xs tabular-nums" :style="{ color: mutedColor }">
+              {{ next.time }}
             </p>
           </div>
         </div>
-        <div class="text-right">
-          <p class="text-xl font-bold tabular-nums leading-none" :style="{ color: headingColor }">
-            {{ countdownLabel }}
-          </p>
-          <p class="mt-1 text-xs tabular-nums" :style="{ color: mutedColor }">
-            {{ next.time }}
-          </p>
+        <div
+          v-if="showProgress"
+          class="h-1 overflow-hidden rounded-full"
+          :style="{ background: trackColor }"
+        >
+          <div
+            class="h-full rounded-full transition-all duration-1000 ease-linear"
+            :style="{ width: `${progress}%`, background: barColor }"
+          />
         </div>
       </div>
     </template>

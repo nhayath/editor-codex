@@ -26,6 +26,7 @@ export const classicTemplate: TemplateDefinition = {
         title: 'Next salah',
         showIqamah: true,
         showIcon: true,
+        showDate: true,
         showProgress: false,
         precision: 'minutes',
         texture: 'girih-diamonds',

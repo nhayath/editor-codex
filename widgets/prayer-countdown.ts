@@ -34,7 +34,7 @@ export const prayerCountdownWidget: WidgetDefinition = {
       { label: 'Gradient', value: 'gradient' },
       { label: 'Surface', value: 'surface' }
     ] },
-    { key: 'texture', label: 'Pattern', type: 'pattern-select', default: 'girih-diamonds', group: 'Texture', groupDefaultOpen: false, showWhen: { key: 'variant', value: 'iqamah-panel' }, options: [
+    { key: 'texture', label: 'Pattern', type: 'pattern-select', default: 'girih-diamonds', group: 'Texture', groupDefaultOpen: false, options: [
       { label: 'None', value: 'none' },
       { label: 'Eight-point stars', value: 'eight-point-star' },
       { label: 'Girih diamonds', value: 'girih-diamonds' },
@@ -59,7 +59,7 @@ export const prayerCountdownWidget: WidgetDefinition = {
     ] },
     { key: 'showIqamah', label: 'Prefer iqamah time', type: 'toggle', default: true, group: 'Display', span: 'half' },
     { key: 'showIcon', label: 'Show icon', type: 'toggle', default: true, group: 'Display', span: 'half' },
-    { key: 'showDate', label: 'Show date', type: 'toggle', default: false, group: 'Display', span: 'half' },
+    { key: 'showDate', label: 'Show date', type: 'toggle', default: true, group: 'Display', span: 'half' },
     { key: 'showProgress', label: 'Show progress bar', type: 'toggle', default: true, group: 'Display', span: 'half' }
   ]
 }
