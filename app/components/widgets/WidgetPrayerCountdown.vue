@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import type { CSSProperties } from 'vue'
+import { pageBackgroundPatterns } from '~/composables/usePageBackground'
+
 const props = withDefaults(defineProps<{
   title?: string
   variant?: string
   accent?: string
   background?: string
+  texture?: string
   align?: string
   precision?: string
   showIqamah?: boolean
@@ -18,6 +22,7 @@ const props = withDefaults(defineProps<{
   variant: 'card',
   accent: 'primary',
   background: 'solid',
+  texture: 'girih-diamonds',
   align: 'left',
   precision: 'minutes',
   showIqamah: true,
@@ -143,6 +148,21 @@ const isFinalMinute = computed(() => {
   return value !== null && value < 60
 })
 
+const texturePattern = computed(() => {
+  if (props.texture === 'none') return null
+  return pageBackgroundPatterns.find(pattern => pattern.id === (props.texture || 'girih-diamonds'))
+    ?? pageBackgroundPatterns.find(pattern => pattern.id === 'girih-diamonds')
+    ?? null
+})
+
+const textureStyle = computed(() => {
+  if (!texturePattern.value) return {}
+  return {
+    maskImage: `url("${texturePattern.value.url}")`,
+    WebkitMaskImage: `url("${texturePattern.value.url}")`
+  } satisfies CSSProperties
+})
+
 // Accent + background system, mirrored from WidgetPrayerTimes for consistency.
 const accentVar = computed(() => {
   switch (props.accent) {
@@ -214,7 +234,11 @@ const upcoming = computed(() => {
     <!-- Iqamah panel: Sacred Modern-inspired standalone board -->
     <template v-if="effectiveVariant === 'iqamah-panel'">
       <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_8%_12%,color-mix(in_srgb,var(--color-secondary)_20%,transparent),transparent_32%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_95%,var(--color-text)),var(--color-primary))]" />
-      <div class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.08] [mask-image:url(/backgrounds/girih-diamonds.svg)] [mask-position:center] [mask-repeat:repeat] [mask-size:220px]" />
+      <div
+        v-if="texturePattern"
+        class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.08] [mask-position:center] [mask-repeat:repeat] [mask-size:220px]"
+        :style="textureStyle"
+      />
 
       <div class="grid gap-4 @md:grid-cols-[auto_1fr_auto] @md:items-center">
         <div class="flex items-center gap-3">

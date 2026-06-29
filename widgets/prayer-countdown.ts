@@ -34,6 +34,21 @@ export const prayerCountdownWidget: WidgetDefinition = {
       { label: 'Gradient', value: 'gradient' },
       { label: 'Surface', value: 'surface' }
     ] },
+    { key: 'texture', label: 'Pattern', type: 'pattern-select', default: 'girih-diamonds', group: 'Texture', groupDefaultOpen: false, showWhen: { key: 'variant', value: 'iqamah-panel' }, options: [
+      { label: 'None', value: 'none' },
+      { label: 'Eight-point stars', value: 'eight-point-star' },
+      { label: 'Girih diamonds', value: 'girih-diamonds' },
+      { label: 'Arabesque vines', value: 'arabesque-vines' },
+      { label: 'Rosette bloom', value: 'rosette-bloom' },
+      { label: 'Palm-leaf fan', value: 'palm-leaf-fan' },
+      { label: 'Mihrab arches', value: 'mihrab-arches' },
+      { label: 'Ramadan lanterns', value: 'ramadan-crescent-lantern' },
+      { label: 'Eid al-Fitr stars', value: 'eid-fitr-stars' },
+      { label: 'Eid al-Adha arches', value: 'eid-adha-arches' },
+      { label: 'Laylat al-Qadr night', value: 'laylat-qadr-night' },
+      { label: 'Hajj tawaf rings', value: 'hajj-tawaf-rings' },
+      { label: 'Jumuah lines', value: 'jumuah-lines' }
+    ] },
     { key: 'align', label: 'Alignment', type: 'select', default: 'left', group: 'Display', span: 'half', options: [
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }

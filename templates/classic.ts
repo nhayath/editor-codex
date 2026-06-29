@@ -28,6 +28,7 @@ export const classicTemplate: TemplateDefinition = {
         showIcon: true,
         showProgress: false,
         precision: 'minutes',
+        texture: 'girih-diamonds',
         variant: 'iqamah-panel'
       }
     },
