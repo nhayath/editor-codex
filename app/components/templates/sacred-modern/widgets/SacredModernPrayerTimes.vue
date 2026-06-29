@@ -70,16 +70,36 @@ function secondsFromTime(time?: string | null) {
   return hours * 3600 + minutes * 60
 }
 
+function secondsUntil(targetSeconds?: number | null) {
+  const secondsNow = currentSeconds.value
+  if (secondsNow === null || targetSeconds === null || targetSeconds === undefined) return null
+
+  let diff = targetSeconds - secondsNow
+  if (diff < 0) diff += 24 * 3600
+  return diff
+}
+
+function formatRemaining(totalSeconds?: number | null) {
+  if (totalSeconds === null || totalSeconds === undefined) return '--'
+  if (totalSeconds < 60) return `${Math.max(0, Math.floor(totalSeconds))}s`
+
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+
+  if (hours > 0) return `${hours}h ${minutes.toString().padStart(2, '0')}m`
+  return `${minutes}m`
+}
+
 const nextPrayer = computed(() => {
   const secondsNow = currentSeconds.value
-  const prayers = featureRows.value.filter(row => row.time)
+  const prayers = featureRows.value.filter(row => row.time || row.iqamah)
   if (!prayers.length) return featureRows.value[0]
 
   if (secondsNow === null) return prayers[0]
 
   return prayers.find((row) => {
-    const prayerSeconds = secondsFromTime(row.time)
-    return prayerSeconds !== null && prayerSeconds >= secondsNow
+    const targetSeconds = secondsFromTime(row.iqamah || row.time)
+    return targetSeconds !== null && targetSeconds >= secondsNow
   }) ?? prayers[0]
 })
 
@@ -106,16 +126,14 @@ const featureDate = computed(() => {
 })
 
 const remainingLabel = computed(() => {
-  const secondsNow = currentSeconds.value
-  const prayerSeconds = secondsFromTime(nextPrayer.value?.time)
-  if (secondsNow === null || prayerSeconds === null) return nextPrayer.value?.time ?? '--:--'
+  const targetSeconds = secondsFromTime(nextPrayer.value?.iqamah || nextPrayer.value?.time)
+  return formatRemaining(secondsUntil(targetSeconds))
+})
 
-  let diff = prayerSeconds - secondsNow
-  if (diff < 0) diff += 24 * 3600
-  const hours = Math.floor(diff / 3600).toString().padStart(2, '0')
-  const minutes = Math.floor((diff % 3600) / 60).toString().padStart(2, '0')
-  const seconds = Math.floor(diff % 60).toString().padStart(2, '0')
-  return `${hours}:${minutes}:${seconds}`
+const isFinalMinute = computed(() => {
+  const targetSeconds = secondsFromTime(nextPrayer.value?.iqamah || nextPrayer.value?.time)
+  const remaining = secondsUntil(targetSeconds)
+  return remaining !== null && remaining < 60
 })
 
 const jummahRows = computed(() => {
@@ -148,6 +166,8 @@ const jummahRows = computed(() => {
         <div
           v-if="showCountdown && nextPrayer"
           class="sacred-modern-countdown inline-flex w-fit max-w-full items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--color-secondary)_36%,transparent)] bg-[color:color-mix(in_srgb,black_18%,transparent)] px-4 py-2 text-sm font-bold text-white/90"
+          :class="{ 'sacred-modern-countdown-urgent': isFinalMinute }"
+          aria-live="polite"
         >
           <UIcon name="i-lucide-clock-3" class="size-4 text-[var(--color-secondary)]" />
           <span>{{ nextPrayer.name }} {{ countdownLabel }}</span>
@@ -224,6 +244,10 @@ const jummahRows = computed(() => {
   .sacred-modern-prayer-cell-active {
     animation: sacred-modern-prayer-glow 3s ease-in-out infinite;
   }
+
+  .sacred-modern-countdown-urgent {
+    animation: sacred-modern-prayer-heartbeat 0.85s ease-in-out infinite;
+  }
 }
 
 @keyframes sacred-modern-prayer-glow {
@@ -233,6 +257,22 @@ const jummahRows = computed(() => {
 
   50% {
     box-shadow: 0 18px 42px color-mix(in srgb, var(--color-secondary) 24%, transparent);
+  }
+}
+
+@keyframes sacred-modern-prayer-heartbeat {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 16px 30px color-mix(in srgb, var(--color-secondary) 12%, transparent);
+  }
+
+  35% {
+    transform: scale(1.035);
+    box-shadow: 0 20px 46px color-mix(in srgb, var(--color-secondary) 32%, transparent);
+  }
+
+  58% {
+    transform: scale(0.99);
   }
 }
 </style>

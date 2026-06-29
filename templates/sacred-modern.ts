@@ -21,7 +21,7 @@ export const sacredModernTemplate: TemplateDefinition = {
         ] },
         { key: 'locationLabel', label: 'Location label', type: 'text', default: 'Fattan Mosque, Berlin, Germany' },
         { key: 'showLocationPill', label: 'Show location pill', type: 'toggle', default: true },
-        { key: 'showNextPrayer', label: 'Show next prayer chip', type: 'toggle', default: true }
+        { key: 'showNextPrayer', label: 'Show next iqamah panel', type: 'toggle', default: true }
       ]
     },
     'prayer-times': {
@@ -36,8 +36,8 @@ export const sacredModernTemplate: TemplateDefinition = {
           { label: 'Feature board', value: 'feature-board' }
         ] },
         { key: 'hijriDate', label: 'Hijri date', type: 'text', default: '16 Dhul Qadah 1447' },
-        { key: 'showCountdown', label: 'Show next prayer chip', type: 'toggle', default: true },
-        { key: 'countdownLabel', label: 'Countdown label', type: 'text', default: 'time in' }
+        { key: 'showCountdown', label: 'Show iqamah countdown', type: 'toggle', default: true },
+        { key: 'countdownLabel', label: 'Countdown label', type: 'text', default: 'iqamah in' }
       ]
     },
     events: {
@@ -177,7 +177,7 @@ export const sacredModernTemplate: TemplateDefinition = {
               showSunrise: false,
               hijriDate: '16 Dhul Qadah 1447',
               showCountdown: true,
-              countdownLabel: 'time in'
+              countdownLabel: 'iqamah in'
             }
           }
         ]
