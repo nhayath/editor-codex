@@ -36,11 +36,6 @@ export const aboutMosqueWidget: WidgetDefinition = {
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', group: 'Display', span: 'half', default: 'surface', options: [
-      { label: 'Surface', value: 'surface' },
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' }
-    ] },
     { key: 'align', label: 'Header alignment', type: 'select', group: 'Display', span: 'half', default: 'left', options: [
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
@@ -55,6 +50,11 @@ export const aboutMosqueWidget: WidgetDefinition = {
     { key: 'showStats', label: 'Show highlight stats', type: 'toggle', group: 'Highlights', span: 'half', default: false },
     { key: 'stats', label: 'Stats', type: 'textarea', group: 'Highlights', default: 'Est. 1995|Serving since\n500+|Families\n5|Daily prayers', placeholder: 'Value|Label, one per line', showWhen: { key: 'showStats', value: true } },
     { key: 'ctaLabel', label: 'Button label', type: 'text', group: 'Highlights', span: 'half', default: '' },
-    { key: 'ctaUrl', label: 'Button link', type: 'url', group: 'Highlights', span: 'half', default: '' }
+    { key: 'ctaUrl', label: 'Button link', type: 'url', group: 'Highlights', span: 'half', default: '' },
+
+    // Unified background picker (theme / solid / gradient / image + darken /
+    // pattern). Theme keeps the legacy transparent section; any fill flips text
+    // contrast automatically. Renders as a standalone drill-in row.
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' } }
   ]
 }

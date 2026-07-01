@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { parsePipeRows } from '~~/utils/widget-content'
+import type { SurfaceBackgroundConfig } from '~~/types/template'
 
 const props = withDefaults(defineProps<{
   title?: string
@@ -9,7 +10,9 @@ const props = withDefaults(defineProps<{
   imagePosition?: string
   variant?: string
   accent?: string
-  background?: string
+  // Unified background config. Legacy string values ('surface'/'solid'/
+  // 'gradient') from older saved drafts are normalised below.
+  background?: SurfaceBackgroundConfig | string
   align?: string
   imageRatio?: string
   showImage?: boolean
@@ -25,7 +28,7 @@ const props = withDefaults(defineProps<{
   imagePosition: 'right',
   variant: 'split',
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   align: 'left',
   imageRatio: 'landscape',
   showImage: true,
@@ -60,55 +63,65 @@ const accentVar = computed(() => {
   }
 })
 
-// `solid`/`gradient` are filled (white text); `surface` keeps the legacy
-// transparent section (no card wrapper).
-const isFilled = computed(() => props.background === 'solid' || props.background === 'gradient')
-
-const containerStyle = computed(() => {
-  if (props.background === 'gradient') {
-    return {
-      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
-    }
+// Normalise legacy string backgrounds ('surface'/'solid'/'gradient') onto the
+// unified SurfaceBackgroundConfig. 'surface' → theme (the legacy transparent
+// section); the filled variants map to solid/gradient with the accent colour.
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
   }
-  if (props.background === 'solid') {
-    return { background: accentVar.value }
-  }
-  // surface = transparent, legacy look
-  return {}
 })
 
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.78)' : 'var(--color-text-muted)')
-const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
+// Contrast-correct colour set shared with every unified-background widget.
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  useLightText,
+  headingColor,
+  mutedColor,
+  accentTextColor,
+  hairlineColor
+} = surface
+
+// Theme keeps the legacy transparent section; any fill paints via the shared
+// presentation (className carries the pattern layer when relevant).
+const containerStyle = computed(() => isTheme.value ? {} : presentation.value.style)
 
 // Image frame ring/card.
 const frameStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: 'rgba(255,255,255,0.1)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)' }
     : { background: 'var(--color-surface)', boxShadow: `inset 0 0 0 1px ${hairlineColor.value}` }
 )
 
 // Stat chip surface.
 const statStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: 'rgba(255,255,255,0.1)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)' }
     : { background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))', boxShadow: `inset 0 0 0 1px ${hairlineColor.value}` }
 )
 
 const ctaStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: '#fff', color: accentVar.value }
     : { background: accentVar.value, color: '#fff' }
 )
 
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 const orderClass = computed(() => props.imagePosition === 'left' ? '@xl:[&>*:first-child]:order-2' : '')
-const padded = computed(() => props.background === 'surface' ? '' : 'rounded-lg p-6')
+const padded = computed(() => isTheme.value ? '' : 'rounded-lg p-6')
 </script>
 
 <template>
-  <div class="@container h-full overflow-hidden" :class="padded" :style="containerStyle">
+  <div class="@container h-full overflow-hidden" :class="[padded, presentation.className]" :style="containerStyle">
     <!-- ===== STACKED ===== -->
     <div v-if="variant === 'stacked'" :class="alignClass">
       <p class="text-sm font-semibold" :style="{ color: accentTextColor }">
