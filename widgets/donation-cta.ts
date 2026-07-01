@@ -38,7 +38,7 @@ export const donationCtaWidget: WidgetDefinition = {
     // Unified background picker (theme / solid / gradient / image + darken /
     // pattern), shared with sections and other widgets. Theme keeps the widget's
     // own light card; any fill flips text contrast automatically.
-    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' }, group: 'Display' },
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' } },
     { key: 'showProgress', label: 'Show progress bar', type: 'toggle', default: false, group: 'Display', span: 'half' },
     { key: 'showRaised', label: 'Show amount raised', type: 'toggle', default: false, group: 'Display', span: 'half' },
     // Donation amount selector — opt-in. Chips append the chosen amount to the

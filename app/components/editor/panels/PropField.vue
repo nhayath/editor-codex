@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WidgetPropSchema } from '~~/types/widget'
+import type { SurfaceBackgroundConfig } from '~~/types/template'
 import { pageBackgroundPatterns } from '~/composables/usePageBackground'
 import { getThemeStyle } from '~/composables/useTheme'
 
@@ -12,6 +13,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: unknown]
+  // Background fields drill into a slide-in sub-panel (owned by SectionsTab)
+  // rather than rendering the picker inline, matching the section-background UX.
+  openBackground: []
 }>()
 
 const value = computed({
@@ -98,6 +102,12 @@ const visible = computed(() => {
   return Array.isArray(showWhen) ? showWhen.some(matchesCondition) : matchesCondition(showWhen)
 })
 
+// Background fields render as a compact drill-in row (styled like a group
+// accordion header): the label + current mode as a muted value. The actual
+// picker opens in a slide-in sub-panel (see SectionsTab).
+const backgroundValue = computed(() => (value.value as SurfaceBackgroundConfig | null) ?? null)
+const backgroundMode = computed(() => getSurfaceBackgroundMode(backgroundValue.value))
+
 // Rich-text editor (UEditor) — a curated, non-technical button set. Grouped
 // arrays render with separators between them. Kept intentionally small so a
 // non-techie editing a short blurb isn't overwhelmed.
@@ -130,8 +140,24 @@ const richtextBubble = [
 </script>
 
 <template>
+  <button
+    v-if="visible && field.type === 'background'"
+    type="button"
+    class="flex w-full min-w-0 items-center justify-between gap-2 rounded-md border border-muted px-3 py-2.5 text-sm font-medium text-default transition-colors hover:bg-elevated/50"
+    @click="emit('openBackground')"
+  >
+    <span class="truncate">{{ field.label }}</span>
+    <span class="flex shrink-0 items-center gap-2">
+      <span class="text-xs font-normal text-muted">{{ backgroundMode.label }}</span>
+      <UIcon
+        name="i-lucide-chevron-right"
+        class="size-4 text-muted"
+      />
+    </span>
+  </button>
+
   <UFormField
-    v-if="visible"
+    v-else-if="visible"
     :label="field.label"
     :name="field.key"
     :required="field.required"
@@ -227,15 +253,6 @@ const richtextBubble = [
         </span>
       </button>
     </div>
-
-    <BackgroundPicker
-      v-else-if="field.type === 'background'"
-      :model-value="(value as any) ?? null"
-      :tenant-id="tenantId"
-      :palette-id="editor.draft.value?.paletteId"
-      :custom-colors="editor.draft.value?.customColors"
-      @update:model-value="emit('update:modelValue', $event)"
-    />
 
     <UColorPicker
       v-else-if="field.type === 'color'"

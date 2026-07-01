@@ -73,6 +73,6 @@ export const heroWidget: WidgetDefinition = {
     // shared with sections and other widgets. Replaces the old background select
     // + separate colour/gradient/overlay fields for the background-driven
     // variants. Image-panel variants keep the Image controls above instead.
-    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' }, group: 'Background', showWhen: { key: 'variant', value: backgroundVariants } }
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' }, showWhen: { key: 'variant', value: backgroundVariants } }
   ]
 }

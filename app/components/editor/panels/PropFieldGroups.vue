@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   update: [key: string, value: unknown]
+  openBackground: [key: string]
 }>()
 
 const resolvedValues = computed(() => props.values ?? {})
@@ -25,8 +26,13 @@ function isVisible(field: WidgetPropSchema) {
   return Array.isArray(showWhen) ? showWhen.some(matchesCondition) : matchesCondition(showWhen)
 }
 
+// Background fields always render as standalone drill-in rows at the bottom (see
+// the template) — never inside the top grid or a group accordion — so they open
+// the slide-in picker in one click, matching the section-background row.
+const isBackgroundField = (field: WidgetPropSchema) => field.type === 'background'
+
 // Fields without a group render at the top, always open.
-const ungroupedFields = computed(() => props.schema.filter(field => !field.group))
+const ungroupedFields = computed(() => props.schema.filter(field => !field.group && !isBackgroundField(field)))
 
 // Groups in first-appearance order that have at least one visible field.
 const groups = computed(() => {
@@ -34,7 +40,7 @@ const groups = computed(() => {
   const byName = new Map<string, WidgetPropSchema[]>()
 
   for (const field of props.schema) {
-    if (!field.group) continue
+    if (!field.group || isBackgroundField(field)) continue
     if (!byName.has(field.group)) {
       byName.set(field.group, [])
       order.push(field.group)
@@ -46,6 +52,10 @@ const groups = computed(() => {
     .map(name => ({ name, fields: byName.get(name)! }))
     .filter(group => group.fields.some(isVisible))
 })
+
+// Standalone background drill-in rows, in schema order. PropField hides itself
+// when a field's showWhen is unmet, so no extra visibility gating is needed here.
+const backgroundFields = computed(() => props.schema.filter(isBackgroundField))
 
 // First group open by default unless its schema explicitly opts into another
 // initial state. User toggles persist while the panel remains mounted.
@@ -81,6 +91,7 @@ function spanClass(field: WidgetPropSchema) {
         :values="resolvedValues"
         :tenant-id="tenantId"
         @update:model-value="emit('update', field.key, $event)"
+        @open-background="emit('openBackground', field.key)"
       />
     </div>
 
@@ -113,8 +124,20 @@ function spanClass(field: WidgetPropSchema) {
           :values="resolvedValues"
           :tenant-id="tenantId"
           @update:model-value="emit('update', field.key, $event)"
+          @open-background="emit('openBackground', field.key)"
         />
       </div>
     </div>
+
+    <PropField
+      v-for="field in backgroundFields"
+      :key="field.key"
+      :field="field"
+      :model-value="resolvedValues[field.key]"
+      :values="resolvedValues"
+      :tenant-id="tenantId"
+      @update:model-value="emit('update', field.key, $event)"
+      @open-background="emit('openBackground', field.key)"
+    />
   </div>
 </template>

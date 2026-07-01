@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Draggable from 'vuedraggable'
-import type { ResolvedSection, ResolvedWidget } from '~~/types/template'
+import type { ResolvedSection, ResolvedWidget, SurfaceBackgroundConfig } from '~~/types/template'
 import type { WidgetCategory, WidgetPropSchema } from '~~/types/widget'
 
 type SectionsPanel =
@@ -8,6 +8,10 @@ type SectionsPanel =
   | { name: 'section', sectionId: string }
   | { name: 'sectionBackground', sectionId: string }
   | { name: 'widget', sectionId: string, slot: string }
+  // A background-typed widget prop drilled into a slide-in picker. `slot` marks a
+  // group-member widget prop, `groupProp` a group-layout prop; neither → a
+  // single-widget section prop.
+  | { name: 'widgetBackground', sectionId: string, propKey: string, slot?: string, groupProp?: boolean }
   | { name: 'widgetPicker' }
 
 const editor = useHomepageEditor()
@@ -28,14 +32,17 @@ const activeSection = computed(() => {
   return sections.value.find(section => section.id === currentPanel.value.sectionId) ?? null
 })
 const activeWidget = computed(() => {
-  if (currentPanel.value.name !== 'widget') return null
-  return activeSection.value?.resolvedWidgets?.find(widget => widget.slot === currentPanel.value.slot) ?? null
+  const panel = currentPanel.value
+  const slot = 'slot' in panel ? panel.slot : undefined
+  if (!slot) return null
+  return activeSection.value?.resolvedWidgets?.find(widget => widget.slot === slot) ?? null
 })
 const panelTitle = computed(() => {
   if (currentPanel.value.name === 'root') return 'Sections'
   if (currentPanel.value.name === 'widgetPicker') return 'Add widget'
   if (currentPanel.value.name === 'widget') return activeWidget.value?.name ?? activeWidget.value?.widgetId ?? 'Widget'
   if (currentPanel.value.name === 'sectionBackground') return 'Section background'
+  if (currentPanel.value.name === 'widgetBackground') return 'Background'
   return activeSection.value?.title ?? activeSection.value?.name ?? activeSection.value?.id ?? 'Section'
 })
 const tenantId = computed(() => editor.tenant.value?.id as string | undefined)
@@ -115,25 +122,44 @@ function groupField(field: { key: string, label: string, type: string, default: 
 }
 
 // Compact summary (label + icon) + a live swatch for the section-background row,
-// so the current state reads at a glance without opening the sub-panel.
-const backgroundModes: Record<string, { label: string, icon: string }> = {
-  theme: { label: 'Theme default', icon: 'i-lucide-undo-2' },
-  solid: { label: 'Solid colour', icon: 'i-lucide-square' },
-  gradient: { label: 'Gradient', icon: 'i-lucide-blend' },
-  image: { label: 'Image', icon: 'i-lucide-image' },
-  pattern: { label: 'Pattern', icon: 'i-lucide-sparkles' }
-}
-
+// so the current state reads at a glance without opening the sub-panel. Shares
+// the mode map/helpers with the widget-background rows (see useSurfaceBackground).
 function backgroundSummary(section: ResolvedSection) {
-  return backgroundModes[section.background?.type ?? 'theme'] ?? backgroundModes.theme!
+  return getSurfaceBackgroundMode(section.background)
 }
 
-function backgroundSwatch(section: ResolvedSection) {
-  return getSurfaceBackgroundPresentation(section.background)
-}
+// ----- Widget-level background props (drill-in, same UX as sections) --------
+// The `widgetBackground` panel reads/writes a background-typed prop on either a
+// single widget, a group-member widget (`slot`), or a group-layout prop
+// (`groupProp`), routing to the matching editor mutation.
+const activeBackgroundValue = computed<SurfaceBackgroundConfig | null>(() => {
+  const panel = currentPanel.value
+  if (panel.name !== 'widgetBackground') return null
+  const source = panel.slot
+    ? activeWidget.value?.resolvedProps
+    : panel.groupProp
+      ? activeSection.value?.resolvedGroupProps
+      : activeSection.value?.resolvedProps
+  return (source?.[panel.propKey] as SurfaceBackgroundConfig | null) ?? null
+})
 
-function isThemeBackground(section: ResolvedSection) {
-  return !section.background || section.background.type === 'theme'
+const backgroundPanelKey = computed(() => {
+  const panel = currentPanel.value
+  return panel.name === 'widgetBackground'
+    ? `${panel.sectionId}-${panel.slot ?? ''}-${panel.groupProp ? 'group' : ''}-${panel.propKey}`
+    : ''
+})
+
+function updateWidgetBackground(value: SurfaceBackgroundConfig | null) {
+  const panel = currentPanel.value
+  if (panel.name !== 'widgetBackground' || !activeSection.value) return
+  if (panel.slot) {
+    editor.updateGroupWidgetProps(activeSection.value.id, panel.slot, { [panel.propKey]: value })
+  } else if (panel.groupProp) {
+    editor.updateGroupProps(activeSection.value.id, { [panel.propKey]: value })
+  } else {
+    editor.updateSectionProps(activeSection.value.id, { [panel.propKey]: value })
+  }
 }
 
 function scrollRowIntoView(sectionId: string) {
@@ -412,7 +438,9 @@ watch(
               :field="groupField(field)"
               :model-value="activeSection.resolvedGroupProps?.[field.key]"
               :values="activeSection.resolvedGroupProps"
+              :tenant-id="tenantId"
               @update:model-value="updateGroup(activeSection, field.key, $event)"
+              @open-background="activeSection && openPanel({ name: 'widgetBackground', sectionId: activeSection.id, propKey: field.key, groupProp: true })"
             />
           </div>
 
@@ -444,33 +472,23 @@ watch(
             :values="activeSection.resolvedProps"
             :tenant-id="tenantId"
             @update="(key, value) => activeSection && updateSection(activeSection, key, value)"
+            @open-background="(key) => activeSection && openPanel({ name: 'widgetBackground', sectionId: activeSection.id, propKey: key })"
           />
         </template>
 
         <button
           type="button"
-          class="mt-1 flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
+          class="flex w-full min-w-0 items-center justify-between gap-2 rounded-md border border-muted px-3 py-2.5 text-sm font-medium text-default transition-colors hover:bg-elevated/50"
           @click="openPanel({ name: 'sectionBackground', sectionId: activeSection.id })"
         >
-          <span
-            class="relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-md border border-muted bg-elevated"
-            :class="backgroundSwatch(activeSection).className"
-            :style="backgroundSwatch(activeSection).style"
-          >
+          <span class="truncate">Section background</span>
+          <span class="flex shrink-0 items-center gap-2">
+            <span class="text-xs font-normal text-muted">{{ backgroundSummary(activeSection).label }}</span>
             <UIcon
-              v-if="isThemeBackground(activeSection)"
-              :name="backgroundSummary(activeSection).icon"
+              name="i-lucide-chevron-right"
               class="size-4 text-muted"
             />
           </span>
-          <span class="min-w-0 flex-1">
-            <span class="block truncate text-sm font-medium text-default">Section background</span>
-            <span class="block truncate text-xs text-muted">{{ backgroundSummary(activeSection).label }}</span>
-          </span>
-          <UIcon
-            name="i-lucide-chevron-right"
-            class="size-4 shrink-0 text-muted"
-          />
         </button>
       </section>
 
@@ -492,6 +510,23 @@ watch(
       </section>
 
       <section
+        v-else-if="currentPanel.name === 'widgetBackground' && activeSection"
+        :key="`widget-bg-${backgroundPanelKey}`"
+        class="grid w-full min-w-0 gap-3 overflow-hidden"
+      >
+        <p class="text-xs leading-4 text-muted">
+          A colour, image, or pattern behind this widget. Theme default follows the section and palette.
+        </p>
+        <BackgroundPicker
+          :model-value="activeBackgroundValue"
+          :tenant-id="tenantId"
+          :palette-id="editor.draft.value?.paletteId"
+          :custom-colors="editor.draft.value?.customColors"
+          @update:model-value="updateWidgetBackground"
+        />
+      </section>
+
+      <section
         v-else-if="currentPanel.name === 'widget' && activeSection && activeWidget"
         :key="`widget-${activeSection.id}-${activeWidget.slot}`"
         class="grid w-full min-w-0 gap-4 overflow-hidden"
@@ -502,6 +537,7 @@ watch(
           :values="activeWidget.resolvedProps"
           :tenant-id="tenantId"
           @update="(key, value) => activeSection && activeWidget && updateWidget(activeSection, activeWidget, key, value)"
+          @open-background="(key) => activeSection && activeWidget && openPanel({ name: 'widgetBackground', sectionId: activeSection.id, slot: activeWidget.slot, propKey: key })"
         />
       </section>
 

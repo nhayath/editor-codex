@@ -13,6 +13,24 @@ export interface SurfaceBackgroundPresentation {
   tone: SurfaceTone
 }
 
+// Friendly label + icon per background mode, shared by every drill-in summary
+// row (section background + widget background props) so they read identically.
+export const surfaceBackgroundModes: Record<string, { label: string, icon: string }> = {
+  theme: { label: 'Theme default', icon: 'i-lucide-undo-2' },
+  solid: { label: 'Solid colour', icon: 'i-lucide-square' },
+  gradient: { label: 'Gradient', icon: 'i-lucide-blend' },
+  image: { label: 'Image', icon: 'i-lucide-image' },
+  pattern: { label: 'Pattern', icon: 'i-lucide-sparkles' }
+}
+
+export function getSurfaceBackgroundMode(background?: SurfaceBackgroundConfig | null) {
+  return surfaceBackgroundModes[background?.type ?? 'theme'] ?? surfaceBackgroundModes.theme!
+}
+
+export function isThemeSurfaceBackground(background?: SurfaceBackgroundConfig | null) {
+  return !background || background.type === 'theme'
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, Number.isFinite(value) ? value : min))
 }
