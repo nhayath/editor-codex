@@ -228,6 +228,15 @@ const richtextBubble = [
       </button>
     </div>
 
+    <BackgroundPicker
+      v-else-if="field.type === 'background'"
+      :model-value="(value as any) ?? null"
+      :tenant-id="tenantId"
+      :palette-id="editor.draft.value?.paletteId"
+      :custom-colors="editor.draft.value?.customColors"
+      @update:model-value="emit('update:modelValue', $event)"
+    />
+
     <UColorPicker
       v-else-if="field.type === 'color'"
       v-model="colorValue"

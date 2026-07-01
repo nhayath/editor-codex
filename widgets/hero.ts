@@ -4,12 +4,11 @@ import type { WidgetDefinition } from '~~/types/widget'
 const imagePanelVariants = ['with-image', 'split', 'immersive']
 // Variants that show one or more action buttons.
 const buttonVariants = ['with-image', 'with-buttons', 'split', 'immersive', 'banner']
-// Variants whose look is driven by a chosen background (solid/gradient/image).
+// Variants whose look is driven by the unified background picker.
 const backgroundVariants = ['simple', 'with-buttons', 'banner']
-const imageControlConditions = [
-  { key: 'variant', value: imagePanelVariants },
-  { key: 'background', value: 'image' }
-]
+// The image-panel image controls only apply to the image-panel variants; the
+// background-driven variants get their imagery through the `background` picker.
+const imagePanelCondition = { key: 'variant', value: imagePanelVariants }
 
 export const heroWidget: WidgetDefinition = {
   id: 'hero',
@@ -42,16 +41,13 @@ export const heroWidget: WidgetDefinition = {
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
     ] },
-    { key: 'imageUrl', label: 'Image', type: 'image', default: '', group: 'Image', showWhen: imageControlConditions },
-    { key: 'overlayOpacity', label: 'Darkness (0-100)', type: 'number', default: 50, group: 'Image', span: 'half', showWhen: imageControlConditions },
+    { key: 'imageUrl', label: 'Image', type: 'image', default: '', group: 'Image', showWhen: imagePanelCondition },
+    { key: 'overlayOpacity', label: 'Darkness (0-100)', type: 'number', default: 50, group: 'Image', span: 'half', showWhen: imagePanelCondition },
     { key: 'textTone', label: 'Text colour', type: 'select', default: 'light', group: 'Image', span: 'half', options: [
       { label: 'Light text', value: 'light' },
       { label: 'Dark text', value: 'dark' }
-    ], showWhen: [
-      ...imageControlConditions,
-      { key: 'background', value: ['solid', 'gradient'] }
-    ] },
-    { key: 'texture', label: 'Pattern', type: 'pattern-select', default: 'eight-point-star', group: 'Texture', groupDefaultOpen: false, showWhen: imageControlConditions, options: [
+    ], showWhen: imagePanelCondition },
+    { key: 'texture', label: 'Pattern', type: 'pattern-select', default: 'eight-point-star', group: 'Texture', groupDefaultOpen: false, showWhen: imagePanelCondition, options: [
       { label: 'None', value: 'none' },
       { label: 'Eight-point stars', value: 'eight-point-star' },
       { label: 'Girih diamonds', value: 'girih-diamonds' },
@@ -73,15 +69,10 @@ export const heroWidget: WidgetDefinition = {
     { key: 'primaryUrl', label: 'Primary URL', type: 'url', default: '#prayer-times', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: buttonVariants } },
     { key: 'secondaryLabel', label: 'Secondary button', type: 'text', default: 'Upcoming events', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: ['with-image', 'with-buttons', 'split', 'immersive'] } },
     { key: 'secondaryUrl', label: 'Secondary URL', type: 'url', default: '#events', group: 'Buttons', span: 'half', showWhen: { key: 'variant', value: ['with-image', 'with-buttons', 'split', 'immersive'] } },
-    { key: 'background', label: 'Background style', type: 'select', default: 'plain', group: 'Background', options: [
-      { label: 'Plain', value: 'plain' },
-      { label: 'Solid colour', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' },
-      { label: 'Image', value: 'image' }
-    ], showWhen: { key: 'variant', value: backgroundVariants } },
-    { key: 'bgColor', label: 'Background colour', type: 'color', default: 'var(--color-primary)', group: 'Background', showWhen: { key: 'background', value: 'solid' } },
-    { key: 'gradientFrom', label: 'Gradient start', type: 'color', default: 'var(--color-primary)', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
-    { key: 'gradientTo', label: 'Gradient end', type: 'color', default: 'var(--color-secondary)', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
-    { key: 'overlay', label: 'Darken image', type: 'toggle', default: true, group: 'Background', span: 'half', showWhen: { key: 'background', value: 'image' } }
+    // Unified background picker (colour / gradient / image + darken / pattern),
+    // shared with sections and other widgets. Replaces the old background select
+    // + separate colour/gradient/overlay fields for the background-driven
+    // variants. Image-panel variants keep the Image controls above instead.
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' }, group: 'Background', showWhen: { key: 'variant', value: backgroundVariants } }
   ]
 }

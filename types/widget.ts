@@ -8,6 +8,7 @@ export type WidgetPropType =
   | 'toggle'
   | 'select'
   | 'pattern-select'
+  | 'background'
   | 'color'
   | 'image'
   | 'images'

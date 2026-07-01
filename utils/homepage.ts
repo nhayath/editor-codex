@@ -268,6 +268,7 @@ export function resolveSections(template: TemplateDefinition, draft: HomepageCon
         icon: widget?.icon,
         component: widget?.component,
         propSchema: widget?.propSchema ?? [],
+        background: override.background ?? null,
         resolvedProps: {
           ...getSectionDefaultProps(section, widget),
           ...(override.props ?? {})
@@ -284,6 +285,7 @@ export function resolveSections(template: TemplateDefinition, draft: HomepageCon
       required: section.required,
       removable: section.removable,
       enabled,
+      background: override.background ?? null,
       resolvedGroupProps: {
         layout: section.group?.layout ?? 'row',
         ...groupProps,

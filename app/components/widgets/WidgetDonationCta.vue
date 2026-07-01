@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { SurfaceBackgroundConfig } from '~~/types/template'
+
 const props = withDefaults(defineProps<{
   title?: string
   subtitle?: string
@@ -7,7 +9,9 @@ const props = withDefaults(defineProps<{
   variant?: string
   eyebrow?: string
   accent?: string
-  background?: string
+  // Unified background config. Legacy string values ('surface'/'solid'/
+  // 'gradient') from older saved drafts are normalised below.
+  background?: SurfaceBackgroundConfig | string
   align?: string
   showProgress?: boolean
   showRaised?: boolean
@@ -26,7 +30,7 @@ const props = withDefaults(defineProps<{
   variant: 'banner',
   eyebrow: 'Giving',
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   align: 'left',
   showProgress: false,
   showRaised: false,
@@ -124,50 +128,65 @@ const accentVar = computed(() => {
   }
 })
 
-// `solid`/`gradient` are filled (white text); `surface` is a light card.
-const isFilled = computed(() => props.background !== 'surface')
-
-const containerStyle = computed(() => {
-  if (props.variant === 'banner' && props.background === 'surface') {
-    return {
-      background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))'
-    }
+// Normalise legacy string backgrounds ('surface'/'solid'/'gradient') onto the
+// unified SurfaceBackgroundConfig. 'surface' → theme (the widget's own light
+// card); the filled variants map to solid/gradient with the accent colour.
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
   }
-  if (props.background === 'surface') {
+})
+
+// Contrast-correct colour set shared with every unified-background widget.
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  isFilled,
+  useLightText,
+  headingColor,
+  bodyColor,
+  mutedColor,
+  accentTextColor,
+  hairlineColor,
+  trackColor,
+  barColor,
+  panelStyle,
+  buttonColor
+} = surface
+
+// Theme mode keeps the widget's own light card chrome; any fill paints via the
+// shared presentation (className carries the pattern layer when relevant).
+const containerStyle = computed(() => {
+  if (isTheme.value) {
+    if (props.variant === 'banner') {
+      return { background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))' }
+    }
     return {
       background: 'var(--color-surface)',
       boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)`
     }
   }
-  if (props.background === 'gradient') {
-    return {
-      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
-    }
-  }
-  return { background: accentVar.value }
+  return presentation.value.style
 })
 
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.75)' : 'var(--color-text-muted)')
-const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
-const trackColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.2)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
-const barColor = computed(() => isFilled.value ? '#fff' : accentVar.value)
+// Banner headline follows the accent on the light card, but flips to white on a
+// filled/dark surface so it never clashes with the fill.
+const bannerTitleColor = computed(() => useLightText.value ? '#fff' : accentVar.value)
 const bannerImageUrl = computed(() => props.imageUrl || featured.value?.imageUrl || '')
-// Cards/panels sit on a tint of the card surface.
-const panelStyle = computed(() =>
-  isFilled.value
-    ? { background: 'rgba(255,255,255,0.1)' }
-    : { background: `color-mix(in srgb, ${accentVar.value} 7%, var(--color-surface))`, boxShadow: `inset 0 0 0 1px ${hairlineColor.value}` }
-)
-// Filled backgrounds use a light "neutral" button; surface uses the accent.
-const buttonColor = computed(() => isFilled.value ? 'neutral' : 'primary')
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 
 // Colours handed to the amount picker so it matches the filled/surface scheme.
 const pickerColors = computed(() => ({
   activeBg: barColor.value,
-  activeText: isFilled.value ? accentVar.value : '#fff',
+  activeText: useLightText.value ? accentVar.value : '#fff',
   idleText: headingColor.value,
   border: hairlineColor.value,
   muted: mutedColor.value
@@ -175,6 +194,7 @@ const pickerColors = computed(() => ({
 
 const rootClass = computed(() => [
   '@container relative isolate h-full overflow-hidden',
+  presentation.value.className,
   props.variant === 'banner' ? 'px-5 py-8 @md:px-7 @xl:px-8 @xl:py-10' : 'rounded-lg p-6'
 ])
 
@@ -198,7 +218,7 @@ function bannerAmountStyle(amount: number) {
     :style="containerStyle"
   >
     <div
-      v-if="variant === 'banner'"
+      v-if="variant === 'banner' && isTheme"
       class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-text)] opacity-[0.035] [mask-image:url('/backgrounds/eight-point-star.svg')] [mask-position:center] [mask-repeat:repeat] [mask-size:170px]"
       aria-hidden="true"
     />
@@ -373,8 +393,8 @@ function bannerAmountStyle(amount: number) {
     <!-- BANNER (default): split quick-donate panel with amounts + image -->
     <div v-else class="grid gap-8 @4xl:grid-cols-[minmax(280px,0.52fr)_minmax(0,0.88fr)] @4xl:items-center @6xl:gap-12">
       <div :class="alignClass">
-        <h2 class="tenant-heading text-3xl font-bold leading-tight @xl:text-4xl" :style="{ color: accentVar }">{{ title }}</h2>
-        <p class="mt-5 max-w-[35rem] text-base leading-8 @xl:text-lg" :style="{ color: 'var(--color-text)' }">{{ subtitle }}</p>
+        <h2 class="tenant-heading text-3xl font-bold leading-tight @xl:text-4xl" :style="{ color: bannerTitleColor }">{{ title }}</h2>
+        <p class="mt-5 max-w-[35rem] text-base leading-8 @xl:text-lg" :style="{ color: bodyColor }">{{ subtitle }}</p>
         <div v-if="showProgress && featured?.goal" class="mt-6 max-w-md" :class="align === 'center' ? 'mx-auto' : ''">
           <div class="h-2 w-full overflow-hidden rounded-full" :style="{ background: trackColor }">
             <div class="h-full rounded-full" :style="{ width: pct(featured) + '%', background: barColor }" />

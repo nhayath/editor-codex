@@ -93,12 +93,39 @@ export interface AnnouncementBarConfig {
   props: Record<string, unknown>
 }
 
+// The unified background config shared by the page background, section
+// backgrounds, and (progressively) individual widgets. `theme` reuses the
+// template/palette default look (no explicit fill); the other modes mirror
+// PageBackgroundConfig so one editor + one renderer serve every surface.
+export type SurfaceBackgroundConfig =
+  | { type: 'theme' }
+  | { type: 'solid', color: string }
+  | { type: 'gradient', from: string, to: string, angle: number }
+  | {
+      type: 'image'
+      url: string
+      fit: 'cover' | 'contain' | 'tile'
+      position: 'center' | 'top' | 'bottom' | 'left' | 'right'
+      overlayTone: 'dark' | 'light'
+      overlayOpacity: number
+    }
+  | {
+      type: 'pattern'
+      presetId: string
+      baseColor: string
+      scale: number
+      intensity: number
+    }
+
 export interface SectionOverride {
   customWidgetId?: string
   customTitle?: string
   props?: Record<string, unknown>
   groupProps?: Record<string, unknown>
   widgets?: Record<string, { props?: Record<string, unknown> }>
+  // Full-bleed background for the whole section, rendered on the section
+  // wrapper by SectionRenderer/GroupRenderer.
+  background?: SurfaceBackgroundConfig | null
 }
 
 export interface ResolvedWidget {
@@ -127,4 +154,5 @@ export interface ResolvedSection {
   resolvedWidgets?: ResolvedWidget[]
   propSchema?: WidgetPropSchema[]
   groupPropSchema?: GroupPropSchema[]
+  background?: SurfaceBackgroundConfig | null
 }

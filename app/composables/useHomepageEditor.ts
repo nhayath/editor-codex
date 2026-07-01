@@ -1,4 +1,4 @@
-import type { HomepageConfigDraft, ResolvedSection, TemplateDefinition } from '~~/types/template'
+import type { HomepageConfigDraft, ResolvedSection, SurfaceBackgroundConfig, TemplateDefinition } from '~~/types/template'
 import type { HomepageConfigResponse } from '~~/types/editor'
 import { normaliseDraft, resolveSections } from '~~/utils/homepage'
 
@@ -290,6 +290,19 @@ export function useHomepageEditor() {
     }
   }
 
+  function setSectionBackground(sectionId: string, background: SurfaceBackgroundConfig | null) {
+    if (!draft.value) return
+
+    markSectionEdited(sectionId)
+    const override = { ...(draft.value.sectionOverrides[sectionId] ?? {}) }
+    if (background) {
+      override.background = background
+    } else {
+      delete override.background
+    }
+    draft.value.sectionOverrides[sectionId] = override
+  }
+
   function toggleSection(sectionId: string, enabled: boolean) {
     if (!draft.value || !template.value) return
 
@@ -528,6 +541,7 @@ export function useHomepageEditor() {
     loadConfig,
     saveConfig,
     updateSectionProps,
+    setSectionBackground,
     updateGroupProps,
     updateGroupWidgetProps,
     toggleSection,

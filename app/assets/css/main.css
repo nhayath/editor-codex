@@ -68,6 +68,43 @@ body {
   padding: 4rem 0;
 }
 
+/* Unified surface background — shared by section wrappers (and, progressively,
+   widget cards). `getSurfaceBackgroundPresentation` supplies the inline fill;
+   these classes add the pattern overlay + stacking context. */
+.tenant-surface {
+  position: relative;
+  isolation: isolate;
+}
+
+.tenant-surface-pattern::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--tenant-pattern-color);
+  content: "";
+  mask-image: var(--tenant-pattern-image);
+  mask-position: top left;
+  mask-repeat: repeat;
+  mask-size: var(--tenant-pattern-size);
+  opacity: var(--tenant-pattern-opacity);
+  pointer-events: none;
+}
+
+.tenant-surface-pattern > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* A dark section fill flips the theme text/surface variables so any widget
+   inside stays legible without per-widget changes (widgets are theme-variable
+   driven). Light fills keep the default dark text. */
+.tenant-section[data-surface-tone='dark'] {
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.72);
+  --color-surface: rgba(255, 255, 255, 0.1);
+  --color-bg: rgba(255, 255, 255, 0.04);
+}
+
 .tenant-container {
   width: min(1120px, calc(100% - 2rem));
   margin-inline: auto;

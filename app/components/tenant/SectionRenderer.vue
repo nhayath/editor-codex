@@ -19,6 +19,8 @@ const emit = defineEmits<{
 }>()
 
 const widgetComponent = computed(() => resolveWidgetComponent(props.section.component, props.section.widgetId))
+
+const background = computed(() => getSurfaceBackgroundPresentation(props.section.background))
 </script>
 
 <template>
@@ -40,12 +42,14 @@ const widgetComponent = computed(() => resolveWidgetComponent(props.section.comp
     v-else-if="section.enabled && section.widgetId"
     :id="section.id"
     class="tenant-section"
-    :class="{
+    :class="[background.className, {
       'editor-preview-editable-section': editable,
       'editor-new-section-highlight': highlighted,
       'editor-preview-section-highlight': activeHighlight,
       'editor-preview-section-edit-highlight': editingHighlight
-    }"
+    }]"
+    :style="background.style"
+    :data-surface-tone="background.tone === 'neutral' ? undefined : background.tone"
     @mouseenter="emit('focus-section')"
     @mouseleave="emit('blur-section')"
   >

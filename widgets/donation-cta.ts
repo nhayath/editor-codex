@@ -31,15 +31,14 @@ export const donationCtaWidget: WidgetDefinition = {
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', default: 'surface', group: 'Display', span: 'half', options: [
-      { label: 'Surface', value: 'surface' },
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' }
-    ] },
     { key: 'align', label: 'Alignment', type: 'select', default: 'left', group: 'Display', span: 'half', options: [
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
     ] },
+    // Unified background picker (theme / solid / gradient / image + darken /
+    // pattern), shared with sections and other widgets. Theme keeps the widget's
+    // own light card; any fill flips text contrast automatically.
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' }, group: 'Display' },
     { key: 'showProgress', label: 'Show progress bar', type: 'toggle', default: false, group: 'Display', span: 'half' },
     { key: 'showRaised', label: 'Show amount raised', type: 'toggle', default: false, group: 'Display', span: 'half' },
     // Donation amount selector — opt-in. Chips append the chosen amount to the

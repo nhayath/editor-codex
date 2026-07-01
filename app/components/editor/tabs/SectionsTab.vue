@@ -6,6 +6,7 @@ import type { WidgetCategory, WidgetPropSchema } from '~~/types/widget'
 type SectionsPanel =
   | { name: 'root' }
   | { name: 'section', sectionId: string }
+  | { name: 'sectionBackground', sectionId: string }
   | { name: 'widget', sectionId: string, slot: string }
   | { name: 'widgetPicker' }
 
@@ -34,6 +35,7 @@ const panelTitle = computed(() => {
   if (currentPanel.value.name === 'root') return 'Sections'
   if (currentPanel.value.name === 'widgetPicker') return 'Add widget'
   if (currentPanel.value.name === 'widget') return activeWidget.value?.name ?? activeWidget.value?.widgetId ?? 'Widget'
+  if (currentPanel.value.name === 'sectionBackground') return 'Section background'
   return activeSection.value?.title ?? activeSection.value?.name ?? activeSection.value?.id ?? 'Section'
 })
 const tenantId = computed(() => editor.tenant.value?.id as string | undefined)
@@ -110,6 +112,28 @@ function updateWidget(section: ResolvedSection, widget: ResolvedWidget, key: str
 
 function groupField(field: { key: string, label: string, type: string, default: unknown, options?: { label: string, value: string }[] }) {
   return field as WidgetPropSchema
+}
+
+// Compact summary (label + icon) + a live swatch for the section-background row,
+// so the current state reads at a glance without opening the sub-panel.
+const backgroundModes: Record<string, { label: string, icon: string }> = {
+  theme: { label: 'Theme default', icon: 'i-lucide-undo-2' },
+  solid: { label: 'Solid colour', icon: 'i-lucide-square' },
+  gradient: { label: 'Gradient', icon: 'i-lucide-blend' },
+  image: { label: 'Image', icon: 'i-lucide-image' },
+  pattern: { label: 'Pattern', icon: 'i-lucide-sparkles' }
+}
+
+function backgroundSummary(section: ResolvedSection) {
+  return backgroundModes[section.background?.type ?? 'theme'] ?? backgroundModes.theme!
+}
+
+function backgroundSwatch(section: ResolvedSection) {
+  return getSurfaceBackgroundPresentation(section.background)
+}
+
+function isThemeBackground(section: ResolvedSection) {
+  return !section.background || section.background.type === 'theme'
 }
 
 function scrollRowIntoView(sectionId: string) {
@@ -422,6 +446,49 @@ watch(
             @update="(key, value) => activeSection && updateSection(activeSection, key, value)"
           />
         </template>
+
+        <button
+          type="button"
+          class="mt-1 flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-md border border-muted bg-default p-3 text-left transition hover:border-primary"
+          @click="openPanel({ name: 'sectionBackground', sectionId: activeSection.id })"
+        >
+          <span
+            class="relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-md border border-muted bg-elevated"
+            :class="backgroundSwatch(activeSection).className"
+            :style="backgroundSwatch(activeSection).style"
+          >
+            <UIcon
+              v-if="isThemeBackground(activeSection)"
+              :name="backgroundSummary(activeSection).icon"
+              class="size-4 text-muted"
+            />
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-sm font-medium text-default">Section background</span>
+            <span class="block truncate text-xs text-muted">{{ backgroundSummary(activeSection).label }}</span>
+          </span>
+          <UIcon
+            name="i-lucide-chevron-right"
+            class="size-4 shrink-0 text-muted"
+          />
+        </button>
+      </section>
+
+      <section
+        v-else-if="currentPanel.name === 'sectionBackground' && activeSection"
+        :key="`section-bg-${activeSection.id}`"
+        class="grid w-full min-w-0 gap-3 overflow-hidden"
+      >
+        <p class="text-xs leading-4 text-muted">
+          A full-width colour, image, or pattern behind the whole section.
+        </p>
+        <BackgroundPicker
+          :model-value="activeSection.background ?? null"
+          :tenant-id="tenantId"
+          :palette-id="editor.draft.value?.paletteId"
+          :custom-colors="editor.draft.value?.customColors"
+          @update:model-value="activeSection && editor.setSectionBackground(activeSection.id, $event)"
+        />
       </section>
 
       <section

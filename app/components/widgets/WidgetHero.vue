@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
+import type { SurfaceBackgroundConfig } from '~~/types/template'
 import { pageBackgroundPatterns } from '~/composables/usePageBackground'
 
 const props = withDefaults(defineProps<{
@@ -13,7 +14,10 @@ const props = withDefaults(defineProps<{
   secondaryUrl?: string
   variant?: string
   align?: string
-  background?: string
+  // Unified background (colour / gradient / image / pattern) for the
+  // background-driven variants. Accepts the legacy string form too.
+  background?: SurfaceBackgroundConfig | string
+  // Deprecated — kept only so old saved configs normalise (see heroBackground).
   bgColor?: string
   gradientFrom?: string
   gradientTo?: string
@@ -35,7 +39,7 @@ const props = withDefaults(defineProps<{
   secondaryUrl: '#events',
   variant: 'with-buttons',
   align: 'left',
-  background: 'plain',
+  background: () => ({ type: 'theme' }),
   bgColor: 'var(--color-primary)',
   gradientFrom: 'var(--color-primary)',
   gradientTo: 'var(--color-secondary)',
@@ -62,29 +66,45 @@ const links = computed<HeroLink[]>(() => {
   return props.variant === 'banner' ? all.slice(0, 1) : all
 })
 
-// Background system (used by simple / action / banner).
-const isPlain = computed(() => !['solid', 'gradient', 'image'].includes(props.background))
-const useLightText = computed(() => !isPlain.value && props.textTone === 'light')
+// ----- Unified background (simple / action / banner) --------------------
+// New configs store a SurfaceBackgroundConfig object. Old configs stored a
+// string ('plain'|'solid'|'gradient'|'image') + sibling colour/overlay props;
+// map those to the unified config so saved tenants render unchanged.
 const overlayValue = computed(() => Math.min(Math.max(props.overlayOpacity, 0), 100) / 100)
+
+const heroBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: props.bgColor || 'var(--color-primary)' }
+    case 'gradient':
+      return { type: 'gradient', from: props.gradientFrom || 'var(--color-primary)', to: props.gradientTo || 'var(--color-secondary)', angle: 135 }
+    case 'image':
+      return { type: 'image', url: props.imageUrl || '', fit: 'cover', position: 'center', overlayTone: 'dark', overlayOpacity: props.overlay ? overlayValue.value : 0 }
+    default:
+      return { type: 'theme' }
+  }
+})
+
+const presentation = computed(() => getSurfaceBackgroundPresentation(heroBackground.value))
+const isPlain = computed(() => heroBackground.value.type === 'theme')
+// Prefer the luminance-derived tone; fall back to the old "filled ⇒ light text"
+// default when the fill colour can't be read (e.g. a `var(--color-*)` value).
+const useLightText = computed(() => {
+  if (presentation.value.tone === 'dark') return true
+  if (presentation.value.tone === 'light') return false
+  return !isPlain.value
+})
+
 const imageOverlayStyle = computed(() => ({
   opacity: overlayValue.value
 }))
 const useImageLightText = computed(() => props.textTone === 'light')
 
-// Empty values fall back to the active theme colours so the hero never renders
-// a hardcoded colour when nothing is chosen.
-const bgColorValue = computed(() => props.bgColor || 'var(--color-primary)')
-const gradientFromValue = computed(() => props.gradientFrom || 'var(--color-primary)')
-const gradientToValue = computed(() => props.gradientTo || 'var(--color-secondary)')
-
-const bgStyle = computed(() => {
-  if (props.background === 'solid') return { backgroundColor: bgColorValue.value }
-  if (props.background === 'gradient') return { backgroundImage: `linear-gradient(135deg, ${gradientFromValue.value}, ${gradientToValue.value})` }
-  return {}
-})
-
 const bgWrapperClass = computed(() => [
   '@container relative isolate overflow-hidden rounded-lg',
+  presentation.value.className,
   isPlain.value ? 'bg-[var(--color-surface)] ring-1 ring-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)]' : ''
 ])
 
@@ -321,18 +341,8 @@ function buttonClass(index: number, light: boolean) {
   <div
     v-else-if="variant === 'banner'"
     :class="bgWrapperClass"
-    :style="bgStyle"
+    :style="presentation.style"
   >
-    <template v-if="background === 'image' && imageUrl">
-      <img :src="imageUrl" :alt="title" class="absolute inset-0 -z-20 h-full w-full object-cover">
-      <div v-if="overlay" class="absolute inset-0 -z-10 bg-black" :style="{ opacity: overlayValue }" />
-      <div
-        v-if="texturePattern"
-        :class="`${textureLayerClass} -z-10`"
-        :style="textureStyle"
-        aria-hidden="true"
-      />
-    </template>
     <div class="flex flex-col items-start gap-4 px-6 py-7 @xl:flex-row @xl:items-center @xl:justify-between @xl:px-10">
       <div class="min-w-0">
         <p v-if="eyebrow" class="text-xs font-bold uppercase tracking-wide" :class="useLightText ? 'text-[color:color-mix(in_srgb,var(--color-surface)_80%,transparent)]' : 'text-[var(--color-primary)]'">
@@ -361,19 +371,8 @@ function buttonClass(index: number, light: boolean) {
   <div
     v-else
     :class="bgWrapperClass"
-    :style="bgStyle"
+    :style="presentation.style"
   >
-    <template v-if="background === 'image' && imageUrl">
-      <img :src="imageUrl" :alt="title" class="absolute inset-0 -z-20 h-full w-full object-cover">
-      <div v-if="overlay" class="absolute inset-0 -z-10 bg-black" :style="{ opacity: overlayValue }" />
-      <div
-        v-if="texturePattern"
-        :class="`${textureLayerClass} -z-10`"
-        :style="textureStyle"
-        aria-hidden="true"
-      />
-    </template>
-
     <div class="px-6 py-12 @xl:py-16" :class="centered ? 'text-center' : ''">
       <div class="mx-auto flex max-w-3xl flex-col gap-5" :class="centered ? 'items-center' : 'items-start'">
         <template v-if="variant === 'with-buttons'">
