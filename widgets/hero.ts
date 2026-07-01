@@ -79,9 +79,9 @@ export const heroWidget: WidgetDefinition = {
       { label: 'Gradient', value: 'gradient' },
       { label: 'Image', value: 'image' }
     ], showWhen: { key: 'variant', value: backgroundVariants } },
-    { key: 'bgColor', label: 'Background colour', type: 'color', default: '#0f766e', group: 'Background', showWhen: { key: 'background', value: 'solid' } },
-    { key: 'gradientFrom', label: 'Gradient start', type: 'color', default: '#0f766e', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
-    { key: 'gradientTo', label: 'Gradient end', type: 'color', default: '#134e4a', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
+    { key: 'bgColor', label: 'Background colour', type: 'color', default: 'var(--color-primary)', group: 'Background', showWhen: { key: 'background', value: 'solid' } },
+    { key: 'gradientFrom', label: 'Gradient start', type: 'color', default: 'var(--color-primary)', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
+    { key: 'gradientTo', label: 'Gradient end', type: 'color', default: 'var(--color-secondary)', group: 'Background', span: 'half', showWhen: { key: 'background', value: 'gradient' } },
     { key: 'overlay', label: 'Darken image', type: 'toggle', default: true, group: 'Background', span: 'half', showWhen: { key: 'background', value: 'image' } }
   ]
 }

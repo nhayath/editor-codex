@@ -36,9 +36,9 @@ const props = withDefaults(defineProps<{
   variant: 'with-buttons',
   align: 'left',
   background: 'plain',
-  bgColor: '#0f766e',
-  gradientFrom: '#0f766e',
-  gradientTo: '#134e4a',
+  bgColor: 'var(--color-primary)',
+  gradientFrom: 'var(--color-primary)',
+  gradientTo: 'var(--color-secondary)',
   overlay: true,
   overlayOpacity: 50,
   textTone: 'light',
@@ -71,9 +71,15 @@ const imageOverlayStyle = computed(() => ({
 }))
 const useImageLightText = computed(() => props.textTone === 'light')
 
+// Empty values fall back to the active theme colours so the hero never renders
+// a hardcoded colour when nothing is chosen.
+const bgColorValue = computed(() => props.bgColor || 'var(--color-primary)')
+const gradientFromValue = computed(() => props.gradientFrom || 'var(--color-primary)')
+const gradientToValue = computed(() => props.gradientTo || 'var(--color-secondary)')
+
 const bgStyle = computed(() => {
-  if (props.background === 'solid') return { backgroundColor: props.bgColor }
-  if (props.background === 'gradient') return { backgroundImage: `linear-gradient(135deg, ${props.gradientFrom}, ${props.gradientTo})` }
+  if (props.background === 'solid') return { backgroundColor: bgColorValue.value }
+  if (props.background === 'gradient') return { backgroundImage: `linear-gradient(135deg, ${gradientFromValue.value}, ${gradientToValue.value})` }
   return {}
 })
 

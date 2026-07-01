@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WidgetPropSchema } from '~~/types/widget'
 import { pageBackgroundPatterns } from '~/composables/usePageBackground'
+import { getThemeStyle } from '~/composables/useTheme'
 
 const props = defineProps<{
   field: WidgetPropSchema
@@ -39,6 +40,26 @@ const selectValue = computed({
 })
 
 const selectItems = computed(() => (props.field.options ?? []) as any[])
+
+// Colour fields may store a `var(--color-*)` reference (e.g. the theme default).
+// The colour picker can't render a CSS variable, so resolve it to the active
+// theme's hex for display; picking a new colour writes the literal hex back.
+const editor = useHomepageEditor()
+const themeColors = computed<Record<string, string>>(() => {
+  const draft = editor.draft.value
+  return getThemeStyle(draft?.paletteId, draft?.fontPairId, draft?.customColors) as Record<string, string>
+})
+
+function resolveColor(input: string) {
+  const match = /^var\(\s*(--[\w-]+)\s*\)$/.exec(input.trim())
+  if (!match) return input
+  return themeColors.value[match[1]!] ?? input
+}
+
+const colorValue = computed({
+  get: () => resolveColor(stringValue.value),
+  set: next => emit('update:modelValue', next)
+})
 
 const patternItems = computed(() => {
   const options = props.field.options?.length
@@ -209,7 +230,7 @@ const richtextBubble = [
 
     <UColorPicker
       v-else-if="field.type === 'color'"
-      v-model="stringValue"
+      v-model="colorValue"
     />
 
     <ImagePicker
