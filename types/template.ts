@@ -61,32 +61,20 @@ export interface HomepageConfigDraft {
   announcementBar?: AnnouncementBarConfig | null
 }
 
-export type PageBackgroundConfig =
-  | {
-      type: 'solid'
-      color: string
-    }
-  | {
-      type: 'gradient'
-      from: string
-      to: string
-      angle: number
-    }
-  | {
-      type: 'image'
-      url: string
-      fit: 'cover' | 'contain' | 'tile'
-      position: 'center' | 'top' | 'bottom' | 'left' | 'right'
-      overlayTone: 'dark' | 'light'
-      overlayOpacity: number
-    }
-  | {
-      type: 'pattern'
-      presetId: string
-      baseColor: string
-      scale: number
-      intensity: number
-    }
+// A decorative motif layered ON TOP of any base background (theme/solid/
+// gradient/image), like the iqamah panel — NOT a background of its own. `color`
+// defaults to the palette primary when omitted.
+export interface SurfacePatternOverlay {
+  presetId: string
+  color?: string
+  scale: number
+  intensity: number
+}
+
+// The page background reuses the exact same shape as every other surface, so a
+// single editor + renderer serve both. `theme` (or null) = the template default
+// fill; any base may additionally carry a `pattern` overlay.
+export type PageBackgroundConfig = SurfaceBackgroundConfig
 
 export interface AnnouncementBarConfig {
   enabled: boolean
@@ -98,9 +86,9 @@ export interface AnnouncementBarConfig {
 // template/palette default look (no explicit fill); the other modes mirror
 // PageBackgroundConfig so one editor + one renderer serve every surface.
 export type SurfaceBackgroundConfig =
-  | { type: 'theme' }
-  | { type: 'solid', color: string }
-  | { type: 'gradient', from: string, to: string, angle: number }
+  | { type: 'theme', pattern?: SurfacePatternOverlay }
+  | { type: 'solid', color: string, pattern?: SurfacePatternOverlay }
+  | { type: 'gradient', from: string, to: string, angle: number, pattern?: SurfacePatternOverlay }
   | {
       type: 'image'
       url: string
@@ -108,13 +96,7 @@ export type SurfaceBackgroundConfig =
       position: 'center' | 'top' | 'bottom' | 'left' | 'right'
       overlayTone: 'dark' | 'light'
       overlayOpacity: number
-    }
-  | {
-      type: 'pattern'
-      presetId: string
-      baseColor: string
-      scale: number
-      intensity: number
+      pattern?: SurfacePatternOverlay
     }
 
 export interface SectionOverride {

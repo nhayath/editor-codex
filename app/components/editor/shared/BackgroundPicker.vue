@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { SurfaceBackgroundConfig } from '~~/types/template'
+import type { SurfaceBackgroundConfig, SurfacePatternOverlay } from '~~/types/template'
 import { getPalette } from '~/composables/useTheme'
+import { defaultPatternOverlay, migrateSurfaceBackground } from '~/composables/usePageBackground'
 
 // Friendly, non-technical background editor shared by widgets and sections.
 // Mode cards + contextual controls mirror the page background editor so admins
@@ -27,9 +28,11 @@ const palette = computed(() => ({
   ...(props.customColors ?? {})
 }))
 
-// null and an explicit `theme` config both mean "no fill".
+// Migrate legacy standalone-pattern configs so the editor shows the right base
+// + overlay. null and an explicit `theme` config both mean "no fill".
+const config = computed(() => migrateSurfaceBackground(props.modelValue))
 const mode = computed(() => {
-  const type = props.modelValue?.type
+  const type = config.value?.type
   return !type || type === 'theme' ? 'theme' : type
 })
 
@@ -37,8 +40,7 @@ const modeOptions = computed(() => [
   { id: 'theme', label: props.themeLabel, icon: 'i-lucide-undo-2', description: props.themeDescription },
   { id: 'solid', label: 'Solid colour', icon: 'i-lucide-square', description: 'One clean background colour' },
   { id: 'gradient', label: 'Gradient', icon: 'i-lucide-blend', description: 'Blend two colours' },
-  { id: 'image', label: 'Image', icon: 'i-lucide-image', description: 'Upload or choose a photo' },
-  { id: 'pattern', label: 'Pattern', icon: 'i-lucide-sparkles', description: 'Islamic art & nature motifs' }
+  { id: 'image', label: 'Image', icon: 'i-lucide-image', description: 'Upload or choose a photo' }
 ] as const)
 
 const gradientAngles = [
@@ -48,27 +50,55 @@ const gradientAngles = [
   { label: '↗', value: 45, title: 'Diagonal up' }
 ]
 
-function selectMode(nextMode: 'theme' | 'solid' | 'gradient' | 'image' | 'pattern') {
-  if (nextMode === 'theme') {
-    emit('update:modelValue', null)
-    return
-  }
-  if (nextMode === mode.value) return
+// The pattern overlay is preserved when switching between base fills.
+const pattern = computed<SurfacePatternOverlay | undefined>(() => config.value?.pattern)
+const hasPattern = computed(() => Boolean(pattern.value))
 
-  if (nextMode === 'solid') {
-    emit('update:modelValue', { type: 'solid', color: palette.value.background })
+function selectMode(nextMode: 'theme' | 'solid' | 'gradient' | 'image') {
+  if (nextMode === mode.value) return
+  const keep = pattern.value ? { pattern: pattern.value } : {}
+
+  if (nextMode === 'theme') {
+    // Keep a pattern layered over the theme base; otherwise clear the fill.
+    emit('update:modelValue', pattern.value ? { type: 'theme', pattern: pattern.value } : null)
+  } else if (nextMode === 'solid') {
+    emit('update:modelValue', { type: 'solid', color: palette.value.background, ...keep })
   } else if (nextMode === 'gradient') {
-    emit('update:modelValue', { type: 'gradient', from: palette.value.background, to: palette.value.primary, angle: 135 })
-  } else if (nextMode === 'image') {
-    emit('update:modelValue', { type: 'image', url: '', fit: 'cover', position: 'center', overlayTone: 'dark', overlayOpacity: 0 })
+    emit('update:modelValue', { type: 'gradient', from: palette.value.background, to: palette.value.primary, angle: 135, ...keep })
   } else {
-    emit('update:modelValue', { type: 'pattern', presetId: pageBackgroundPatterns[0]!.id, baseColor: palette.value.background, scale: 72, intensity: 0.12 })
+    emit('update:modelValue', { type: 'image', url: '', fit: 'cover', position: 'center', overlayTone: 'dark', overlayOpacity: 0, ...keep })
   }
 }
 
+// Patch the base fill (never the pattern — see updatePattern).
 function updateCurrent(patch: Record<string, unknown>) {
-  if (!props.modelValue || props.modelValue.type === 'theme') return
-  emit('update:modelValue', { ...props.modelValue, ...patch } as SurfaceBackgroundConfig)
+  const base = config.value
+  if (!base || base.type === 'theme') return
+  emit('update:modelValue', { ...base, ...patch } as SurfaceBackgroundConfig)
+}
+
+// ----- Pattern overlay (orthogonal to the base fill) -----
+function setPattern(next: SurfacePatternOverlay | null) {
+  const base = config.value
+  if (!next) {
+    // Drop the overlay; a theme base with no fill collapses back to default.
+    if (!base || base.type === 'theme') { emit('update:modelValue', null); return }
+    const rest = { ...base }
+    delete (rest as { pattern?: unknown }).pattern
+    emit('update:modelValue', rest)
+    return
+  }
+  if (!base || base.type === 'theme') { emit('update:modelValue', { type: 'theme', pattern: next }); return }
+  emit('update:modelValue', { ...base, pattern: next })
+}
+
+function togglePattern() {
+  setPattern(hasPattern.value ? null : defaultPatternOverlay())
+}
+
+function updatePattern(patch: Partial<SurfacePatternOverlay>) {
+  if (!pattern.value) return
+  setPattern({ ...pattern.value, ...patch })
 }
 
 function patternPreviewStyle(patternUrl: string) {
@@ -100,27 +130,27 @@ function patternPreviewStyle(patternUrl: string) {
       </button>
     </div>
 
-    <template v-if="modelValue?.type === 'solid'">
+    <template v-if="config?.type === 'solid'">
       <UFormField label="Background colour">
         <div class="grid gap-2">
-          <UColorPicker :model-value="modelValue.color" @update:model-value="updateCurrent({ color: $event })" />
-          <UInput :model-value="modelValue.color" placeholder="#FAFDF9" @update:model-value="updateCurrent({ color: String($event) })" />
+          <UColorPicker :model-value="config.color" @update:model-value="updateCurrent({ color: $event })" />
+          <UInput :model-value="config.color" placeholder="#FAFDF9" @update:model-value="updateCurrent({ color: String($event) })" />
         </div>
       </UFormField>
     </template>
 
-    <template v-else-if="modelValue?.type === 'gradient'">
+    <template v-else-if="config?.type === 'gradient'">
       <div class="grid grid-cols-2 gap-3">
         <UFormField label="Start colour">
           <div class="grid gap-2">
-            <UColorPicker :model-value="modelValue.from" @update:model-value="updateCurrent({ from: $event })" />
-            <UInput :model-value="modelValue.from" @update:model-value="updateCurrent({ from: String($event) })" />
+            <UColorPicker :model-value="config.from" @update:model-value="updateCurrent({ from: $event })" />
+            <UInput :model-value="config.from" @update:model-value="updateCurrent({ from: String($event) })" />
           </div>
         </UFormField>
         <UFormField label="End colour">
           <div class="grid gap-2">
-            <UColorPicker :model-value="modelValue.to" @update:model-value="updateCurrent({ to: $event })" />
-            <UInput :model-value="modelValue.to" @update:model-value="updateCurrent({ to: String($event) })" />
+            <UColorPicker :model-value="config.to" @update:model-value="updateCurrent({ to: $event })" />
+            <UInput :model-value="config.to" @update:model-value="updateCurrent({ to: String($event) })" />
           </div>
         </UFormField>
       </div>
@@ -132,7 +162,7 @@ function patternPreviewStyle(patternUrl: string) {
             :key="angle.value"
             type="button"
             class="rounded-md border border-muted bg-default py-2 text-base text-default transition hover:border-primary"
-            :class="modelValue.angle === angle.value ? 'ring-2 ring-primary' : ''"
+            :class="config.angle === angle.value ? 'ring-2 ring-primary' : ''"
             :title="angle.title"
             @click="updateCurrent({ angle: angle.value })"
           >
@@ -142,9 +172,9 @@ function patternPreviewStyle(patternUrl: string) {
       </UFormField>
     </template>
 
-    <template v-else-if="modelValue?.type === 'image'">
+    <template v-else-if="config?.type === 'image'">
       <ImagePicker
-        :model-value="modelValue.url"
+        :model-value="config.url"
         :tenant-id="tenantId"
         @update:model-value="updateCurrent({ url: $event })"
       />
@@ -152,7 +182,7 @@ function patternPreviewStyle(patternUrl: string) {
       <div class="grid grid-cols-2 gap-3">
         <UFormField label="Image fit">
           <USelect
-            :model-value="modelValue.fit"
+            :model-value="config.fit"
             :items="[
               { label: 'Cover area', value: 'cover' },
               { label: 'Fit whole image', value: 'contain' },
@@ -167,7 +197,7 @@ function patternPreviewStyle(patternUrl: string) {
 
         <UFormField label="Position">
           <USelect
-            :model-value="modelValue.position"
+            :model-value="config.position"
             :items="[
               { label: 'Center', value: 'center' },
               { label: 'Top', value: 'top' },
@@ -186,7 +216,7 @@ function patternPreviewStyle(patternUrl: string) {
       <div class="grid grid-cols-2 gap-3">
         <UFormField label="Darken / lighten">
           <USelect
-            :model-value="modelValue.overlayTone"
+            :model-value="config.overlayTone"
             :items="[
               { label: 'Darken', value: 'dark' },
               { label: 'Lighten', value: 'light' }
@@ -198,9 +228,9 @@ function patternPreviewStyle(patternUrl: string) {
           />
         </UFormField>
 
-        <UFormField :label="`Overlay strength ${Math.round(modelValue.overlayOpacity * 100)}%`">
+        <UFormField :label="`Overlay strength ${Math.round(config.overlayOpacity * 100)}%`">
           <input
-            :value="modelValue.overlayOpacity"
+            :value="config.overlayOpacity"
             type="range"
             min="0"
             max="0.8"
@@ -215,63 +245,80 @@ function patternPreviewStyle(patternUrl: string) {
       </p>
     </template>
 
-    <template v-else-if="modelValue?.type === 'pattern'">
-      <div class="grid grid-cols-2 gap-2">
-        <button
-          v-for="pattern in pageBackgroundPatterns"
-          :key="pattern.id"
-          type="button"
-          class="overflow-hidden rounded-md border border-muted bg-default text-left transition hover:border-primary"
-          :class="modelValue.presetId === pattern.id ? 'ring-2 ring-primary' : ''"
-          @click="updateCurrent({ presetId: pattern.id })"
-        >
-          <span class="relative block h-20 overflow-hidden" :style="{ backgroundColor: modelValue.baseColor }">
-            <span
-              class="absolute inset-0 bg-primary opacity-20 [mask-position:center] [mask-repeat:repeat] [mask-size:52px]"
-              :style="patternPreviewStyle(pattern.url)"
-            />
+    <!-- ===== Pattern overlay — layers on top of ANY base above ===== -->
+    <div class="rounded-md border border-muted">
+      <button
+        type="button"
+        class="flex w-full items-center justify-between gap-3 p-3 text-left"
+        @click="togglePattern"
+      >
+        <span class="flex min-w-0 items-center gap-2">
+          <UIcon name="i-lucide-sparkles" class="size-4 shrink-0 text-primary" />
+          <span class="min-w-0">
+            <span class="block text-sm font-semibold text-default">Pattern overlay</span>
+            <span class="block text-xs leading-4 text-muted">Islamic art &amp; nature motifs over the background</span>
           </span>
-          <span class="block p-2">
-            <span class="block truncate text-xs font-semibold text-default">{{ pattern.name }}</span>
-            <span class="mt-0.5 block line-clamp-2 text-[11px] leading-4 text-muted">{{ pattern.description }}</span>
-          </span>
-        </button>
-      </div>
+        </span>
+        <USwitch :model-value="hasPattern" @update:model-value="togglePattern" @click.stop />
+      </button>
 
-      <UFormField label="Base colour">
-        <div class="grid gap-2">
-          <UColorPicker :model-value="modelValue.baseColor" @update:model-value="updateCurrent({ baseColor: $event })" />
-          <UInput :model-value="modelValue.baseColor" @update:model-value="updateCurrent({ baseColor: String($event) })" />
+      <div v-if="config?.pattern" class="grid gap-4 border-t border-muted p-3">
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            v-for="preset in pageBackgroundPatterns"
+            :key="preset.id"
+            type="button"
+            class="overflow-hidden rounded-md border border-muted bg-default text-left transition hover:border-primary"
+            :class="config.pattern.presetId === preset.id ? 'ring-2 ring-primary' : ''"
+            @click="updatePattern({ presetId: preset.id })"
+          >
+            <span class="relative block h-16 overflow-hidden bg-elevated">
+              <span
+                class="absolute inset-0 opacity-40 [mask-position:center] [mask-repeat:repeat] [mask-size:44px]"
+                :style="patternPreviewStyle(preset.url)"
+              />
+            </span>
+            <span class="block p-2">
+              <span class="block truncate text-xs font-semibold text-default">{{ preset.name }}</span>
+            </span>
+          </button>
         </div>
-      </UFormField>
 
-      <UFormField :label="`Pattern size ${modelValue.scale}px`">
-        <input
-          :value="modelValue.scale"
-          type="range"
-          min="32"
-          max="180"
-          step="4"
-          class="w-full accent-[var(--ui-primary)]"
-          @input="updateCurrent({ scale: Number(($event.target as HTMLInputElement).value) })"
-        >
-      </UFormField>
+        <UFormField label="Motif colour">
+          <div class="grid gap-2">
+            <UColorPicker :model-value="config.pattern.color || palette.primary" @update:model-value="updatePattern({ color: String($event) })" />
+            <UInput :model-value="config.pattern.color || palette.primary" @update:model-value="updatePattern({ color: String($event) })" />
+          </div>
+        </UFormField>
 
-      <UFormField :label="`Motif strength ${Math.round(modelValue.intensity * 100)}%`">
-        <input
-          :value="modelValue.intensity"
-          type="range"
-          min="0.03"
-          max="0.5"
-          step="0.01"
-          class="w-full accent-[var(--ui-primary)]"
-          @input="updateCurrent({ intensity: Number(($event.target as HTMLInputElement).value) })"
-        >
-      </UFormField>
-    </template>
+        <UFormField :label="`Pattern size ${config.pattern.scale}px`">
+          <input
+            :value="config.pattern.scale"
+            type="range"
+            min="32"
+            max="180"
+            step="4"
+            class="w-full accent-[var(--ui-primary)]"
+            @input="updatePattern({ scale: Number(($event.target as HTMLInputElement).value) })"
+          >
+        </UFormField>
+
+        <UFormField :label="`Motif strength ${Math.round(config.pattern.intensity * 100)}%`">
+          <input
+            :value="config.pattern.intensity"
+            type="range"
+            min="0.03"
+            max="0.5"
+            step="0.01"
+            class="w-full accent-[var(--ui-primary)]"
+            @input="updatePattern({ intensity: Number(($event.target as HTMLInputElement).value) })"
+          >
+        </UFormField>
+      </div>
+    </div>
 
     <UButton
-      v-if="mode !== 'theme'"
+      v-if="mode !== 'theme' || hasPattern"
       color="neutral"
       variant="outline"
       icon="i-lucide-rotate-ccw"

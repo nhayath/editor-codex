@@ -1,6 +1,6 @@
 import { computed, toValue, type CSSProperties, type MaybeRefOrGetter } from 'vue'
 import type { SurfaceBackgroundConfig } from '~~/types/template'
-import { pageBackgroundPatterns } from '~/composables/usePageBackground'
+import { buildSurfacePatternVars, migrateSurfaceBackground } from '~/composables/usePageBackground'
 
 // The tone tells consumers whether the resulting surface is visually dark
 // (needs light text) or light (needs dark text). `neutral` means "leave the
@@ -13,31 +13,36 @@ export interface SurfaceBackgroundPresentation {
   tone: SurfaceTone
 }
 
-// Friendly label + icon per background mode, shared by every drill-in summary
-// row (section background + widget background props) so they read identically.
+// Friendly label + icon per BASE background mode, shared by every drill-in
+// summary row (section background + widget background props) so they read
+// identically. Pattern is an overlay now, not a base — see getSurfaceBackgroundMode.
 export const surfaceBackgroundModes: Record<string, { label: string, icon: string }> = {
   theme: { label: 'Theme default', icon: 'i-lucide-undo-2' },
   solid: { label: 'Solid colour', icon: 'i-lucide-square' },
   gradient: { label: 'Gradient', icon: 'i-lucide-blend' },
-  image: { label: 'Image', icon: 'i-lucide-image' },
-  pattern: { label: 'Pattern', icon: 'i-lucide-sparkles' }
+  image: { label: 'Image', icon: 'i-lucide-image' }
 }
 
+// Summary of the base fill + whether a pattern overlay is layered on top, so a
+// row can read e.g. "Solid colour · with pattern".
 export function getSurfaceBackgroundMode(background?: SurfaceBackgroundConfig | null) {
-  return surfaceBackgroundModes[background?.type ?? 'theme'] ?? surfaceBackgroundModes.theme!
+  const bg = migrateSurfaceBackground(background)
+  const base = surfaceBackgroundModes[bg?.type ?? 'theme'] ?? surfaceBackgroundModes.theme!
+  const hasPattern = Boolean(bg?.pattern)
+  return {
+    ...base,
+    hasPattern,
+    label: hasPattern ? `${base.label} · pattern` : base.label
+  }
 }
 
 export function isThemeSurfaceBackground(background?: SurfaceBackgroundConfig | null) {
-  return !background || background.type === 'theme'
+  const bg = migrateSurfaceBackground(background)
+  return !bg || bg.type === 'theme'
 }
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, Number.isFinite(value) ? value : min))
-}
-
-function patternUrl(presetId: string) {
-  return pageBackgroundPatterns.find(pattern => pattern.id === presetId)?.url
-    ?? pageBackgroundPatterns[0]!.url
 }
 
 // Relative luminance of a hex colour → tone. Non-hex inputs (e.g. a CSS
@@ -75,68 +80,56 @@ export function getSurfaceBackgroundPresentation(
   background?: SurfaceBackgroundConfig | null,
   palette?: { background?: string, primary?: string, secondary?: string } | null
 ): SurfaceBackgroundPresentation {
-  if (!background || background.type === 'theme') return EMPTY
-
+  const bg = migrateSurfaceBackground(background)
   const fallbackBg = palette?.background ?? 'var(--color-bg)'
   const fallbackPrimary = palette?.primary ?? 'var(--color-primary)'
 
-  if (background.type === 'solid') {
-    return {
-      className: 'tenant-surface',
-      style: { background: background.color || fallbackBg },
-      tone: hexTone(background.color)
-    }
-  }
+  // ----- Base fill (theme = none). Tone is derived from the base only. -----
+  let className = ''
+  let style: CSSProperties = {}
+  let tone: SurfaceTone = 'neutral'
 
-  if (background.type === 'gradient') {
-    const angle = clamp(Number(background.angle), 0, 360)
-    return {
-      className: 'tenant-surface',
-      style: {
-        background: `linear-gradient(${angle}deg, ${background.from || fallbackBg}, ${background.to || fallbackPrimary})`
-      },
-      tone: averageTone(background.from, background.to)
-    }
-  }
-
-  if (background.type === 'image') {
-    const opacity = clamp(Number(background.overlayOpacity), 0, 1)
-    const overlay = background.overlayTone === 'light'
+  if (bg && bg.type === 'solid') {
+    className = 'tenant-surface'
+    style = { background: bg.color || fallbackBg }
+    tone = hexTone(bg.color)
+  } else if (bg && bg.type === 'gradient') {
+    const angle = clamp(Number(bg.angle), 0, 360)
+    className = 'tenant-surface'
+    style = { background: `linear-gradient(${angle}deg, ${bg.from || fallbackBg}, ${bg.to || fallbackPrimary})` }
+    tone = averageTone(bg.from, bg.to)
+  } else if (bg && bg.type === 'image') {
+    const opacity = clamp(Number(bg.overlayOpacity), 0, 1)
+    const overlay = bg.overlayTone === 'light'
       ? `rgba(255, 255, 255, ${opacity})`
       : `rgba(0, 0, 0, ${opacity})`
-    const hasImage = Boolean(background.url?.trim())
-    const isTile = background.fit === 'tile'
+    const hasImage = Boolean(bg.url?.trim())
+    const isTile = bg.fit === 'tile'
     // Only claim a tone once the overlay is strong enough to dominate the
     // (unknown) image; a faint overlay leaves the theme text colours alone.
-    const tone: SurfaceTone = opacity >= 0.35
-      ? (background.overlayTone === 'light' ? 'light' : 'dark')
+    tone = opacity >= 0.35
+      ? (bg.overlayTone === 'light' ? 'light' : 'dark')
       : 'neutral'
-
-    return {
-      className: 'tenant-surface',
-      style: {
-        backgroundColor: fallbackBg,
-        backgroundImage: hasImage ? `linear-gradient(${overlay}, ${overlay}), url("${background.url}")` : undefined,
-        backgroundPosition: `center, ${background.position || 'center'}`,
-        backgroundRepeat: isTile ? 'no-repeat, repeat' : 'no-repeat, no-repeat',
-        backgroundSize: isTile ? '100% 100%, auto' : `100% 100%, ${background.fit}`
-      },
-      tone
+    className = 'tenant-surface'
+    style = {
+      backgroundColor: fallbackBg,
+      backgroundImage: hasImage ? `linear-gradient(${overlay}, ${overlay}), url("${bg.url}")` : undefined,
+      backgroundPosition: `center, ${bg.position || 'center'}`,
+      backgroundRepeat: isTile ? 'no-repeat, repeat' : 'no-repeat, no-repeat',
+      backgroundSize: isTile ? '100% 100%, auto' : `100% 100%, ${bg.fit}`
     }
   }
 
-  // pattern
-  return {
-    className: 'tenant-surface tenant-surface-pattern',
-    style: {
-      background: background.baseColor || fallbackBg,
-      '--tenant-pattern-image': `url("${patternUrl(background.presetId)}")`,
-      '--tenant-pattern-color': fallbackPrimary,
-      '--tenant-pattern-size': `${clamp(Number(background.scale), 32, 180)}px`,
-      '--tenant-pattern-opacity': String(clamp(Number(background.intensity), 0.03, 0.5))
-    } as CSSProperties,
-    tone: hexTone(background.baseColor)
+  // ----- Optional pattern overlay (layers on ANY base, incl. theme) -----
+  if (bg?.pattern) {
+    // Force the base class so the ::before has its positioning context even
+    // when the base fill is theme (transparent — motif over the theme surface).
+    className = className ? `${className} tenant-surface-pattern` : 'tenant-surface tenant-surface-pattern'
+    style = { ...style, ...buildSurfacePatternVars(bg.pattern, fallbackPrimary) }
   }
+
+  if (!className) return EMPTY
+  return { className, style, tone }
 }
 
 /**
@@ -156,12 +149,22 @@ export function useSurfaceBackground(
   background: MaybeRefOrGetter<SurfaceBackgroundConfig | null | undefined>,
   options: { accent?: MaybeRefOrGetter<string> } = {}
 ) {
-  const presentation = computed(() => getSurfaceBackgroundPresentation(toValue(background)))
+  const config = computed(() => migrateSurfaceBackground(toValue(background)))
+  const presentation = computed(() => getSurfaceBackgroundPresentation(config.value))
   const isTheme = computed(() => {
-    const bg = toValue(background)
+    const bg = config.value
     return !bg || bg.type === 'theme'
   })
   const isFilled = computed(() => !isTheme.value)
+  const hasPattern = computed(() => Boolean(config.value?.pattern))
+  // Just the pattern CSS vars — for widgets that special-case theme mode (they
+  // paint their OWN chrome and drop presentation.style); merging this keeps a
+  // pattern overlay visible even over a theme base. Empty when no pattern.
+  const patternStyle = computed<CSSProperties>(() => {
+    const bg = config.value
+    return bg?.pattern ? buildSurfacePatternVars(bg.pattern, 'var(--color-primary)') : {}
+  })
+  const patternClassName = computed(() => hasPattern.value ? 'tenant-surface tenant-surface-pattern' : '')
   const tone = computed<SurfaceTone>(() => presentation.value.tone)
   // Dark fill → light text; light fill → dark text; a filled-but-neutral tone
   // (e.g. a `var(--color-*)` solid or a faint image overlay) defaults to light,
@@ -189,6 +192,9 @@ export function useSurfaceBackground(
     presentation,
     isTheme,
     isFilled,
+    hasPattern,
+    patternStyle,
+    patternClassName,
     tone,
     useLightText,
     accent,

@@ -48,12 +48,12 @@ const backgroundModel = computed({
 })
 
 const backgroundSummary = computed(() => {
-  const background = backgroundModel.value
-  if (!background) return 'Template default'
-  if (background.type === 'solid') return 'Solid color'
-  if (background.type === 'gradient') return 'Gradient'
-  if (background.type === 'image') return background.url ? 'Custom image' : 'Choose an image'
-  return pageBackgroundPatterns.find(pattern => pattern.id === background.presetId)?.name ?? 'Islamic pattern'
+  const background = migrateSurfaceBackground(backgroundModel.value)
+  const suffix = background?.pattern ? ' · pattern' : ''
+  if (!background || background.type === 'theme') return background?.pattern ? `Template default${suffix}` : 'Template default'
+  if (background.type === 'solid') return `Solid color${suffix}`
+  if (background.type === 'gradient') return `Gradient${suffix}`
+  return `${background.url ? 'Custom image' : 'Choose an image'}${suffix}`
 })
 
 const backgroundPreview = computed(() => {
@@ -284,8 +284,10 @@ function goBack() {
         key="background"
         class="w-full min-w-0 overflow-hidden"
       >
-        <PageBackgroundEditor
+        <BackgroundPicker
           v-model="backgroundModel"
+          theme-label="Template default"
+          theme-description="Use the template background"
           :tenant-id="typeof editor.tenant.value?.id === 'string' ? editor.tenant.value.id : undefined"
           :palette-id="editor.draft.value?.paletteId"
           :custom-colors="editor.draft.value?.customColors"

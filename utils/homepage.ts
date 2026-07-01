@@ -1,4 +1,4 @@
-import type { AnnouncementBarConfig, HomepageConfigDraft, PageBackgroundConfig, ResolvedSection, SectionOverride, TemplateDefinition, TemplateSectionDef } from '~~/types/template'
+import type { AnnouncementBarConfig, HomepageConfigDraft, PageBackgroundConfig, ResolvedSection, SectionOverride, SurfacePatternOverlay, TemplateDefinition, TemplateSectionDef } from '~~/types/template'
 import type { WidgetDefinition, WidgetPropSchema } from '~~/types/widget'
 import { getTemplateDefinition } from '~~/templates'
 import { getWidgetDefinition } from '~~/widgets'
@@ -17,12 +17,46 @@ export function stringifyJsonField(value: unknown) {
   return JSON.stringify(value ?? {})
 }
 
+// A pattern is now an overlay layered on any base (theme/solid/gradient/image),
+// not a base of its own. Validate it here so a saved overlay survives round-trips.
+function normalisePatternOverlay(value: unknown): SurfacePatternOverlay | undefined {
+  if (!value || typeof value !== 'object') return undefined
+  const p = value as Record<string, unknown>
+  if (typeof p.presetId !== 'string') return undefined
+  if (!Number.isFinite(Number(p.scale)) || !Number.isFinite(Number(p.intensity))) return undefined
+  const overlay: SurfacePatternOverlay = {
+    presetId: p.presetId,
+    scale: Number(p.scale),
+    intensity: Number(p.intensity)
+  }
+  if (typeof p.color === 'string') overlay.color = p.color
+  return overlay
+}
+
 function normalisePageBackground(value: unknown): PageBackgroundConfig | null {
   if (!value || typeof value !== 'object') return null
-  const background = value as Record<string, unknown>
+  let background = value as Record<string, unknown>
+
+  // Migrate legacy standalone-pattern configs to a solid base + pattern overlay.
+  if (background.type === 'pattern' && typeof background.presetId === 'string') {
+    background = {
+      type: 'solid',
+      color: typeof background.baseColor === 'string' ? background.baseColor : 'var(--color-bg)',
+      pattern: { presetId: background.presetId, scale: Number(background.scale), intensity: Number(background.intensity) }
+    }
+  }
+
+  const pattern = normalisePatternOverlay(background.pattern)
+  const withPattern = <T extends PageBackgroundConfig>(base: T): T =>
+    (pattern ? { ...base, pattern } : base)
+
+  if (background.type === 'theme') {
+    // Theme base only persists when it carries a pattern; otherwise it is null.
+    return pattern ? { type: 'theme', pattern } : null
+  }
 
   if (background.type === 'solid' && typeof background.color === 'string') {
-    return { type: 'solid', color: background.color }
+    return withPattern({ type: 'solid', color: background.color })
   }
 
   if (
@@ -31,12 +65,12 @@ function normalisePageBackground(value: unknown): PageBackgroundConfig | null {
     && typeof background.to === 'string'
     && Number.isFinite(Number(background.angle))
   ) {
-    return {
+    return withPattern({
       type: 'gradient',
       from: background.from,
       to: background.to,
       angle: Number(background.angle)
-    }
+    })
   }
 
   if (
@@ -47,30 +81,14 @@ function normalisePageBackground(value: unknown): PageBackgroundConfig | null {
     && ['dark', 'light'].includes(String(background.overlayTone))
     && Number.isFinite(Number(background.overlayOpacity))
   ) {
-    return {
+    return withPattern({
       type: 'image',
       url: background.url,
       fit: background.fit as 'cover' | 'contain' | 'tile',
       position: background.position as 'center' | 'top' | 'bottom' | 'left' | 'right',
       overlayTone: background.overlayTone as 'dark' | 'light',
       overlayOpacity: Number(background.overlayOpacity)
-    }
-  }
-
-  if (
-    background.type === 'pattern'
-    && typeof background.presetId === 'string'
-    && typeof background.baseColor === 'string'
-    && Number.isFinite(Number(background.scale))
-    && Number.isFinite(Number(background.intensity))
-  ) {
-    return {
-      type: 'pattern',
-      presetId: background.presetId,
-      baseColor: background.baseColor,
-      scale: Number(background.scale),
-      intensity: Number(background.intensity)
-    }
+    })
   }
 
   return null

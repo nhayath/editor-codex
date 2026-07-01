@@ -150,6 +150,7 @@ const {
   presentation,
   isTheme,
   isFilled,
+  patternStyle,
   useLightText,
   headingColor,
   bodyColor,
@@ -163,15 +164,17 @@ const {
 } = surface
 
 // Theme mode keeps the widget's own light card chrome; any fill paints via the
-// shared presentation (className carries the pattern layer when relevant).
+// shared presentation (className carries the pattern layer when relevant). A
+// pattern overlay layers over the theme card too, so merge its CSS vars.
 const containerStyle = computed(() => {
   if (isTheme.value) {
     if (props.variant === 'banner') {
-      return { background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))' }
+      return { background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))', ...patternStyle.value }
     }
     return {
       background: 'var(--color-surface)',
-      boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)`
+      boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)`,
+      ...patternStyle.value
     }
   }
   return presentation.value.style

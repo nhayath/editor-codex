@@ -84,6 +84,7 @@ const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar }
 const {
   presentation,
   isTheme,
+  patternStyle,
   useLightText,
   headingColor,
   mutedColor,
@@ -92,8 +93,9 @@ const {
 } = surface
 
 // Theme keeps the legacy transparent section; any fill paints via the shared
-// presentation (className carries the pattern layer when relevant).
-const containerStyle = computed(() => isTheme.value ? {} : presentation.value.style)
+// presentation (className carries the pattern layer when relevant). A pattern
+// overlay must still show over the theme base, so merge its CSS vars there.
+const containerStyle = computed(() => isTheme.value ? patternStyle.value : presentation.value.style)
 
 // Image frame ring/card.
 const frameStyle = computed(() =>

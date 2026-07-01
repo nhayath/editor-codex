@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'vue'
-import type { PageBackgroundConfig } from '~~/types/template'
+import type { PageBackgroundConfig, SurfaceBackgroundConfig, SurfacePatternOverlay } from '~~/types/template'
 import { getPalette } from '~/composables/useTheme'
 
 export interface PageBackgroundPattern {
@@ -93,69 +93,92 @@ function patternUrl(presetId: string) {
     ?? pageBackgroundPatterns[0]!.url
 }
 
+// Default overlay used when an admin first switches the pattern layer on.
+export function defaultPatternOverlay(): SurfacePatternOverlay {
+  return { presetId: pageBackgroundPatterns[0]!.id, scale: 72, intensity: 0.12 }
+}
+
+// The pattern layer is painted by a `::before` (see main.css) driven entirely by
+// CSS variables, so it composes on top of ANY base fill. `color` falls back to
+// the palette primary. Shared by the page + surface renderers so a motif looks
+// identical wherever it is layered.
+export function buildSurfacePatternVars(
+  pattern: SurfacePatternOverlay,
+  fallbackColor: string
+): CSSProperties {
+  return {
+    '--tenant-pattern-image': `url("${patternUrl(pattern.presetId)}")`,
+    '--tenant-pattern-color': pattern.color || fallbackColor,
+    '--tenant-pattern-size': `${clamp(Number(pattern.scale), 32, 180)}px`,
+    '--tenant-pattern-opacity': String(clamp(Number(pattern.intensity), 0.03, 0.5))
+  } as CSSProperties
+}
+
+// Pattern is no longer a standalone background mode — it is an overlay. Migrate
+// legacy saved configs (`{ type:'pattern', baseColor, presetId, scale,
+// intensity }`) to `{ type:'solid', color: baseColor, pattern:{…} }` so old
+// drafts keep rendering. Everything else passes through untouched.
+export function migrateSurfaceBackground<T extends SurfaceBackgroundConfig | PageBackgroundConfig | null | undefined>(
+  background: T
+): T {
+  const bg = background as Record<string, unknown> | null | undefined
+  if (bg && bg.type === 'pattern') {
+    return {
+      type: 'solid',
+      color: (bg.baseColor as string) || 'var(--color-bg)',
+      pattern: {
+        presetId: bg.presetId as string,
+        scale: Number(bg.scale),
+        intensity: Number(bg.intensity)
+      }
+    } as unknown as T
+  }
+  return background
+}
+
 export function getPageBackgroundPresentation(
   background?: PageBackgroundConfig | null,
   paletteId?: string,
   customColors?: Record<string, string> | null
 ) {
-  if (!background) {
-    return {
-      className: '',
-      style: {} as CSSProperties
-    }
-  }
-
+  const bg = migrateSurfaceBackground(background)
   const palette = { ...getPalette(paletteId), ...(customColors ?? {}) }
 
-  if (background.type === 'solid') {
-    return {
-      className: 'tenant-page-background',
-      style: {
-        background: background.color || palette.background
-      } satisfies CSSProperties
-    }
-  }
+  // ----- Base fill (theme/default = none) -----
+  let className = ''
+  let style: CSSProperties = {}
 
-  if (background.type === 'gradient') {
-    const angle = clamp(Number(background.angle), 0, 360)
-    return {
-      className: 'tenant-page-background',
-      style: {
-        background: `linear-gradient(${angle}deg, ${background.from || palette.background}, ${background.to || palette.primary})`
-      } satisfies CSSProperties
-    }
-  }
-
-  if (background.type === 'image') {
-    const opacity = clamp(Number(background.overlayOpacity), 0, 1)
-    const overlay = background.overlayTone === 'light'
+  if (bg && bg.type === 'solid') {
+    className = 'tenant-page-background'
+    style = { background: bg.color || palette.background }
+  } else if (bg && bg.type === 'gradient') {
+    const angle = clamp(Number(bg.angle), 0, 360)
+    className = 'tenant-page-background'
+    style = { background: `linear-gradient(${angle}deg, ${bg.from || palette.background}, ${bg.to || palette.primary})` }
+  } else if (bg && bg.type === 'image') {
+    const opacity = clamp(Number(bg.overlayOpacity), 0, 1)
+    const overlay = bg.overlayTone === 'light'
       ? `rgba(255, 255, 255, ${opacity})`
       : `rgba(0, 0, 0, ${opacity})`
-    const hasImage = Boolean(background.url?.trim())
-    const isTile = background.fit === 'tile'
-
-    return {
-      className: 'tenant-page-background',
-      style: {
-        backgroundColor: palette.background,
-        backgroundImage: hasImage ? `linear-gradient(${overlay}, ${overlay}), url("${background.url}")` : undefined,
-        backgroundPosition: `center, ${background.position || 'center'}`,
-        backgroundRepeat: isTile ? 'no-repeat, repeat' : 'no-repeat, no-repeat',
-        backgroundSize: isTile ? '100% 100%, auto' : `100% 100%, ${background.fit}`
-      } satisfies CSSProperties
+    const hasImage = Boolean(bg.url?.trim())
+    const isTile = bg.fit === 'tile'
+    className = 'tenant-page-background'
+    style = {
+      backgroundColor: palette.background,
+      backgroundImage: hasImage ? `linear-gradient(${overlay}, ${overlay}), url("${bg.url}")` : undefined,
+      backgroundPosition: `center, ${bg.position || 'center'}`,
+      backgroundRepeat: isTile ? 'no-repeat, repeat' : 'no-repeat, no-repeat',
+      backgroundSize: isTile ? '100% 100%, auto' : `100% 100%, ${bg.fit}`
     }
   }
 
-  const patternStyle = {
-    background: background.baseColor || palette.background,
-    '--tenant-pattern-image': `url("${patternUrl(background.presetId)}")`,
-    '--tenant-pattern-color': palette.primary,
-    '--tenant-pattern-size': `${clamp(Number(background.scale), 32, 180)}px`,
-    '--tenant-pattern-opacity': String(clamp(Number(background.intensity), 0.03, 0.5))
-  } as CSSProperties
-
-  return {
-    className: 'tenant-page-background tenant-page-background-pattern',
-    style: patternStyle
+  // ----- Optional pattern overlay (layers on ANY base, incl. theme) -----
+  if (bg?.pattern) {
+    // The base class supplies the positioning context the ::before needs, so
+    // ensure it is present even when the base fill itself is theme/default.
+    className = 'tenant-page-background tenant-page-background-pattern'
+    style = { ...style, ...buildSurfacePatternVars(bg.pattern, palette.primary) }
   }
+
+  return { className, style }
 }
