@@ -31,11 +31,6 @@ export const servicesWidget: WidgetDefinition = {
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', group: 'Display', span: 'half', default: 'surface', options: [
-      { label: 'Surface', value: 'surface' },
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' }
-    ] },
     { key: 'columns', label: 'Columns', type: 'select', group: 'Display', span: 'half', default: '3', options: [
       { label: '2', value: '2' },
       { label: '3', value: '3' },
@@ -53,6 +48,11 @@ export const servicesWidget: WidgetDefinition = {
     { key: 'showImage', label: 'Show images', type: 'toggle', group: 'Display', span: 'half', default: true },
     { key: 'showIcon', label: 'Show icons', type: 'toggle', group: 'Display', span: 'half', default: true },
     { key: 'showDescription', label: 'Show descriptions', type: 'toggle', group: 'Display', span: 'half', default: true },
-    { key: 'showCta', label: 'Show "Learn more" link', type: 'toggle', group: 'Display', span: 'half', default: false }
+    { key: 'showCta', label: 'Show "Learn more" link', type: 'toggle', group: 'Display', span: 'half', default: false },
+
+    // Unified background picker (theme / solid / gradient / image + darken /
+    // pattern). Theme keeps the legacy transparent section; any fill flips text
+    // contrast automatically. Renders as a standalone drill-in row.
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' } }
   ]
 }
