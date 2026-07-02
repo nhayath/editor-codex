@@ -8,8 +8,7 @@ type SectionsPanel =
   | { name: 'section', sectionId: string }
   | { name: 'sectionBackground', sectionId: string }
   | { name: 'widget', sectionId: string, slot: string }
-  | { name: 'carouselStyle', sectionId: string, slot?: string }
-  | { name: 'heroStyle', sectionId: string, slot?: string }
+  | { name: 'widgetStyle', sectionId: string, slot?: string }
   // A background-typed widget prop drilled into a slide-in picker. `slot` marks a
   // group-member widget prop, `groupProp` a group-layout prop; neither → a
   // single-widget section prop.
@@ -43,8 +42,7 @@ const panelTitle = computed(() => {
   if (currentPanel.value.name === 'root') return 'Sections'
   if (currentPanel.value.name === 'widgetPicker') return 'Add widget'
   if (currentPanel.value.name === 'widget') return activeWidget.value?.name ?? activeWidget.value?.widgetId ?? 'Widget'
-  if (currentPanel.value.name === 'carouselStyle') return 'Style'
-  if (currentPanel.value.name === 'heroStyle') return 'Style'
+  if (currentPanel.value.name === 'widgetStyle') return 'Style'
   if (currentPanel.value.name === 'sectionBackground') return 'Section background'
   if (currentPanel.value.name === 'widgetBackground') return 'Background'
   return activeSection.value?.title ?? activeSection.value?.name ?? activeSection.value?.id ?? 'Section'
@@ -154,48 +152,29 @@ const backgroundPanelKey = computed(() => {
     : ''
 })
 
-const carouselWidgetSchema = computed(() => widgetRegistry.widgets.value.find(widget => widget.id === 'carousel')?.propSchema ?? [])
-const heroWidgetSchema = computed(() => widgetRegistry.widgets.value.find(widget => widget.id === 'hero')?.propSchema ?? [])
-
-const activeCarouselStyleSchema = computed(() => {
-  const panel = currentPanel.value
-  if (panel.name !== 'carouselStyle') return []
-  const schema = panel.slot ? activeWidget.value?.propSchema ?? [] : activeSection.value?.propSchema ?? []
-  return schema.length ? schema : carouselWidgetSchema.value
+const activeWidgetDefinition = computed(() => {
+  const widgetId = activeWidget.value?.widgetId ?? activeSection.value?.widgetId
+  return widgetId ? widgetRegistry.widgets.value.find(widget => widget.id === widgetId) : null
 })
 
-const activeCarouselStyleValues = computed(() => {
+const activeWidgetStyleSchema = computed(() => {
   const panel = currentPanel.value
-  if (panel.name !== 'carouselStyle') return {}
+  if (panel.name !== 'widgetStyle') return []
+  const schema = panel.slot ? activeWidget.value?.propSchema ?? [] : activeSection.value?.propSchema ?? []
+  return schema.length ? schema : activeWidgetDefinition.value?.propSchema ?? []
+})
+
+const activeWidgetStyleValues = computed(() => {
+  const panel = currentPanel.value
+  if (panel.name !== 'widgetStyle') return {}
   return panel.slot ? activeWidget.value?.resolvedProps ?? {} : activeSection.value?.resolvedProps ?? {}
 })
 
-function updateCarouselStyle(key: string, value: unknown) {
-  const panel = currentPanel.value
-  if (panel.name !== 'carouselStyle' || !activeSection.value) return
-  if (panel.slot) {
-    editor.updateGroupWidgetProps(activeSection.value.id, panel.slot, { [key]: value })
-  } else {
-    editor.updateSectionProps(activeSection.value.id, { [key]: value })
-  }
-}
+const activeWidgetStyleId = computed(() => activeWidget.value?.widgetId ?? activeSection.value?.widgetId)
 
-const activeHeroStyleSchema = computed(() => {
+function updateWidgetStyle(key: string, value: unknown) {
   const panel = currentPanel.value
-  if (panel.name !== 'heroStyle') return []
-  const schema = panel.slot ? activeWidget.value?.propSchema ?? [] : activeSection.value?.propSchema ?? []
-  return schema.length ? schema : heroWidgetSchema.value
-})
-
-const activeHeroStyleValues = computed(() => {
-  const panel = currentPanel.value
-  if (panel.name !== 'heroStyle') return {}
-  return panel.slot ? activeWidget.value?.resolvedProps ?? {} : activeSection.value?.resolvedProps ?? {}
-})
-
-function updateHeroStyle(key: string, value: unknown) {
-  const panel = currentPanel.value
-  if (panel.name !== 'heroStyle' || !activeSection.value) return
+  if (panel.name !== 'widgetStyle' || !activeSection.value) return
   if (panel.slot) {
     editor.updateGroupWidgetProps(activeSection.value.id, panel.slot, { [key]: value })
   } else {
@@ -527,8 +506,7 @@ watch(
             :tenant-id="tenantId"
             @update="(key, value) => activeSection && updateSection(activeSection, key, value)"
             @open-background="(key) => activeSection && openPanel({ name: 'widgetBackground', sectionId: activeSection.id, propKey: key })"
-            @open-carousel-style="activeSection && openPanel({ name: 'carouselStyle', sectionId: activeSection.id })"
-            @open-hero-style="activeSection && openPanel({ name: 'heroStyle', sectionId: activeSection.id })"
+            @open-widget-style="activeSection && openPanel({ name: 'widgetStyle', sectionId: activeSection.id })"
           />
         </template>
 
@@ -566,28 +544,16 @@ watch(
       </section>
 
       <section
-        v-else-if="currentPanel.name === 'carouselStyle' && activeSection"
-        :key="`carousel-style-${activeSection.id}-${currentPanel.slot ?? ''}`"
+        v-else-if="currentPanel.name === 'widgetStyle' && activeSection"
+        :key="`widget-style-${activeSection.id}-${currentPanel.slot ?? ''}`"
         class="grid w-full min-w-0 gap-3 overflow-hidden"
       >
-        <CarouselStylePanel
-          :schema="activeCarouselStyleSchema"
-          :values="activeCarouselStyleValues"
+        <WidgetStylePanel
+          :schema="activeWidgetStyleSchema"
+          :values="activeWidgetStyleValues"
+          :widget-id="activeWidgetStyleId"
           :tenant-id="tenantId"
-          @update="updateCarouselStyle"
-        />
-      </section>
-
-      <section
-        v-else-if="currentPanel.name === 'heroStyle' && activeSection"
-        :key="`hero-style-${activeSection.id}-${currentPanel.slot ?? ''}`"
-        class="grid w-full min-w-0 gap-3 overflow-hidden"
-      >
-        <HeroStylePanel
-          :schema="activeHeroStyleSchema"
-          :values="activeHeroStyleValues"
-          :tenant-id="tenantId"
-          @update="updateHeroStyle"
+          @update="updateWidgetStyle"
         />
       </section>
 
@@ -621,8 +587,7 @@ watch(
           :tenant-id="tenantId"
           @update="(key, value) => activeSection && activeWidget && updateWidget(activeSection, activeWidget, key, value)"
           @open-background="(key) => activeSection && activeWidget && openPanel({ name: 'widgetBackground', sectionId: activeSection.id, slot: activeWidget.slot, propKey: key })"
-          @open-carousel-style="activeSection && activeWidget && openPanel({ name: 'carouselStyle', sectionId: activeSection.id, slot: activeWidget.slot })"
-          @open-hero-style="activeSection && activeWidget && openPanel({ name: 'heroStyle', sectionId: activeSection.id, slot: activeWidget.slot })"
+          @open-widget-style="activeSection && activeWidget && openPanel({ name: 'widgetStyle', sectionId: activeSection.id, slot: activeWidget.slot })"
         />
       </section>
 

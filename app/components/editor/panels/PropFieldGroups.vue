@@ -11,8 +11,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   update: [key: string, value: unknown]
   openBackground: [key: string]
-  openCarouselStyle: []
-  openHeroStyle: []
+  openWidgetStyle: []
 }>()
 
 const resolvedValues = computed(() => props.values ?? {})
@@ -33,25 +32,25 @@ function isVisible(field: WidgetPropSchema) {
 // the template) — never inside the top grid or a group accordion — so they open
 // the slide-in picker in one click, matching the section-background row.
 const isBackgroundField = (field: WidgetPropSchema) => field.type === 'background'
-const isCarouselField = computed(() => props.widgetId === 'carousel')
+const styleGroups = new Set(['Style', 'Display', 'Texture', 'Image', 'Card', 'Appearance', 'Layout'])
+const hasVariantStyle = computed(() => props.schema.some(field => field.key === 'variant'))
 const carouselStyleFieldKeys = new Set(['variant', 'accent', 'align', 'slidesPerView', 'imageRatio', 'showCta', 'showArrows', 'showDots', 'loop', 'autoplay', 'autoplaySpeed'])
-const isCarouselStyleField = (field: WidgetPropSchema) => isCarouselField.value && carouselStyleFieldKeys.has(field.key)
-const isHeroField = computed(() => props.widgetId === 'hero')
 const heroStyleFieldKeys = new Set(['variant', 'align', 'imageUrl', 'overlayOpacity', 'textTone', 'texture', 'spotlightCardBg', 'spotlightCardOpacity', 'spotlightCardBlur'])
-const isHeroStyleField = (field: WidgetPropSchema) => isHeroField.value && heroStyleFieldKeys.has(field.key)
-const isWidgetStyleField = (field: WidgetPropSchema) => isCarouselStyleField(field) || isHeroStyleField(field)
+const isWidgetStyleField = (field: WidgetPropSchema) => {
+  if (!hasVariantStyle.value) return false
+  if (field.key === 'variant') return true
+  if (field.type === 'background') return false
+  if (props.widgetId === 'carousel' && carouselStyleFieldKeys.has(field.key)) return true
+  if (props.widgetId === 'hero' && heroStyleFieldKeys.has(field.key)) return true
+  return Boolean(field.group && styleGroups.has(field.group))
+}
 
 // Fields without a group render at the top, always open.
 const ungroupedFields = computed(() => props.schema.filter(field => !field.group && !isBackgroundField(field) && !isWidgetStyleField(field)))
-const carouselVariantField = computed(() => props.schema.find(field => isCarouselStyleField(field) && field.key === 'variant'))
-const carouselVariantLabel = computed(() => {
-  const value = String(resolvedValues.value.variant ?? carouselVariantField.value?.default ?? 'single-slide')
-  return carouselVariantField.value?.options?.find(option => option.value === value)?.label ?? 'Hero slide'
-})
-const heroVariantField = computed(() => props.schema.find(field => isHeroStyleField(field) && field.key === 'variant'))
-const heroVariantLabel = computed(() => {
-  const value = String(resolvedValues.value.variant ?? heroVariantField.value?.default ?? 'with-buttons')
-  return heroVariantField.value?.options?.find(option => option.value === value)?.label?.split(' — ')[0] ?? 'Action'
+const variantField = computed(() => props.schema.find(field => field.key === 'variant'))
+const variantLabel = computed(() => {
+  const value = String(resolvedValues.value.variant ?? variantField.value?.default ?? '')
+  return variantField.value?.options?.find(option => option.value === value)?.label?.split(' — ')[0] ?? 'Style'
 })
 
 // Groups in first-appearance order that have at least one visible field.
@@ -116,30 +115,14 @@ function spanClass(field: WidgetPropSchema) {
     </div>
 
     <button
-      v-if="isCarouselField && carouselVariantField"
+      v-if="hasVariantStyle && variantField"
       type="button"
       class="flex w-full min-w-0 items-center justify-between gap-2 rounded-md border border-muted px-3 py-2.5 text-sm font-medium text-default transition-colors hover:bg-elevated/50"
-      @click="emit('openCarouselStyle')"
+      @click="emit('openWidgetStyle')"
     >
       <span class="truncate">Style</span>
       <span class="flex shrink-0 items-center gap-2">
-        <span class="text-xs font-normal text-muted">{{ carouselVariantLabel }}</span>
-        <UIcon
-          name="i-lucide-chevron-right"
-          class="size-4 text-muted"
-        />
-      </span>
-    </button>
-
-    <button
-      v-if="isHeroField && heroVariantField"
-      type="button"
-      class="flex w-full min-w-0 items-center justify-between gap-2 rounded-md border border-muted px-3 py-2.5 text-sm font-medium text-default transition-colors hover:bg-elevated/50"
-      @click="emit('openHeroStyle')"
-    >
-      <span class="truncate">Style</span>
-      <span class="flex shrink-0 items-center gap-2">
-        <span class="text-xs font-normal text-muted">{{ heroVariantLabel }}</span>
+        <span class="text-xs font-normal text-muted">{{ variantLabel }}</span>
         <UIcon
           name="i-lucide-chevron-right"
           class="size-4 text-muted"
