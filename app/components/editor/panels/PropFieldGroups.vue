@@ -12,6 +12,7 @@ const emit = defineEmits<{
   update: [key: string, value: unknown]
   openBackground: [key: string]
   openCarouselStyle: []
+  openHeroStyle: []
 }>()
 
 const resolvedValues = computed(() => props.values ?? {})
@@ -35,13 +36,22 @@ const isBackgroundField = (field: WidgetPropSchema) => field.type === 'backgroun
 const isCarouselField = computed(() => props.widgetId === 'carousel')
 const carouselStyleFieldKeys = new Set(['variant', 'accent', 'align', 'slidesPerView', 'imageRatio', 'showCta', 'showArrows', 'showDots', 'loop', 'autoplay', 'autoplaySpeed'])
 const isCarouselStyleField = (field: WidgetPropSchema) => isCarouselField.value && carouselStyleFieldKeys.has(field.key)
+const isHeroField = computed(() => props.widgetId === 'hero')
+const heroStyleFieldKeys = new Set(['variant', 'align', 'imageUrl', 'overlayOpacity', 'textTone', 'texture', 'spotlightCardBg', 'spotlightCardOpacity', 'spotlightCardBlur'])
+const isHeroStyleField = (field: WidgetPropSchema) => isHeroField.value && heroStyleFieldKeys.has(field.key)
+const isWidgetStyleField = (field: WidgetPropSchema) => isCarouselStyleField(field) || isHeroStyleField(field)
 
 // Fields without a group render at the top, always open.
-const ungroupedFields = computed(() => props.schema.filter(field => !field.group && !isBackgroundField(field) && !isCarouselStyleField(field)))
+const ungroupedFields = computed(() => props.schema.filter(field => !field.group && !isBackgroundField(field) && !isWidgetStyleField(field)))
 const carouselVariantField = computed(() => props.schema.find(field => isCarouselStyleField(field) && field.key === 'variant'))
 const carouselVariantLabel = computed(() => {
   const value = String(resolvedValues.value.variant ?? carouselVariantField.value?.default ?? 'single-slide')
   return carouselVariantField.value?.options?.find(option => option.value === value)?.label ?? 'Hero slide'
+})
+const heroVariantField = computed(() => props.schema.find(field => isHeroStyleField(field) && field.key === 'variant'))
+const heroVariantLabel = computed(() => {
+  const value = String(resolvedValues.value.variant ?? heroVariantField.value?.default ?? 'with-buttons')
+  return heroVariantField.value?.options?.find(option => option.value === value)?.label?.split(' — ')[0] ?? 'Action'
 })
 
 // Groups in first-appearance order that have at least one visible field.
@@ -50,7 +60,7 @@ const groups = computed(() => {
   const byName = new Map<string, WidgetPropSchema[]>()
 
   for (const field of props.schema) {
-    if (!field.group || isBackgroundField(field) || isCarouselStyleField(field)) continue
+    if (!field.group || isBackgroundField(field) || isWidgetStyleField(field)) continue
     if (!byName.has(field.group)) {
       byName.set(field.group, [])
       order.push(field.group)
@@ -114,6 +124,22 @@ function spanClass(field: WidgetPropSchema) {
       <span class="truncate">Style</span>
       <span class="flex shrink-0 items-center gap-2">
         <span class="text-xs font-normal text-muted">{{ carouselVariantLabel }}</span>
+        <UIcon
+          name="i-lucide-chevron-right"
+          class="size-4 text-muted"
+        />
+      </span>
+    </button>
+
+    <button
+      v-if="isHeroField && heroVariantField"
+      type="button"
+      class="flex w-full min-w-0 items-center justify-between gap-2 rounded-md border border-muted px-3 py-2.5 text-sm font-medium text-default transition-colors hover:bg-elevated/50"
+      @click="emit('openHeroStyle')"
+    >
+      <span class="truncate">Style</span>
+      <span class="flex shrink-0 items-center gap-2">
+        <span class="text-xs font-normal text-muted">{{ heroVariantLabel }}</span>
         <UIcon
           name="i-lucide-chevron-right"
           class="size-4 text-muted"
