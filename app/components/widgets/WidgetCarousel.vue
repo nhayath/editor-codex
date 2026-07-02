@@ -68,6 +68,45 @@ interface FeatureSlide {
   i?: number
 }
 
+function isMediaUrl(value: string) {
+  return /^(https?:\/\/|\/|data:image\/|blob:)/.test(value) || /\.(avif|gif|jpe?g|png|svg|webp)(\?.*)?$/i.test(value)
+}
+
+function normaliseFeatureRow(row: string[]): Omit<FeatureSlide, 'i'> {
+  const panel = (row[0] ?? 'none').toLowerCase()
+
+  // If the generic 5-column slide editor saved data while the feature variant
+  // was selected, the image URL lands in the title column. Recover that shape
+  // as a text-only feature slide with the image promoted to the panel bg.
+  if (!['prayer', 'donation', 'events', 'none'].includes(panel) && isMediaUrl(row[2] ?? '')) {
+    return {
+      panel: 'none',
+      eyebrow: '',
+      title: row[0] ?? '',
+      arabic: '',
+      translation: row[1] ?? '',
+      reference: '',
+      link: row[3] ?? '',
+      buttonLabel: row[4] ?? '',
+      bg: `image:${row[2]}`,
+      tint: ''
+    }
+  }
+
+  return {
+    panel,
+    eyebrow: row[1] ?? '',
+    title: row[2] ?? '',
+    arabic: row[3] ?? '',
+    translation: row[4] ?? '',
+    reference: row[5] ?? '',
+    link: row[6] ?? '',
+    buttonLabel: row[7] ?? '',
+    bg: row[8] ?? '',
+    tint: row[9] ?? ''
+  }
+}
+
 const featureFallback: FeatureSlide[] = [
   {
     panel: 'prayer',
@@ -111,18 +150,7 @@ const featureItems = computed<FeatureSlide[]>(() => {
   const parsed = parsePipeRows(props.slides, 10)
   const base = !parsed.length
     ? featureFallback
-    : parsed.map(row => ({
-        panel: (row[0] ?? 'none').toLowerCase(),
-        eyebrow: row[1] ?? '',
-        title: row[2] ?? '',
-        arabic: row[3] ?? '',
-        translation: row[4] ?? '',
-        reference: row[5] ?? '',
-        link: row[6] ?? '',
-        buttonLabel: row[7] ?? '',
-        bg: row[8] ?? '',
-        tint: row[9] ?? ''
-      }))
+    : parsed.map(normaliseFeatureRow)
   return base.map((slide, i) => ({ ...slide, i }))
 })
 

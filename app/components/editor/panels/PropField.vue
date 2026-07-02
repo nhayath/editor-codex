@@ -68,6 +68,8 @@ const colorValue = computed({
   set: next => emit('update:modelValue', next)
 })
 
+const usesFeatureSlideEditor = computed(() => props.field.key === 'slides' && props.values?.variant === 'feature')
+
 const patternItems = computed(() => {
   const options = props.field.options?.length
     ? props.field.options
@@ -270,6 +272,12 @@ const richtextBubble = [
 
     <GalleryImagePicker
       v-else-if="field.type === 'images'"
+      v-model="stringValue"
+      :tenant-id="tenantId"
+    />
+
+    <FeaturePanelPicker
+      v-else-if="usesFeatureSlideEditor"
       v-model="stringValue"
       :tenant-id="tenantId"
     />
