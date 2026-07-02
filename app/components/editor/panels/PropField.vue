@@ -34,7 +34,10 @@ const numberValue = computed({
 })
 
 const booleanValue = computed({
-  get: () => Boolean(value.value),
+  get: () => {
+    if (typeof value.value === 'string') return value.value !== 'false' && value.value !== '0'
+    return Boolean(value.value)
+  },
   set: next => emit('update:modelValue', next)
 })
 

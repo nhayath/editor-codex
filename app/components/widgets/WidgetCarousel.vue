@@ -253,6 +253,17 @@ const imageRatioClass = computed(() => {
   }
 })
 
+function enabled(value: unknown) {
+  if (typeof value === 'string') return value !== 'false' && value !== '0'
+  return value !== false
+}
+
+const showSlideCta = computed(() => enabled(props.showCta))
+const showCarouselArrows = computed(() => enabled(props.showArrows))
+const showCarouselDots = computed(() => enabled(props.showDots))
+const carouselLoops = computed(() => enabled(props.loop))
+const carouselAutoplays = computed(() => enabled(props.autoplay))
+
 const basisClass = computed(() => {
   // Hero / split / minimal are always one slide at a time.
   if (props.variant === 'single-slide' || props.variant === 'split' || props.variant === 'minimal' || props.variant === 'feature') {
@@ -265,16 +276,28 @@ const basisClass = computed(() => {
   }
 })
 
-const autoplayConfig = computed(() => props.autoplay ? { delay: Math.max(1500, props.autoplaySpeed) } : false)
+const carouselUi = computed(() => ({
+  item: basisClass.value,
+  viewport: 'overflow-hidden rounded-lg',
+  container: props.variant === 'feature' ? 'items-stretch' : undefined,
+  controls: 'relative mt-4 min-h-3',
+  arrows: '',
+  prev: 'start-3 top-1/2 -translate-y-1/2 bg-default/90 shadow-sm ring ring-default',
+  next: 'end-3 top-1/2 -translate-y-1/2 bg-default/90 shadow-sm ring ring-default',
+  dots: 'static flex flex-wrap items-center justify-center gap-3',
+  dot: 'size-2.5'
+}))
+
+const autoplayConfig = computed(() => carouselAutoplays.value ? { delay: Math.max(1500, props.autoplaySpeed) } : false)
 
 function slideHref(item: Slide) {
-  return props.showCta && item.link ? item.link : undefined
+  return showSlideCta.value && item.link ? item.link : undefined
 }
 </script>
 
 <template>
   <div
-    class="@container grid h-full gap-6 overflow-hidden"
+    class="@container grid h-full gap-6"
     :class="[isTheme ? '' : 'rounded-2xl p-8', presentation.className]"
     :style="containerStyle"
     data-testid="carousel-widget"
@@ -295,12 +318,12 @@ function slideHref(item: Slide) {
     <UCarousel
       v-slot="{ item }"
       :items="variant === 'feature' ? featureItems : items"
-      :arrows="showArrows"
-      :dots="showDots"
-      :loop="loop"
+      :arrows="showCarouselArrows"
+      :dots="showCarouselDots"
+      :loop="carouselLoops"
       :autoplay="autoplayConfig"
-      :ui="variant === 'feature' ? { item: basisClass, container: 'items-stretch' } : { item: basisClass }"
-      class="min-w-0 overflow-hidden rounded-lg"
+      :ui="carouselUi"
+      class="min-w-0 rounded-lg"
     >
       <!-- Feature: ayah / message panel paired with a live widget, on an
            alternating dark, geometric-patterned panel (equal height). -->
@@ -341,7 +364,7 @@ function slideHref(item: Slide) {
               {{ item.reference }}
             </p>
             <a
-              v-if="showCta && item.link"
+              v-if="showSlideCta && item.link"
               :href="item.link"
               class="mt-1 inline-flex w-fit items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[var(--color-surface)] transition-colors hover:bg-[color:color-mix(in_srgb,var(--color-surface)_25%,transparent)]"
               style="background: rgba(255,255,255,0.16)"
