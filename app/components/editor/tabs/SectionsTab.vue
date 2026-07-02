@@ -8,6 +8,7 @@ type SectionsPanel =
   | { name: 'section', sectionId: string }
   | { name: 'sectionBackground', sectionId: string }
   | { name: 'widget', sectionId: string, slot: string }
+  | { name: 'carouselStyle', sectionId: string, slot?: string }
   // A background-typed widget prop drilled into a slide-in picker. `slot` marks a
   // group-member widget prop, `groupProp` a group-layout prop; neither → a
   // single-widget section prop.
@@ -41,6 +42,7 @@ const panelTitle = computed(() => {
   if (currentPanel.value.name === 'root') return 'Sections'
   if (currentPanel.value.name === 'widgetPicker') return 'Add widget'
   if (currentPanel.value.name === 'widget') return activeWidget.value?.name ?? activeWidget.value?.widgetId ?? 'Widget'
+  if (currentPanel.value.name === 'carouselStyle') return 'Style'
   if (currentPanel.value.name === 'sectionBackground') return 'Section background'
   if (currentPanel.value.name === 'widgetBackground') return 'Background'
   return activeSection.value?.title ?? activeSection.value?.name ?? activeSection.value?.id ?? 'Section'
@@ -149,6 +151,31 @@ const backgroundPanelKey = computed(() => {
     ? `${panel.sectionId}-${panel.slot ?? ''}-${panel.groupProp ? 'group' : ''}-${panel.propKey}`
     : ''
 })
+
+const carouselWidgetSchema = computed(() => widgetRegistry.widgets.value.find(widget => widget.id === 'carousel')?.propSchema ?? [])
+
+const activeCarouselStyleSchema = computed(() => {
+  const panel = currentPanel.value
+  if (panel.name !== 'carouselStyle') return []
+  const schema = panel.slot ? activeWidget.value?.propSchema ?? [] : activeSection.value?.propSchema ?? []
+  return schema.length ? schema : carouselWidgetSchema.value
+})
+
+const activeCarouselStyleValues = computed(() => {
+  const panel = currentPanel.value
+  if (panel.name !== 'carouselStyle') return {}
+  return panel.slot ? activeWidget.value?.resolvedProps ?? {} : activeSection.value?.resolvedProps ?? {}
+})
+
+function updateCarouselStyle(key: string, value: unknown) {
+  const panel = currentPanel.value
+  if (panel.name !== 'carouselStyle' || !activeSection.value) return
+  if (panel.slot) {
+    editor.updateGroupWidgetProps(activeSection.value.id, panel.slot, { [key]: value })
+  } else {
+    editor.updateSectionProps(activeSection.value.id, { [key]: value })
+  }
+}
 
 function updateWidgetBackground(value: SurfaceBackgroundConfig | null) {
   const panel = currentPanel.value
@@ -470,9 +497,11 @@ watch(
           <PropFieldGroups
             :schema="activeSection.propSchema ?? []"
             :values="activeSection.resolvedProps"
+            :widget-id="activeSection.widgetId"
             :tenant-id="tenantId"
             @update="(key, value) => activeSection && updateSection(activeSection, key, value)"
             @open-background="(key) => activeSection && openPanel({ name: 'widgetBackground', sectionId: activeSection.id, propKey: key })"
+            @open-carousel-style="activeSection && openPanel({ name: 'carouselStyle', sectionId: activeSection.id })"
           />
         </template>
 
@@ -510,6 +539,19 @@ watch(
       </section>
 
       <section
+        v-else-if="currentPanel.name === 'carouselStyle' && activeSection"
+        :key="`carousel-style-${activeSection.id}-${currentPanel.slot ?? ''}`"
+        class="grid w-full min-w-0 gap-3 overflow-hidden"
+      >
+        <CarouselStylePanel
+          :schema="activeCarouselStyleSchema"
+          :values="activeCarouselStyleValues"
+          :tenant-id="tenantId"
+          @update="updateCarouselStyle"
+        />
+      </section>
+
+      <section
         v-else-if="currentPanel.name === 'widgetBackground' && activeSection"
         :key="`widget-bg-${backgroundPanelKey}`"
         class="grid w-full min-w-0 gap-3 overflow-hidden"
@@ -535,9 +577,11 @@ watch(
         <PropFieldGroups
           :schema="activeWidget.propSchema ?? []"
           :values="activeWidget.resolvedProps"
+          :widget-id="activeWidget.widgetId"
           :tenant-id="tenantId"
           @update="(key, value) => activeSection && activeWidget && updateWidget(activeSection, activeWidget, key, value)"
           @open-background="(key) => activeSection && activeWidget && openPanel({ name: 'widgetBackground', sectionId: activeSection.id, slot: activeWidget.slot, propKey: key })"
+          @open-carousel-style="activeSection && activeWidget && openPanel({ name: 'carouselStyle', sectionId: activeSection.id, slot: activeWidget.slot })"
         />
       </section>
 

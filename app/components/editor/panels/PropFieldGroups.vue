@@ -5,11 +5,13 @@ const props = defineProps<{
   schema: WidgetPropSchema[]
   values?: Record<string, unknown>
   tenantId?: string
+  widgetId?: string
 }>()
 
 const emit = defineEmits<{
   update: [key: string, value: unknown]
   openBackground: [key: string]
+  openCarouselStyle: []
 }>()
 
 const resolvedValues = computed(() => props.values ?? {})
@@ -30,9 +32,17 @@ function isVisible(field: WidgetPropSchema) {
 // the template) — never inside the top grid or a group accordion — so they open
 // the slide-in picker in one click, matching the section-background row.
 const isBackgroundField = (field: WidgetPropSchema) => field.type === 'background'
+const isCarouselField = computed(() => props.widgetId === 'carousel')
+const carouselStyleFieldKeys = new Set(['variant', 'accent', 'align', 'slidesPerView', 'imageRatio', 'showCta', 'showArrows', 'showDots', 'loop', 'autoplay', 'autoplaySpeed'])
+const isCarouselStyleField = (field: WidgetPropSchema) => isCarouselField.value && carouselStyleFieldKeys.has(field.key)
 
 // Fields without a group render at the top, always open.
-const ungroupedFields = computed(() => props.schema.filter(field => !field.group && !isBackgroundField(field)))
+const ungroupedFields = computed(() => props.schema.filter(field => !field.group && !isBackgroundField(field) && !isCarouselStyleField(field)))
+const carouselVariantField = computed(() => props.schema.find(field => isCarouselStyleField(field) && field.key === 'variant'))
+const carouselVariantLabel = computed(() => {
+  const value = String(resolvedValues.value.variant ?? carouselVariantField.value?.default ?? 'single-slide')
+  return carouselVariantField.value?.options?.find(option => option.value === value)?.label ?? 'Hero slide'
+})
 
 // Groups in first-appearance order that have at least one visible field.
 const groups = computed(() => {
@@ -40,7 +50,7 @@ const groups = computed(() => {
   const byName = new Map<string, WidgetPropSchema[]>()
 
   for (const field of props.schema) {
-    if (!field.group || isBackgroundField(field)) continue
+    if (!field.group || isBackgroundField(field) || isCarouselStyleField(field)) continue
     if (!byName.has(field.group)) {
       byName.set(field.group, [])
       order.push(field.group)
@@ -94,6 +104,22 @@ function spanClass(field: WidgetPropSchema) {
         @open-background="emit('openBackground', field.key)"
       />
     </div>
+
+    <button
+      v-if="isCarouselField && carouselVariantField"
+      type="button"
+      class="flex w-full min-w-0 items-center justify-between gap-2 rounded-md border border-muted px-3 py-2.5 text-sm font-medium text-default transition-colors hover:bg-elevated/50"
+      @click="emit('openCarouselStyle')"
+    >
+      <span class="truncate">Style</span>
+      <span class="flex shrink-0 items-center gap-2">
+        <span class="text-xs font-normal text-muted">{{ carouselVariantLabel }}</span>
+        <UIcon
+          name="i-lucide-chevron-right"
+          class="size-4 text-muted"
+        />
+      </span>
+    </button>
 
     <div
       v-for="(group, index) in groups"
