@@ -40,7 +40,7 @@ export const carouselWidget: WidgetDefinition = {
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
     ] },
-    { key: 'slidesPerView', label: 'Slides per view', type: 'select', default: '1', group: 'Display', span: 'half', showWhen: { key: 'variant', value: ['multi-slide', 'cards'] }, options: [
+    { key: 'slidesPerView', label: 'Slides per view', type: 'select', default: '3', group: 'Display', span: 'half', showWhen: { key: 'variant', value: ['multi-slide', 'cards'] }, options: [
       { label: '1', value: '1' },
       { label: '2', value: '2' },
       { label: '3', value: '3' }

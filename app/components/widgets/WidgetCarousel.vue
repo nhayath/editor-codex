@@ -295,12 +295,12 @@ const carouselAutoplays = computed(() => enabled(props.autoplay))
 const basisClass = computed(() => {
   // Hero / split / minimal are always one slide at a time.
   if (props.variant === 'single-slide' || props.variant === 'split' || props.variant === 'minimal' || props.variant === 'feature') {
-    return 'basis-full'
+    return 'min-w-0 shrink-0 basis-full'
   }
   switch (props.slidesPerView) {
-    case '3': return 'basis-full @md:basis-1/2 @2xl:basis-1/3'
-    case '2': return 'basis-full @xl:basis-1/2'
-    default: return 'basis-full'
+    case '1': return 'min-w-0 shrink-0 basis-full'
+    case '2': return 'min-w-0 shrink-0 basis-full @xl:basis-1/2'
+    default: return 'min-w-0 shrink-0 basis-full @md:basis-1/2 @2xl:basis-1/3'
   }
 })
 
