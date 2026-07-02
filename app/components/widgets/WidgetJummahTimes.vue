@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import type { SurfaceBackgroundConfig } from '~~/types/template'
+
 const props = withDefaults(defineProps<{
   title?: string
   subtitle?: string
   variant?: string
   accent?: string
-  background?: string
+  background?: SurfaceBackgroundConfig | string
   align?: string
   showIcon?: boolean
   showLabel?: boolean
@@ -17,7 +19,7 @@ const props = withDefaults(defineProps<{
   subtitle: '',
   variant: 'card',
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   align: 'left',
   showIcon: true,
   showLabel: true,
@@ -133,7 +135,6 @@ const contextNote = computed(() => {
   return 'This Friday'
 })
 
-// Accent + background system, mirrored from the prayer widgets for consistency.
 const accentVar = computed(() => {
   switch (props.accent) {
     case 'soft': return 'var(--color-secondary)'
@@ -142,37 +143,49 @@ const accentVar = computed(() => {
   }
 })
 
-// `solid`/`gradient` are filled (white text); `surface` is a light card.
-const isFilled = computed(() => props.background !== 'surface')
-
-const containerStyle = computed(() => {
-  if (props.background === 'surface') {
-    return {
-      background: 'var(--color-surface)',
-      boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)`
-    }
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
   }
-  if (props.background === 'gradient') {
-    return {
-      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
-    }
-  }
-  return { background: accentVar.value }
 })
 
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.75)' : 'var(--color-text-muted)')
-const timeColor = computed(() => isFilled.value ? '#fff' : accentVar.value)
-const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
-const railColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.3)' : 'color-mix(in srgb, var(--color-text) 18%, transparent)')
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  patternStyle,
+  useLightText,
+  headingColor,
+  mutedColor,
+  accentTextColor,
+  hairlineColor
+} = surface
+
+const containerStyle = computed(() => {
+  if (!isTheme.value) return presentation.value.style
+  return {
+    background: 'var(--color-surface)',
+    boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)',
+    ...patternStyle.value
+  }
+})
+
+const timeColor = computed(() => useLightText.value ? '#fff' : accentVar.value)
+const railColor = computed(() => useLightText.value ? 'rgba(255,255,255,0.3)' : 'color-mix(in srgb, var(--color-text) 18%, transparent)')
 
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 
 function highlightStyle(row: JummahRow) {
   if (!row.isNext) return {}
   return {
-    background: isFilled.value
+    background: useLightText.value
       ? 'rgba(255,255,255,0.15)'
       : `color-mix(in srgb, ${accentVar.value} 8%, var(--color-surface))`
   }
@@ -182,6 +195,7 @@ function highlightStyle(row: JummahRow) {
 <template>
   <div
     class="@container h-full overflow-hidden rounded-lg p-6"
+    :class="presentation.className"
     :style="containerStyle"
   >
     <!-- Header -->
@@ -211,7 +225,7 @@ function highlightStyle(row: JummahRow) {
     <template v-else-if="variant === 'feature'">
       <div
         class="rounded-lg p-5"
-        :style="isFilled
+        :style="useLightText
           ? { background: 'rgba(255,255,255,0.12)' }
           : { background: `color-mix(in srgb, ${accentVar} 7%, var(--color-surface))`, boxShadow: `inset 0 0 0 1px ${hairlineColor}` }"
       >

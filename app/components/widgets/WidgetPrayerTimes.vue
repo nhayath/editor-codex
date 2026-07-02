@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { SurfaceBackgroundConfig } from '~~/types/template'
+
 const props = withDefaults(defineProps<{
   title?: string
   variant?: string
@@ -7,7 +9,7 @@ const props = withDefaults(defineProps<{
   showIcons?: boolean
   highlightNext?: boolean
   accent?: string
-  background?: string
+  background?: SurfaceBackgroundConfig | string
   align?: string
   scheduleLabel?: string
   scheduleHref?: string
@@ -20,7 +22,7 @@ const props = withDefaults(defineProps<{
   showIcons: true,
   highlightNext: true,
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   align: 'left',
   scheduleLabel: 'Full schedule',
   scheduleHref: '',
@@ -90,9 +92,6 @@ function isActive(name: string) {
   return name === nextName.value
 }
 
-// Accent + background system, mirrored from the sibling prayer widgets so the
-// three read as one family. `solid`/`gradient` are filled (white text);
-// `surface` is the legacy light themed card.
 const accentVar = computed(() => {
   switch (props.accent) {
     case 'soft': return 'var(--color-secondary)'
@@ -101,39 +100,52 @@ const accentVar = computed(() => {
   }
 })
 
-const isFilled = computed(() => props.background !== 'surface')
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
+  }
+})
+
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  patternStyle,
+  useLightText,
+  headingColor,
+  mutedColor,
+  accentTextColor,
+  hairlineColor
+} = surface
 
 const containerStyle = computed(() => {
-  if (props.background === 'gradient') {
-    return {
-      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
-    }
-  }
-  if (props.background === 'solid') {
-    return { background: accentVar.value }
-  }
-  // surface = legacy light card (a faint accent tint when accent === 'soft').
+  if (!isTheme.value) return presentation.value.style
+  // Theme = legacy light card (a faint accent tint when accent === 'soft').
   return {
     background: props.accent === 'soft'
       ? 'color-mix(in srgb, var(--color-secondary) 6%, var(--color-surface))'
       : 'var(--color-surface)',
-    boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)'
+    boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)',
+    ...patternStyle.value
   }
 })
 
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.75)' : 'var(--color-text-muted)')
-const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
-const zebraColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.06)' : 'color-mix(in srgb, var(--color-text) 3%, transparent)')
+const zebraColor = computed(() => useLightText.value ? 'rgba(255,255,255,0.06)' : 'color-mix(in srgb, var(--color-text) 3%, transparent)')
 
 // Highlight styling for the next prayer.
-const activeBg = computed(() => isFilled.value
+const activeBg = computed(() => useLightText.value
   ? 'rgba(255,255,255,0.16)'
   : `color-mix(in srgb, ${accentVar.value} 8%, var(--color-surface))`)
-const activeBorder = computed(() => isFilled.value ? 'rgba(255,255,255,0.55)' : accentVar.value)
+const activeBorder = computed(() => useLightText.value ? 'rgba(255,255,255,0.55)' : accentVar.value)
 // "Next" pill: inverted so it stands out on either scheme.
-const nextBadgeStyle = computed(() => isFilled.value
+const nextBadgeStyle = computed(() => useLightText.value
   ? { background: '#fff', color: accentVar.value }
   : { background: accentVar.value, color: '#fff' })
 
@@ -149,6 +161,7 @@ const stripRows = computed(() => rows.value.filter(row => row.isPrayer))
   <div
     v-if="variant === 'strip'"
     class="@container overflow-hidden rounded-lg px-4 py-3.5 @md:px-6"
+    :class="presentation.className"
     :style="containerStyle"
   >
     <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
@@ -199,6 +212,7 @@ const stripRows = computed(() => rows.value.filter(row => row.isPrayer))
   <div
     v-else
     class="@container h-full overflow-hidden rounded-lg p-6"
+    :class="presentation.className"
     :style="containerStyle"
   >
     <div class="mb-5 flex flex-wrap items-start justify-between gap-3" :class="alignClass">

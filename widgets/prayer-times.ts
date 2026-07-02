@@ -29,11 +29,7 @@ export const prayerTimesWidget: WidgetDefinition = {
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', default: 'surface', group: 'Display', span: 'half', options: [
-      { label: 'Surface', value: 'surface' },
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' }
-    ] },
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' } },
     { key: 'align', label: 'Alignment', type: 'select', default: 'left', group: 'Display', span: 'half', options: [
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
