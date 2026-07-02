@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { SurfaceBackgroundConfig } from '~~/types/template'
+
 const props = withDefaults(defineProps<{
   title?: string
   eyebrow?: string
@@ -6,7 +8,7 @@ const props = withDefaults(defineProps<{
   maxItems?: number
   showPinnedOnly?: boolean
   accent?: string
-  background?: string
+  background?: SurfaceBackgroundConfig | string
   align?: string
   columns?: string
   showImage?: boolean
@@ -21,7 +23,7 @@ const props = withDefaults(defineProps<{
   maxItems: 3,
   showPinnedOnly: false,
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   align: 'left',
   columns: '3',
   showImage: true,
@@ -66,7 +68,6 @@ const hasItems = computed(() => items.value.length > 0)
 const topItem = computed(() => items.value[0] ?? null)
 const restItems = computed(() => items.value.slice(1))
 
-// Accent + background system, mirrored from the other upgraded widgets.
 const accentVar = computed(() => {
   switch (props.accent) {
     case 'soft': return 'var(--color-secondary)'
@@ -75,43 +76,58 @@ const accentVar = computed(() => {
   }
 })
 
-const isFilled = computed(() => props.background !== 'surface')
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
+  }
+})
+
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  patternStyle,
+  useLightText,
+  headingColor,
+  mutedColor,
+  accentTextColor,
+  hairlineColor
+} = surface
 
 // Banner/ticker are inherently "bars" and always need an opaque surface; the
 // card-grid variants keep the legacy transparent section on `surface`.
 const isBar = computed(() => props.variant === 'banner' || props.variant === 'ticker')
 // The root carries a real background when filled or when it's a bar variant;
 // otherwise the card-grid variants keep the legacy transparent section.
-const rootHasBackground = computed(() => isFilled.value || isBar.value)
+const rootHasBackground = computed(() => !isTheme.value || isBar.value)
 
 const containerStyle = computed(() => {
-  if (!rootHasBackground.value) return {}
-  if (props.background === 'gradient') {
-    return { background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))` }
-  }
-  if (props.background === 'solid') {
-    return { background: accentVar.value }
-  }
-  // surface bar: opaque card so the bar reads as a distinct strip
+  if (!isTheme.value) return presentation.value.style
+  if (!isBar.value) return patternStyle.value
+  // Theme bar: opaque card so the bar reads as a distinct strip.
   return {
     background: 'var(--color-surface)',
-    boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)'
+    boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)',
+    ...patternStyle.value
   }
 })
 
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.78)' : 'var(--color-text-muted)')
-const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
-
 // Inner card surface for the cards/list/feature variants.
-const cardSurfaceStyle = computed(() => isFilled.value
+const cardSurfaceStyle = computed(() => useLightText.value
   ? { background: 'rgba(255,255,255,0.12)' }
   : { background: 'var(--color-surface)', boxShadow: `inset 0 0 0 1px ${hairlineColor.value}` })
 
 const rootClass = computed(() => {
   const cls = ['@container', 'h-full', 'overflow-hidden']
   if (rootHasBackground.value) cls.push('rounded-lg', isBar.value ? 'px-6 py-4' : 'p-6')
+  if (presentation.value.className) cls.push(presentation.value.className)
   return cls
 })
 
@@ -125,8 +141,8 @@ function hasImage(item?: Item | null) {
 function badgeStyle(item: Item) {
   if (item.isUrgent) {
     return {
-      background: isFilled.value ? 'rgba(255,255,255,0.2)' : 'color-mix(in srgb, var(--color-warning, #d97706) 16%, var(--color-surface))',
-      color: isFilled.value ? '#fff' : 'var(--color-warning, #b45309)'
+      background: useLightText.value ? 'rgba(255,255,255,0.2)' : 'color-mix(in srgb, var(--color-warning, #d97706) 16%, var(--color-surface))',
+      color: useLightText.value ? '#fff' : 'var(--color-warning, #b45309)'
     }
   }
   return { background: hairlineColor.value, color: headingColor.value }
@@ -229,7 +245,7 @@ function badgeStyle(item: Item) {
       <template v-else-if="variant === 'feature'">
         <div
           class="overflow-hidden rounded-lg"
-          :style="isFilled
+          :style="useLightText
             ? { background: 'rgba(255,255,255,0.12)' }
             : { background: `color-mix(in srgb, ${accentVar} 7%, var(--color-surface))`, boxShadow: `inset 0 0 0 1px ${hairlineColor}` }"
         >

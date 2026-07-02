@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SurfaceBackgroundConfig } from '~~/types/template'
 import { parsePipeRows } from '~~/utils/widget-content'
 
 const props = withDefaults(defineProps<{
@@ -8,7 +9,7 @@ const props = withDefaults(defineProps<{
   variant?: string
   featuredIcon?: string
   accent?: string
-  background?: string
+  background?: SurfaceBackgroundConfig | string
   align?: string
   columns?: string
   showHeaderIcon?: boolean
@@ -22,7 +23,7 @@ const props = withDefaults(defineProps<{
   variant: 'tiles',
   featuredIcon: 'islamic-mosque',
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   align: 'left',
   columns: '2',
   showHeaderIcon: true,
@@ -42,7 +43,6 @@ const hasLinks = computed(() => links.value.length > 0)
 const featuredLink = computed(() => links.value[0])
 const otherLinks = computed(() => links.value.slice(1))
 
-// ----- Shared accent / background system --------------------------------
 const accentVar = computed(() => {
   switch (props.accent) {
     case 'soft': return 'var(--color-secondary)'
@@ -51,46 +51,57 @@ const accentVar = computed(() => {
   }
 })
 
-// `solid`/`gradient` are filled (white text); `surface` is a light card.
-const isFilled = computed(() => props.background !== 'surface')
-
-const containerStyle = computed(() => {
-  if (props.background === 'surface') {
-    return {
-      background: 'var(--color-surface)',
-      boxShadow: `inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)`
-    }
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
   }
-  if (props.background === 'gradient') {
-    return {
-      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
-    }
-  }
-  return { background: accentVar.value }
 })
 
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.78)' : 'var(--color-text-muted)')
-const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  patternStyle,
+  useLightText,
+  headingColor,
+  mutedColor,
+  accentTextColor,
+  hairlineColor
+} = surface
+
+const containerStyle = computed(() => {
+  if (!isTheme.value) return presentation.value.style
+  return {
+    background: 'var(--color-surface)',
+    boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)',
+    ...patternStyle.value
+  }
+})
 
 // Header badge: legacy = tinted accent on white; filled = translucent white.
 const headerBadgeStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: 'rgba(255,255,255,0.14)', color: '#fff' }
     : { background: `color-mix(in srgb, ${accentVar.value} 12%, var(--color-surface))`, color: accentVar.value }
 )
 
 // Per-link icon badge: legacy = solid accent + white; filled = translucent.
 const iconBadgeStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: 'rgba(255,255,255,0.16)', color: '#fff' }
     : { background: accentVar.value, color: '#fff' }
 )
 
 // Card surface for tiles/rail/featured rows.
 const cardStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: 'rgba(255,255,255,0.1)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)' }
     : {
         background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))',
@@ -100,12 +111,12 @@ const cardStyle = computed(() =>
 
 // Pill buttons.
 const buttonStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: 'rgba(255,255,255,0.16)', color: '#fff' }
     : { background: `color-mix(in srgb, ${accentVar.value} 10%, var(--color-surface))`, color: accentVar.value, boxShadow: `inset 0 0 0 1px ${hairlineColor.value}` }
 )
 
-const arrowColor = computed(() => isFilled.value ? '#fff' : accentVar.value)
+const arrowColor = computed(() => useLightText.value ? '#fff' : accentVar.value)
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 
 const tilesGridClass = computed(() =>
@@ -116,7 +127,7 @@ const tilesGridClass = computed(() =>
 </script>
 
 <template>
-  <div class="@container h-full overflow-hidden rounded-lg p-6" :style="containerStyle">
+  <div class="@container h-full overflow-hidden rounded-lg p-6" :class="presentation.className" :style="containerStyle">
     <!-- Header -->
     <div class="flex items-start justify-between gap-4" :class="align === 'center' ? 'flex-col items-center text-center' : ''">
       <div>

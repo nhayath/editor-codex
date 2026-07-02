@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SurfaceBackgroundConfig } from '~~/types/template'
 import { parsePipeRows } from '~~/utils/widget-content'
 
 const props = withDefaults(defineProps<{
@@ -8,7 +9,7 @@ const props = withDefaults(defineProps<{
   imageUrls?: string
   variant?: string
   accent?: string
-  background?: string
+  background?: SurfaceBackgroundConfig | string
   align?: string
   columns?: string
   imageRatio?: string
@@ -21,7 +22,7 @@ const props = withDefaults(defineProps<{
   imageUrls: '/templates/mosque-hero-1.svg\n/templates/mosque-hero-2.svg\n/templates/mosque-hero-3.svg',
   variant: 'grid',
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   align: 'left',
   columns: '3',
   imageRatio: 'landscape',
@@ -61,22 +62,33 @@ const accentVar = computed(() => {
   }
 })
 
-const isFilled = computed(() => props.background !== 'surface')
-
-const containerStyle = computed(() => {
-  if (!isFilled.value) return {}
-  if (props.background === 'gradient') {
-    return {
-      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
-    }
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
   }
-  return { background: accentVar.value }
 })
 
-const eyebrowColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.8)' : 'var(--color-primary)')
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.78)' : 'var(--color-text-muted)')
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  patternStyle,
+  useLightText,
+  headingColor,
+  mutedColor,
+  hairlineColor
+} = surface
+
+const containerStyle = computed(() => isTheme.value ? patternStyle.value : presentation.value.style)
+
+const eyebrowColor = computed(() => useLightText.value ? 'rgba(255,255,255,0.8)' : 'var(--color-primary)')
 const headerAlignClass = computed(() => props.align === 'center' ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl')
 
 const gridColsClass = computed(() => {
@@ -159,7 +171,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     class="@container grid h-full gap-6 overflow-hidden"
-    :class="isFilled ? 'rounded-2xl p-8' : ''"
+    :class="[isTheme ? '' : 'rounded-2xl p-8', presentation.className]"
     :style="containerStyle"
     data-testid="gallery-widget"
     :data-gallery-variant="variant"
@@ -284,7 +296,7 @@ onBeforeUnmount(() => {
           v-for="(image, index) in images"
           :key="`${image.src}-${index}`"
           class="w-[78cqw] max-w-sm shrink-0 overflow-hidden rounded-xl @xl:w-80"
-          :style="{ background: isFilled ? 'rgba(255,255,255,0.1)' : 'var(--color-surface)', boxShadow: `inset 0 0 0 1px ${hairlineColor}` }"
+          :style="{ background: useLightText ? 'rgba(255,255,255,0.1)' : 'var(--color-surface)', boxShadow: `inset 0 0 0 1px ${hairlineColor}` }"
         >
           <button
             v-if="showLightbox"

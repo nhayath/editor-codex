@@ -32,11 +32,7 @@ export const contactWidget: WidgetDefinition = {
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', group: 'Display', span: 'half', default: 'surface', options: [
-      { label: 'Surface', value: 'surface' },
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' }
-    ] },
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' } },
     { key: 'align', label: 'Header alignment', type: 'select', group: 'Display', span: 'half', default: 'left', options: [
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }

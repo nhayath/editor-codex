@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import type { SurfaceBackgroundConfig } from '~~/types/template'
+
 const props = withDefaults(defineProps<{
   variant?: string
   eyebrow?: string
   title?: string
   intro?: string
   accent?: string
-  background?: string
+  background?: SurfaceBackgroundConfig | string
   align?: string
   showIcons?: boolean
   showAddress?: boolean
@@ -20,7 +22,7 @@ const props = withDefaults(defineProps<{
   title: 'Contact us',
   intro: 'Get in touch with the mosque office.',
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   align: 'left',
   showIcons: true,
   showAddress: true,
@@ -88,7 +90,6 @@ const socialItems = computed(() => [
 
 const hasContent = computed(() => contactItems.value.length > 0 || socialItems.value.length > 0)
 
-// ----- Shared accent / background system --------------------------------
 const accentVar = computed(() => {
   switch (props.accent) {
     case 'soft': return 'var(--color-secondary)'
@@ -97,31 +98,44 @@ const accentVar = computed(() => {
   }
 })
 
-const isFilled = computed(() => props.background !== 'surface')
-
-const containerStyle = computed(() => {
-  if (props.background === 'surface') {
-    return {
-      background: 'var(--color-surface)',
-      boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)'
-    }
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
   }
-  if (props.background === 'gradient') {
-    return {
-      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
-    }
-  }
-  return { background: accentVar.value }
 })
 
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.78)' : 'var(--color-text-muted)')
-const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  patternStyle,
+  useLightText,
+  headingColor,
+  mutedColor,
+  accentTextColor,
+  hairlineColor
+} = surface
+
+const containerStyle = computed(() => {
+  if (!isTheme.value) return presentation.value.style
+  return {
+    background: 'var(--color-surface)',
+    boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--color-text) 12%, transparent)',
+    ...patternStyle.value
+  }
+})
+
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 
 const panelStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: 'rgba(255,255,255,0.1)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)' }
     : {
         background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))',
@@ -130,20 +144,20 @@ const panelStyle = computed(() =>
 )
 
 const iconStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: 'rgba(255,255,255,0.14)', color: '#fff' }
     : { background: `color-mix(in srgb, ${accentVar.value} 12%, var(--color-surface))`, color: accentVar.value }
 )
 
 const primaryActionStyle = computed(() =>
-  isFilled.value
+  useLightText.value
     ? { background: '#fff', color: accentVar.value }
     : { background: accentVar.value, color: '#fff' }
 )
 </script>
 
 <template>
-  <div class="@container h-full overflow-hidden rounded-lg p-6" :style="containerStyle">
+  <div class="@container h-full overflow-hidden rounded-lg p-6" :class="presentation.className" :style="containerStyle">
     <!-- ===== CARDS ===== -->
     <template v-if="variant === 'cards'">
       <div :class="alignClass">
@@ -369,7 +383,7 @@ const primaryActionStyle = computed(() =>
             :rel="item.external ? 'noopener noreferrer' : undefined"
             class="flex min-w-0 items-start gap-2"
           >
-            <UIcon v-if="showIcons" :name="item.icon" class="mt-0.5 size-4 shrink-0" :style="{ color: accentVar }" />
+            <UIcon v-if="showIcons" :name="item.icon" class="mt-0.5 size-4 shrink-0" :style="{ color: accentTextColor }" />
             <span class="break-words">{{ item.value }}</span>
           </component>
 

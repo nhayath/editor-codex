@@ -28,18 +28,12 @@ export const announcementsWidget: WidgetDefinition = {
     { key: 'maxItems', label: 'Maximum items', type: 'number', default: 3, span: 'half' },
     { key: 'showPinnedOnly', label: 'Pinned only', type: 'toggle', default: false, span: 'half' },
 
-    // Display tuning — mirrors the shared accent/background system used by the
-    // other upgraded widgets (prayer-countdown, jummah-times, services, events).
     { key: 'accent', label: 'Accent', type: 'select', default: 'primary', group: 'Display', span: 'half', options: [
       { label: 'Primary', value: 'primary' },
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', default: 'surface', group: 'Display', span: 'half', options: [
-      { label: 'Surface', value: 'surface' },
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' }
-    ] },
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' } },
     { key: 'align', label: 'Alignment', type: 'select', default: 'left', group: 'Display', span: 'half', options: [
       { label: 'Left', value: 'left' },
       { label: 'Center', value: 'center' }
