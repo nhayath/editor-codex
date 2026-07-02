@@ -1,8 +1,86 @@
 # Session Handoff
 
-_Last updated: 2026-06-26_
+_Last updated: 2026-07-02_
 
-## CURRENT initiative: per-template visual enhancement (one template at a time)
+## CURRENT initiative: unified background system (one background for every surface)
+
+Goal: give every widget/section/page the SAME background option set (theme
+default / solid / gradient / image+overlay / **pattern overlay**) via ONE friendly
+editor (`BackgroundPicker.vue`) + ONE renderer, replacing the scattered per-widget
+`background`/`accent` selects. Non-technical-admin friendly. See the
+`unified-background-initiative` memory for the full increment log.
+
+### Mental model (READ FIRST — changed 2026-07-02)
+- **Pattern is an OVERLAY, not a base.** A background = one **base fill**
+  (`theme | solid | gradient | image`) + an OPTIONAL `pattern?: SurfacePatternOverlay`
+  (`{presetId, color?, scale, intensity}`) layered on top (like the iqamah panel).
+  Earlier it was a 5th mutually-exclusive base mode that REPLACED the fill — the
+  user flagged that as wrong; it's now orthogonal.
+- **One shape everywhere:** `PageBackgroundConfig = SurfaceBackgroundConfig` (both
+  in `types/template.ts`). The page background and every section/widget background
+  share the same type, editor, and CSS (`tenant-surface[-pattern]` /
+  `tenant-page-background[-pattern]` `::before` in `main.css`).
+- **Renderers** (`getSurfaceBackgroundPresentation`, `getPageBackgroundPresentation`
+  in `useSurfaceBackground.ts` / `usePageBackground.ts`): compute base fill from
+  `type`, THEN if `.pattern` append the `-pattern` class + `--tenant-pattern-*`
+  vars (`buildSurfacePatternVars`). Tone (contrast) derives from the BASE only.
+  `migrateSurfaceBackground()` converts legacy `{type:'pattern', baseColor,…}` →
+  `{type:'solid', color:baseColor, pattern:{…}}` at render time.
+- **Editor:** `BackgroundPicker.vue` = 4 base cards + a separate "Pattern overlay"
+  USwitch (preset grid + motif colour + size + strength) that layers on any base.
+  `ThemeTab` mounts it for the page background too; the old `PageBackgroundEditor.vue`
+  was DELETED. `useSurfaceBackground` composable exposes `patternStyle` so
+  theme-mode widgets (which paint their own chrome) still show an overlay.
+
+### DONE so far
+- **Increments 1–5:** foundation (types/CSS/`getSurfaceBackgroundPresentation`/
+  `BackgroundPicker`/section-wrapper mount + drill-in sub-panel UX), then the
+  widget-level `type:'background'` prop converted for **hero, donation-cta,
+  about-mosque, services** (recipe below). Committed (fe8769b/5671a38/d0f6404 +
+  the user's 32e3cdc).
+- **Pattern-as-overlay refactor (2026-07-02, NOT yet committed):** the mental-model
+  change above. Files: `types/template.ts`, `app/composables/usePageBackground.ts`,
+  `app/composables/useSurfaceBackground.ts`, `app/components/editor/shared/
+  BackgroundPicker.vue`, `app/components/editor/tabs/ThemeTab.vue`,
+  `utils/homepage.ts` (`normalisePageBackground`), the 3 theme-painting widgets
+  (`WidgetAboutMosque/Services/DonationCta.vue` merge `patternStyle`), and
+  **deleted** `app/components/editor/theme/PageBackgroundEditor.vue`. Typecheck 0
+  errors. QA (birmingham-central, dev, non-destructive PUT+restore): page root got
+  BOTH `background:#0b3d2e` AND `tenant-page-background-pattern`+vars (overlay, not
+  replace); legacy `{type:'pattern'}` round-tripped to solid+overlay; editor shows
+  4 base cards + Pattern overlay switch and renders the motif over the theme base;
+  0 console errors; config restored to null, dev.db `git checkout` clean.
+
+### The widget-conversion recipe (for the remaining widgets)
+1. `widgets/<id>.ts`: delete the legacy `surface/solid/gradient` (or `accent`-only)
+   background select; add `{ key:'background', label:'Background', type:'background',
+   default:{ type:'theme' } }` with **NO `group`** → it auto-renders as a bottom
+   standalone drill-in row.
+2. `Widget<X>.vue`: widen the `background` prop to `SurfaceBackgroundConfig | string`
+   + default `() => ({ type:'theme' })`; add a `normalizedBackground` computed
+   mapping legacy strings (`surface`→theme; `solid`/`gradient`→config w/ accentVar);
+   `const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })`
+   and destructure the colours you need. `containerStyle` = theme special-case
+   (own chrome **+ merge `patternStyle.value`**) else `presentation.value.style`;
+   add `presentation.className` to the root; rekey bespoke filled-vs-surface styles
+   off `useLightText`.
+3. QA: if the widget is in birmingham-central's default homepage → non-destructive
+   config PUT + restore; if NOT → add it live in the editor (in-memory, discarded
+   on reload). Verify theme/solid/gradient/image/**+pattern overlay** all render
+   with correct contrast + no 390px overflow. Typecheck. Then commit.
+
+### NEXT STEP
+1. **Commit the pattern-as-overlay refactor** (10 files, listed above) — it's done,
+   verified, and currently uncommitted. Suggested msg: `background: pattern is now
+   an overlay on any base, unified across page/section/widget`.
+2. **Increment 6 = events**, then announcements → contact → quick-links → gallery →
+   carousel → … (any remaining global widget with a legacy background/accent select
+   or a self-painted fill). Same recipe, one per pass, QA + config-restore each.
+   Verify each converts cleanly AND accepts a pattern overlay.
+
+---
+
+## PAST initiative: per-template visual enhancement (one template at a time)
 
 Make each template **more modern with Islamic touches + tasteful subtle
 animation**, great on **mobile / tablet / desktop**. User-confirmed decisions:

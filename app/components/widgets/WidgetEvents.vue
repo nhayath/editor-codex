@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import type { SurfaceBackgroundConfig } from '~~/types/template'
+
 const props = withDefaults(defineProps<{
   title?: string
   eyebrow?: string
   variant?: string
   maxItems?: number
   accent?: string
-  background?: string
+  background?: SurfaceBackgroundConfig | string
   columns?: string
   align?: string
   imageRatio?: string
@@ -21,7 +23,7 @@ const props = withDefaults(defineProps<{
   variant: 'grid',
   maxItems: 3,
   accent: 'primary',
-  background: 'surface',
+  background: () => ({ type: 'theme' }),
   columns: '3',
   align: 'left',
   imageRatio: 'landscape',
@@ -81,31 +83,47 @@ const accentVar = computed(() => {
   }
 })
 
-// `solid`/`gradient` fill the whole section (white text on an accent block).
-// `surface` keeps the legacy transparent section so existing tenants are unchanged.
-const isFilled = computed(() => props.background !== 'surface')
-
-const containerStyle = computed(() => {
-  if (!isFilled.value) return {}
-  if (props.background === 'gradient') {
-    return {
-      background: `linear-gradient(135deg, ${accentVar.value}, color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary)))`
-    }
+// Normalise legacy string backgrounds ('surface'/'solid'/'gradient') onto the
+// unified SurfaceBackgroundConfig. 'surface' → theme (the legacy transparent
+// section); the filled variants map to solid/gradient with the accent colour.
+const normalizedBackground = computed<SurfaceBackgroundConfig>(() => {
+  const bg = props.background
+  if (bg && typeof bg === 'object') return bg
+  switch (bg) {
+    case 'solid':
+      return { type: 'solid', color: accentVar.value }
+    case 'gradient':
+      return { type: 'gradient', from: accentVar.value, to: `color-mix(in srgb, ${accentVar.value} 60%, var(--color-secondary))`, angle: 135 }
+    default:
+      return { type: 'theme' }
   }
-  return { background: accentVar.value }
 })
 
-const eyebrowColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.8)' : 'var(--color-primary)')
-const headingColor = computed(() => isFilled.value ? '#fff' : 'var(--color-text)')
-const mutedColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.78)' : 'var(--color-text-muted)')
-const accentTextColor = computed(() => isFilled.value ? 'var(--color-secondary)' : accentVar.value)
-const hairlineColor = computed(() => isFilled.value ? 'rgba(255,255,255,0.22)' : 'color-mix(in srgb, var(--color-text) 12%, transparent)')
+// Contrast-correct colour set shared with every unified-background widget.
+const surface = useSurfaceBackground(normalizedBackground, { accent: accentVar })
+const {
+  presentation,
+  isTheme,
+  patternStyle,
+  useLightText,
+  headingColor,
+  mutedColor,
+  accentTextColor,
+  hairlineColor
+} = surface
 
-const cardStyle = computed(() => isFilled.value
+// Theme keeps the legacy transparent section; any fill paints via the shared
+// presentation (className carries the pattern layer when relevant). A pattern
+// overlay must still show over the theme base, so merge its CSS vars there.
+const containerStyle = computed(() => isTheme.value ? patternStyle.value : presentation.value.style)
+
+const eyebrowColor = computed(() => useLightText.value ? 'rgba(255,255,255,0.8)' : 'var(--color-primary)')
+
+const cardStyle = computed(() => useLightText.value
   ? { background: 'rgba(255,255,255,0.1)' }
   : { background: 'var(--color-surface)', boxShadow: `inset 0 0 0 1px ${hairlineColor.value}` })
 
-const imageTileStyle = computed(() => isFilled.value
+const imageTileStyle = computed(() => useLightText.value
   ? { background: 'rgba(255,255,255,0.16)', color: '#fff' }
   : { background: 'color-mix(in srgb, var(--color-primary) 12%, var(--color-surface))', color: accentVar.value })
 
@@ -135,7 +153,7 @@ const rest = computed(() => events.value.slice(1))
 <template>
   <div
     class="@container grid gap-6"
-    :class="isFilled ? 'rounded-2xl p-8' : ''"
+    :class="[isTheme ? '' : 'rounded-2xl p-8', presentation.className]"
     :style="containerStyle"
   >
     <!-- Header -->

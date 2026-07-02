@@ -32,11 +32,7 @@ export const eventsWidget: WidgetDefinition = {
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', group: 'Display', span: 'half', default: 'surface', options: [
-      { label: 'Surface', value: 'surface' },
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' }
-    ] },
+    { key: 'background', label: 'Background', type: 'background', default: { type: 'theme' } },
     { key: 'columns', label: 'Columns', type: 'select', group: 'Display', span: 'half', default: '3', options: [
       { label: '2', value: '2' },
       { label: '3', value: '3' },
