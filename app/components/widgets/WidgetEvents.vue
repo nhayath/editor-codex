@@ -145,6 +145,14 @@ const imageRatioClass = computed(() => {
   }
 })
 
+const compactImageRatioClass = computed(() => {
+  switch (props.imageRatio) {
+    case 'portrait': return 'h-20 w-[3.75rem]'
+    case 'square': return 'size-16'
+    default: return 'h-16 w-20'
+  }
+})
+
 // Feature variant: first event spotlighted, the rest beneath.
 const featured = computed(() => events.value[0] ?? null)
 const rest = computed(() => events.value.slice(1))
@@ -229,7 +237,8 @@ const rest = computed(() => events.value.slice(1))
           v-if="hasImage(featured)"
           :src="featured.imageUrl"
           :alt="featured.title"
-          class="h-full min-h-48 w-full object-cover"
+          class="w-full object-cover"
+          :class="imageRatioClass"
         >
         <div
           v-else
@@ -272,7 +281,8 @@ const rest = computed(() => events.value.slice(1))
             v-if="hasImage(event)"
             :src="event.imageUrl"
             :alt="event.title"
-            class="aspect-[4/3] w-full object-cover"
+            class="w-full object-cover"
+            :class="imageRatioClass"
           >
           <div class="p-5">
             <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
@@ -318,7 +328,8 @@ const rest = computed(() => events.value.slice(1))
           v-if="hasImage(event)"
           :src="event.imageUrl"
           :alt="event.title"
-          class="size-16 shrink-0 rounded-md object-cover"
+          class="shrink-0 rounded-md object-cover"
+          :class="compactImageRatioClass"
         >
         <div class="min-w-0 flex-1">
           <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
@@ -351,7 +362,8 @@ const rest = computed(() => events.value.slice(1))
           v-if="hasImage(event)"
           :src="event.imageUrl"
           :alt="event.title"
-          class="aspect-[4/3] w-full rounded-md object-cover"
+          class="w-full rounded-md object-cover"
+          :class="imageRatioClass"
         >
         <div>
           <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">
@@ -389,7 +401,8 @@ const rest = computed(() => events.value.slice(1))
           v-if="hasImage(event)"
           :src="event.imageUrl"
           :alt="event.title"
-          class="aspect-[4/3] w-full object-cover"
+          class="w-full object-cover"
+          :class="imageRatioClass"
         >
         <div class="p-5">
           <UBadge v-if="showCategory" color="primary" variant="soft" class="w-fit">

@@ -11,6 +11,7 @@ const props = withDefaults(defineProps<{
   background?: SurfaceBackgroundConfig | string
   align?: string
   columns?: string
+  imageRatio?: string
   showImage?: boolean
   showIcon?: boolean
   showPriorityBadge?: boolean
@@ -26,6 +27,7 @@ const props = withDefaults(defineProps<{
   background: () => ({ type: 'theme' }),
   align: 'left',
   columns: '3',
+  imageRatio: 'landscape',
   showImage: true,
   showIcon: true,
   showPriorityBadge: true,
@@ -133,6 +135,13 @@ const rootClass = computed(() => {
 
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 const cardGridClass = computed(() => props.columns === '2' ? '@xl:grid-cols-2' : '@xl:grid-cols-3')
+const imageRatioClass = computed(() => {
+  switch (props.imageRatio) {
+    case 'square': return 'aspect-square'
+    case 'portrait': return 'aspect-[3/4]'
+    default: return 'aspect-[4/3]'
+  }
+})
 
 function hasImage(item?: Item | null) {
   return props.showImage && !!item?.imageUrl
@@ -253,7 +262,8 @@ function badgeStyle(item: Item) {
             v-if="hasImage(topItem)"
             :src="topItem?.imageUrl"
             :alt="topItem?.title"
-            class="aspect-[16/7] w-full object-cover"
+            class="w-full object-cover"
+            :class="imageRatioClass"
           >
           <div class="p-5">
             <div class="flex items-start justify-between gap-3">
@@ -324,7 +334,8 @@ function badgeStyle(item: Item) {
               v-if="hasImage(item)"
               :src="item.imageUrl"
               :alt="item.title"
-              class="aspect-[4/3] w-full rounded-md object-cover"
+              class="w-full rounded-md object-cover"
+              :class="imageRatioClass"
             >
             <div>
               <div class="flex items-start justify-between gap-3">
@@ -362,7 +373,8 @@ function badgeStyle(item: Item) {
               v-if="hasImage(item)"
               :src="item.imageUrl"
               :alt="item.title"
-              class="aspect-[4/3] w-full object-cover"
+              class="w-full object-cover"
+              :class="imageRatioClass"
             >
             <div class="p-5">
               <div class="flex items-start justify-between gap-3">

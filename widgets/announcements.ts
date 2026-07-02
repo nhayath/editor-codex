@@ -42,6 +42,11 @@ export const announcementsWidget: WidgetDefinition = {
       { label: '2', value: '2' },
       { label: '3', value: '3' }
     ] },
+    { key: 'imageRatio', label: 'Image ratio', type: 'select', default: 'landscape', group: 'Display', span: 'half', showWhen: { key: 'variant', value: ['cards', 'list', 'feature'] }, options: [
+      { label: 'Landscape', value: 'landscape' },
+      { label: 'Square', value: 'square' },
+      { label: 'Portrait', value: 'portrait' }
+    ] },
     { key: 'showImage', label: 'Show images', type: 'toggle', default: true, group: 'Display', span: 'half' },
     { key: 'showIcon', label: 'Show icon', type: 'toggle', default: true, group: 'Display', span: 'half' },
     { key: 'showPriorityBadge', label: 'Show pinned/urgent badge', type: 'toggle', default: true, group: 'Display', span: 'half' },

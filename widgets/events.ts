@@ -46,7 +46,7 @@ export const eventsWidget: WidgetDefinition = {
       { label: 'Landscape', value: 'landscape' },
       { label: 'Square', value: 'square' },
       { label: 'Portrait', value: 'portrait' }
-    ], showWhen: { key: 'variant', value: ['cards', 'feature', 'agenda'] } },
+    ], showWhen: { key: 'variant', value: ['grid', 'list', 'cards', 'feature', 'agenda'] } },
     { key: 'showImage', label: 'Show images', type: 'toggle', group: 'Display', span: 'half', default: true },
     { key: 'showCategory', label: 'Show category', type: 'toggle', group: 'Display', span: 'half', default: true },
     { key: 'showDate', label: 'Show date', type: 'toggle', group: 'Display', span: 'half', default: true },
