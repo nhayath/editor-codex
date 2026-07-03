@@ -190,6 +190,7 @@ const containerStyle = computed(() => {
 // filled/dark surface so it never clashes with the fill.
 const bannerTitleColor = computed(() => useLightText.value ? '#fff' : accentVar.value)
 const bannerImageUrl = computed(() => props.imageUrl || featured.value?.imageUrl || '')
+const featuredImageUrl = computed(() => featured.value?.imageUrl || props.imageUrl || '')
 const alignClass = computed(() => props.align === 'center' ? 'text-center' : 'text-left')
 
 // Colours handed to the amount picker so it matches the filled/surface scheme.
@@ -286,9 +287,9 @@ function bannerAmountStyle(amount: number) {
         </UButton>
       </div>
 
-      <div v-if="featured?.imageUrl" class="overflow-hidden rounded-md" :style="panelStyle">
+      <div v-if="featuredImageUrl" class="overflow-hidden rounded-md" :style="panelStyle">
         <img
-          :src="featured.imageUrl"
+          :src="featuredImageUrl"
           :alt="`${featured.title ?? title} donation image`"
           class="aspect-[4/3] w-full object-cover"
         >
