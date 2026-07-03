@@ -9,6 +9,7 @@ import { announcementsWidget } from './announcements'
 // so it is intentionally NOT registered here / in the Add-widget picker.
 import { eventsWidget } from './events'
 import { donationCtaWidget } from './donation-cta'
+import { donationCampaignsWidget } from './donation-campaigns'
 import { aboutMosqueWidget } from './about-mosque'
 import { servicesWidget } from './services'
 import { galleryWidget } from './gallery'
@@ -28,6 +29,7 @@ export const widgets: WidgetDefinition[] = [
   announcementsWidget,
   eventsWidget,
   donationCtaWidget,
+  donationCampaignsWidget,
   aboutMosqueWidget,
   servicesWidget,
   galleryWidget,

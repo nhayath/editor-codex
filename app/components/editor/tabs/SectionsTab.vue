@@ -21,6 +21,7 @@ const widgetSearch = ref('')
 const sectionsPanel = ref<HTMLElement | null>(null)
 const panelStack = ref<SectionsPanel[]>([{ name: 'root' }])
 const transitionName = ref('sections-slide-forward')
+const ignoreNextBackClick = ref(false)
 
 const sections = computed<ResolvedSection[]>({
   get: () => editor.resolvedSections.value,
@@ -86,6 +87,19 @@ function goBack() {
   if (panelStack.value.length <= 1) return
   transitionName.value = 'sections-slide-back'
   panelStack.value.pop()
+}
+
+function goBackFromPointer() {
+  ignoreNextBackClick.value = true
+  goBack()
+}
+
+function goBackFromClick() {
+  if (ignoreNextBackClick.value) {
+    ignoreNextBackClick.value = false
+    return
+  }
+  goBack()
 }
 
 function openSection(section: ResolvedSection) {
@@ -281,7 +295,8 @@ watch(
         size="xs"
         icon="i-lucide-chevron-left"
         aria-label="Back"
-        @click="goBack"
+        @pointerdown.capture.prevent.stop="goBackFromPointer"
+        @click.stop="goBackFromClick"
       />
       <h2 class="truncate text-sm font-semibold text-default">
         {{ panelTitle }}

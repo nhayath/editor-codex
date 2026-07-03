@@ -8,7 +8,6 @@ export const donationCtaWidget: WidgetDefinition = {
   category: 'engagement',
   variants: [
     { id: 'banner', name: 'Banner' },
-    { id: 'cards', name: 'Cards' },
     { id: 'featured', name: 'Featured' },
     { id: 'compact', name: 'Compact' }
   ],
@@ -17,10 +16,10 @@ export const donationCtaWidget: WidgetDefinition = {
   propSchema: [
     { key: 'variant', label: 'Style', type: 'select', default: 'banner', options: [
       { label: 'Banner', value: 'banner' },
-      { label: 'Cards', value: 'cards' },
       { label: 'Featured', value: 'featured' },
       { label: 'Compact', value: 'compact' }
     ] },
+    { key: 'campaignId', label: 'Donation campaign', type: 'donation-campaign', default: '', placeholder: 'Featured or first active campaign' },
     { key: 'title', label: 'Title', type: 'text', default: 'Quick Donate' },
     { key: 'subtitle', label: 'Subtitle', type: 'textarea', default: 'Your contribution will help us to maintain and develop the wide range of services we offer.' },
     { key: 'buttonLabel', label: 'Button label', type: 'text', default: 'Donate' },

@@ -110,12 +110,12 @@ export const modernTemplate: TemplateDefinition = {
     },
     {
       id: 'donation-cta',
-      title: 'Donation CTA',
+      title: 'Donation Campaigns',
       type: 'single',
       required: false,
       removable: true,
-      widgetId: 'donation-cta',
-      defaultProps: { variant: 'cards', title: 'Give with confidence' }
+      widgetId: 'donation-campaigns',
+      defaultProps: { variant: 'grid', title: 'Give with confidence' }
     },
     {
       id: 'rich-text',

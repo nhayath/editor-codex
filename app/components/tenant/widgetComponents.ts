@@ -7,6 +7,7 @@ import WidgetJummahTimes from '~/components/widgets/WidgetJummahTimes.vue'
 import WidgetAnnouncements from '~/components/widgets/WidgetAnnouncements.vue'
 import WidgetEvents from '~/components/widgets/WidgetEvents.vue'
 import WidgetDonationCta from '~/components/widgets/WidgetDonationCta.vue'
+import WidgetDonationCampaigns from '~/components/widgets/WidgetDonationCampaigns.vue'
 import WidgetAboutMosque from '~/components/widgets/WidgetAboutMosque.vue'
 import WidgetServices from '~/components/widgets/WidgetServices.vue'
 import WidgetGallery from '~/components/widgets/WidgetGallery.vue'
@@ -37,6 +38,7 @@ export const widgetComponents: Record<string, Component> = {
   announcements: WidgetAnnouncements,
   events: WidgetEvents,
   'donation-cta': WidgetDonationCta,
+  'donation-campaigns': WidgetDonationCampaigns,
   'about-mosque': WidgetAboutMosque,
   services: WidgetServices,
   gallery: WidgetGallery,
@@ -57,6 +59,7 @@ const namedWidgetComponents: Record<string, Component> = {
   WidgetAnnouncements,
   WidgetEvents,
   WidgetDonationCta,
+  WidgetDonationCampaigns,
   WidgetAboutMosque,
   WidgetServices,
   WidgetGallery,

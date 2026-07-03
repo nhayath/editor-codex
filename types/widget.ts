@@ -7,6 +7,7 @@ export type WidgetPropType =
   | 'number'
   | 'toggle'
   | 'select'
+  | 'donation-campaign'
   | 'pattern-select'
   | 'background'
   | 'color'

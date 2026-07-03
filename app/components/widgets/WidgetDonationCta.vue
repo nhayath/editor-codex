@@ -5,6 +5,7 @@ const props = withDefaults(defineProps<{
   title?: string
   subtitle?: string
   buttonLabel?: string
+  campaignId?: string
   imageUrl?: string
   variant?: string
   eyebrow?: string
@@ -26,6 +27,7 @@ const props = withDefaults(defineProps<{
   title: 'Quick Donate',
   subtitle: 'Your contribution will help us to maintain and develop the wide range of services we offer.',
   buttonLabel: 'Donate',
+  campaignId: '',
   imageUrl: '/uploads/cmqvigb8x0001a85rnwf799wo/donation-box-7eff6832-27a0-4d13-8bba-c1990c82f698.png',
   variant: 'banner',
   eyebrow: 'Giving',
@@ -52,14 +54,18 @@ interface Campaign {
   paymentUrl?: string
   imageUrl?: string
   isFeatured?: boolean
+  status?: string
 }
 
-const campaigns = computed<Campaign[]>(() => (props.data?.donations ?? []) as Campaign[])
+const campaigns = computed<Campaign[]>(() =>
+  ((props.data?.donations ?? []) as Campaign[]).filter(campaign => !campaign.status || campaign.status === 'ACTIVE')
+)
 const featured = computed<Campaign | undefined>(
-  () => campaigns.value.find(item => item.isFeatured) ?? campaigns.value[0]
+  () => campaigns.value.find(item => item.id === props.campaignId)
+    ?? campaigns.value.find(item => item.isFeatured)
+    ?? campaigns.value[0]
 )
 const hasCampaigns = computed(() => campaigns.value.length > 0)
-const otherCampaigns = computed(() => campaigns.value.filter(c => c.id !== featured.value?.id))
 
 // ----- Donation amount selector -----------------------------------------
 // `selectedAmount` drives the donate links via `donateUrl()`. Custom input is
@@ -232,71 +238,16 @@ function bannerAmountStyle(amount: number) {
       <p class="mt-3 text-sm" :style="{ color: mutedColor }">No donation campaigns yet.</p>
     </div>
 
-    <!-- CARDS: grid of all campaigns -->
-    <div v-else-if="variant === 'cards'">
-      <div class="mb-5" :class="alignClass">
-        <p class="text-sm font-medium" :style="{ color: accentTextColor }">{{ eyebrow }}</p>
-        <h2 class="tenant-heading mt-2 text-2xl font-bold @xl:text-3xl" :style="{ color: headingColor }">{{ title }}</h2>
-        <p v-if="subtitle" class="mt-2 max-w-2xl text-sm" :class="align === 'center' ? 'mx-auto' : ''" :style="{ color: mutedColor }">{{ subtitle }}</p>
-      </div>
-
-      <DonationAmountPicker
-        v-if="showAmounts"
-        class="mb-5"
-        :presets="presets"
-        :selected="selectedAmount"
-        :custom="customAmount"
-        :allow-custom="allowCustomAmount"
-        :frequency-toggle="frequencyToggle"
-        :frequency="frequency"
-        :currency="currencySymbol"
-        :colors="pickerColors"
-        @select="selectPreset"
-        @custom="onCustomInput"
-        @frequency="frequency = $event"
-      />
-
-      <div class="grid gap-4 @md:grid-cols-2">
-        <article
-          v-for="campaign in campaigns"
-          :key="campaign.id"
-          class="rounded-md p-5"
-          :style="panelStyle"
-        >
-          <h3 class="text-lg font-semibold" :style="{ color: headingColor }">{{ campaign.title }}</h3>
-          <p v-if="campaign.description" class="mt-2 text-sm" :style="{ color: mutedColor }">{{ campaign.description }}</p>
-          <div v-if="showProgress && campaign.goal" class="mt-4">
-            <div class="h-2 w-full overflow-hidden rounded-full" :style="{ background: trackColor }">
-              <div class="h-full rounded-full" :style="{ width: pct(campaign) + '%', background: barColor }" />
-            </div>
-            <p v-if="showRaised" class="mt-2 text-xs" :style="{ color: mutedColor }">
-              {{ currencySymbol }}{{ money(campaign.raised) }} of {{ currencySymbol }}{{ money(campaign.goal) }} raised
-            </p>
-          </div>
-          <UButton
-            :to="donateUrl(campaign)"
-            target="_blank"
-            rel="noopener noreferrer"
-            :disabled="!hasPay(campaign)"
-            class="mt-4"
-            :color="buttonColor"
-            size="sm"
-            :label="buttonLabel"
-          >
-            <template #leading>
-              <IconGlyph name="islamic-donation" class="size-4" />
-            </template>
-          </UButton>
-        </article>
-      </div>
-    </div>
-
-    <!-- FEATURED: one spotlighted campaign + amount selector, rest listed -->
-    <div v-else-if="variant === 'featured'" class="grid gap-6 @xl:grid-cols-[1.4fr_1fr]">
+    <!-- FEATURED: one spotlighted campaign + amount selector -->
+    <div v-else-if="variant === 'featured'" class="grid gap-6 @xl:grid-cols-[1.15fr_0.85fr] @xl:items-center">
       <div :class="alignClass">
         <p class="text-sm font-medium" :style="{ color: accentTextColor }">{{ eyebrow }}</p>
         <h2 class="tenant-heading mt-2 text-2xl font-bold @xl:text-3xl" :style="{ color: headingColor }">{{ title }}</h2>
         <p v-if="subtitle" class="mt-3 max-w-2xl" :style="{ color: mutedColor }">{{ subtitle }}</p>
+        <div v-if="featured?.title || featured?.description" class="mt-5 rounded-md p-4 text-left" :style="panelStyle">
+          <h3 v-if="featured?.title" class="text-lg font-semibold" :style="{ color: headingColor }">{{ featured.title }}</h3>
+          <p v-if="featured?.description" class="mt-2 text-sm" :style="{ color: mutedColor }">{{ featured.description }}</p>
+        </div>
         <div v-if="showProgress && featured?.goal" class="mt-5">
           <div class="h-2.5 w-full overflow-hidden rounded-full" :style="{ background: trackColor }">
             <div class="h-full rounded-full" :style="{ width: pct(featured) + '%', background: barColor }" />
@@ -335,21 +286,12 @@ function bannerAmountStyle(amount: number) {
         </UButton>
       </div>
 
-      <div class="grid content-start gap-3">
-        <article
-          v-for="campaign in otherCampaigns"
-          :key="campaign.id"
-          class="rounded-md p-4"
-          :style="panelStyle"
+      <div v-if="featured?.imageUrl" class="overflow-hidden rounded-md" :style="panelStyle">
+        <img
+          :src="featured.imageUrl"
+          :alt="`${featured.title ?? title} donation image`"
+          class="aspect-[4/3] w-full object-cover"
         >
-          <h3 class="text-sm font-semibold" :style="{ color: headingColor }">{{ campaign.title }}</h3>
-          <div v-if="showProgress && campaign.goal" class="mt-3 h-1.5 w-full overflow-hidden rounded-full" :style="{ background: trackColor }">
-            <div class="h-full rounded-full" :style="{ width: pct(campaign) + '%', background: barColor }" />
-          </div>
-          <p v-if="showRaised && campaign.goal" class="mt-2 text-xs" :style="{ color: mutedColor }">
-            {{ currencySymbol }}{{ money(campaign.raised) }} of {{ currencySymbol }}{{ money(campaign.goal) }}
-          </p>
-        </article>
       </div>
     </div>
 

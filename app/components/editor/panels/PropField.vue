@@ -48,6 +48,26 @@ const selectValue = computed({
 
 const selectItems = computed(() => (props.field.options ?? []) as any[])
 
+const AUTO_DONATION_CAMPAIGN = '__auto_donation_campaign__'
+
+const donationCampaignValue = computed({
+  get: () => stringValue.value || AUTO_DONATION_CAMPAIGN,
+  set: next => emit('update:modelValue', next === AUTO_DONATION_CAMPAIGN ? '' : next)
+})
+
+const donationCampaignItems = computed(() => {
+  const campaigns = ((editor.siteData.value?.donations ?? []) as Array<Record<string, unknown>>)
+    .filter(campaign => !campaign.status || campaign.status === 'ACTIVE')
+
+  return [
+    { label: 'Featured or first active campaign', value: AUTO_DONATION_CAMPAIGN },
+    ...campaigns.map(campaign => ({
+      label: String(campaign.title ?? 'Untitled campaign'),
+      value: String(campaign.id ?? '')
+    })).filter(item => item.value)
+  ]
+})
+
 // Colour fields may store a `var(--color-*)` reference (e.g. the theme default).
 // The colour picker can't render a CSS variable, so resolve it to the active
 // theme's hex for display; picking a new colour writes the literal hex back.
@@ -216,6 +236,20 @@ const richtextBubble = [
       :placeholder="field.placeholder"
       class="w-full"
     />
+
+    <select
+      v-else-if="field.type === 'donation-campaign'"
+      v-model="donationCampaignValue"
+      class="h-9 w-full rounded-md border border-muted bg-default px-3 text-sm text-default outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary"
+    >
+      <option
+        v-for="item in donationCampaignItems"
+        :key="item.value"
+        :value="item.value"
+      >
+        {{ item.label }}
+      </option>
+    </select>
 
     <div
       v-else-if="field.type === 'pattern-select'"

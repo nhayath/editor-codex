@@ -169,9 +169,9 @@ export const noorTemplate: TemplateDefinition = {
         widgets: [
           {
             slot: 'main',
-            widgetId: 'donation-cta',
+            widgetId: 'donation-campaigns',
             defaultProps: {
-              variant: 'cards',
+              variant: 'grid',
               title: 'Support the masjid',
               subtitle: 'Help sustain worship, education, youth programmes, and community care.',
               buttonLabel: 'Give now'
