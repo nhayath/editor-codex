@@ -29,7 +29,7 @@ export const prayerCountdownWidget: WidgetDefinition = {
       { label: 'Soft', value: 'soft' },
       { label: 'Neutral', value: 'neutral' }
     ] },
-    { key: 'background', label: 'Background', type: 'select', default: 'solid', group: 'Display', options: [
+    { key: 'background', label: 'Background', type: 'select', default: 'surface', group: 'Display', options: [
       { label: 'Solid', value: 'solid' },
       { label: 'Gradient', value: 'gradient' },
       { label: 'Surface', value: 'surface' }

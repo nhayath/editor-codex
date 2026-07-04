@@ -175,7 +175,7 @@ const {
 const containerStyle = computed(() => {
   if (isTheme.value) {
     if (props.variant === 'banner') {
-      return { background: 'color-mix(in srgb, var(--color-surface) 92%, var(--color-bg))', ...patternStyle.value }
+      return { background: 'var(--color-surface)', ...patternStyle.value }
     }
     return {
       background: 'var(--color-surface)',
@@ -227,11 +227,6 @@ function bannerAmountStyle(amount: number) {
     :class="rootClass"
     :style="containerStyle"
   >
-    <div
-      v-if="variant === 'banner' && isTheme"
-      class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-text)] opacity-[0.035] [mask-image:url('/backgrounds/eight-point-star.svg')] [mask-position:center] [mask-repeat:repeat] [mask-size:170px]"
-      aria-hidden="true"
-    />
     <!-- Empty state -->
     <div v-if="!hasCampaigns" :class="alignClass">
       <p class="text-sm font-medium" :style="{ color: accentTextColor }">{{ eyebrow }}</p>

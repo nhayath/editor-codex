@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<{
   title: 'Next prayer',
   variant: 'card',
   accent: 'primary',
-  background: 'solid',
+  background: 'surface',
   texture: 'girih-diamonds',
   align: 'left',
   precision: 'minutes',
@@ -257,14 +257,14 @@ const standardTextureStyle = computed(() => ({
 const rootClass = computed(() => {
   if (effectiveVariant.value === 'iqamah-panel') {
     return [
-      'classic-iqamah-panel @container relative isolate h-full overflow-hidden rounded-lg border border-[color:color-mix(in_srgb,var(--color-secondary)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--color-primary)_94%,var(--color-text))] p-4 text-[var(--color-surface)] shadow-[0_22px_56px_color-mix(in_srgb,var(--color-primary)_18%,transparent)] @md:p-5',
+      '@container relative isolate h-full overflow-hidden rounded-lg border border-[color:color-mix(in_srgb,var(--color-text)_12%,transparent)] p-4 @md:p-5',
       { 'classic-iqamah-panel-urgent': isFinalMinute.value }
     ]
   }
 
   return '@container relative isolate h-full overflow-hidden rounded-lg p-6'
 })
-const rootStyle = computed(() => effectiveVariant.value === 'iqamah-panel' ? undefined : containerStyle.value)
+const rootStyle = computed(() => containerStyle.value)
 
 // Remaining prayers list for the `split` variant.
 const upcoming = computed(() => {
@@ -297,16 +297,12 @@ const upcoming = computed(() => {
 
     <!-- Iqamah panel: Sacred Modern-inspired standalone board -->
     <template v-if="effectiveVariant === 'iqamah-panel'">
-      <div class="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_8%_12%,color-mix(in_srgb,var(--color-secondary)_20%,transparent),transparent_32%),linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_95%,var(--color-text)),var(--color-primary))]" />
-      <div
-        v-if="texturePattern"
-        class="pointer-events-none absolute inset-0 -z-10 bg-[var(--color-secondary)] opacity-[0.08] [mask-position:center] [mask-repeat:repeat] [mask-size:220px]"
-        :style="textureStyle"
-      />
-
       <div class="grid gap-4 @md:grid-cols-[auto_1fr_auto] @md:items-center">
         <div class="flex items-center gap-3">
-          <span class="classic-iqamah-live-dot grid size-12 shrink-0 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--color-secondary)_18%,transparent)] text-[var(--color-secondary)] ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_42%,transparent)]">
+          <span
+            class="classic-iqamah-live-dot grid size-12 shrink-0 place-items-center rounded-full ring-1"
+            :style="{ background: isFilled ? 'color-mix(in srgb, var(--color-secondary) 18%, transparent)' : 'color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))', color: accentTextColor, borderColor: trackColor }"
+          >
             <UIcon
               v-if="showIcon"
               :name="next.icon"
@@ -314,45 +310,46 @@ const upcoming = computed(() => {
             />
           </span>
           <div>
-            <p class="text-[0.68rem] font-black uppercase tracking-normal text-[var(--color-secondary)]">
+            <p class="text-[0.68rem] font-black uppercase tracking-normal" :style="{ color: accentTextColor }">
               {{ title }}
             </p>
-            <h2 class="tenant-heading mt-0.5 text-2xl font-bold leading-none text-[var(--color-surface)] @md:text-3xl">
+            <h2 class="tenant-heading mt-0.5 text-2xl font-bold leading-none @md:text-3xl" :style="{ color: headingColor }">
               {{ next.name }}
             </h2>
             <p
               v-if="showDate && dateLabel"
-              class="mt-1 max-w-[42rem] text-xs font-semibold leading-snug text-[color:color-mix(in_srgb,var(--color-surface)_64%,transparent)]"
+              class="mt-1 max-w-[42rem] text-xs font-semibold leading-snug"
+              :style="{ color: mutedColor }"
             >
               {{ dateLabel }}
             </p>
           </div>
         </div>
 
-        <div class="grid gap-2 border-y border-[color:color-mix(in_srgb,var(--color-surface)_10%,transparent)] py-4 @md:grid-cols-2 @md:border-x @md:border-y-0 @md:px-6 @md:py-0">
+        <div class="grid gap-2 border-y py-4 @md:grid-cols-2 @md:border-x @md:border-y-0 @md:px-6 @md:py-0" :style="{ borderColor: trackColor }">
           <div>
-            <p class="text-xs font-bold uppercase tracking-normal text-[color:color-mix(in_srgb,var(--color-surface)_50%,transparent)]">
+            <p class="text-xs font-bold uppercase tracking-normal" :style="{ color: mutedColor }">
               Prayer begins
             </p>
-            <p class="mt-1 text-2xl font-black tabular-nums text-[var(--color-surface)]">
+            <p class="mt-1 text-2xl font-black tabular-nums" :style="{ color: headingColor }">
               {{ next.adhanTime || '--:--' }}
             </p>
           </div>
           <div>
-            <p class="text-xs font-bold uppercase tracking-normal text-[color:color-mix(in_srgb,var(--color-surface)_50%,transparent)]">
+            <p class="text-xs font-bold uppercase tracking-normal" :style="{ color: mutedColor }">
               Iqamah
             </p>
-            <p class="mt-1 text-2xl font-black tabular-nums text-[var(--color-secondary)]">
+            <p class="mt-1 text-2xl font-black tabular-nums" :style="{ color: accentTextColor }">
               {{ next.iqamahTime || next.adhanTime || '--:--' }}
             </p>
           </div>
         </div>
 
-        <div class="rounded-md bg-[color:color-mix(in_srgb,var(--color-secondary)_14%,transparent)] px-4 py-3 ring-1 ring-[color:color-mix(in_srgb,var(--color-secondary)_22%,transparent)] @md:min-w-44 @md:text-right">
-          <p class="text-xs font-bold uppercase tracking-normal text-[color:color-mix(in_srgb,var(--color-surface)_64%,transparent)]">
+        <div class="rounded-md px-4 py-3 ring-1 @md:min-w-44 @md:text-right" :style="{ background: isFilled ? 'color-mix(in srgb, var(--color-secondary) 14%, transparent)' : 'color-mix(in srgb, var(--color-primary) 7%, var(--color-surface))', borderColor: trackColor }">
+          <p class="text-xs font-bold uppercase tracking-normal" :style="{ color: mutedColor }">
             {{ contextLabel }}
           </p>
-          <p class="mt-1 text-3xl font-black tabular-nums text-[var(--color-secondary)] @md:text-4xl">
+          <p class="mt-1 text-3xl font-black tabular-nums @md:text-4xl" :style="{ color: accentTextColor }">
             {{ countdownLabel }}
           </p>
         </div>
@@ -567,10 +564,6 @@ const upcoming = computed(() => {
 
 <style scoped>
 @media (prefers-reduced-motion: no-preference) {
-  .classic-iqamah-panel {
-    animation: classic-iqamah-glow 4s ease-in-out infinite;
-  }
-
   .classic-iqamah-live-dot {
     animation: classic-iqamah-pulse 3.2s ease-in-out infinite;
   }
@@ -593,25 +586,13 @@ const upcoming = computed(() => {
   }
 }
 
-@keyframes classic-iqamah-glow {
-  0%, 100% {
-    box-shadow: 0 22px 56px color-mix(in srgb, var(--color-primary) 18%, transparent);
-  }
-
-  50% {
-    box-shadow: 0 24px 72px color-mix(in srgb, var(--color-secondary) 22%, transparent);
-  }
-}
-
 @keyframes classic-iqamah-heartbeat {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 22px 56px color-mix(in srgb, var(--color-secondary) 18%, transparent);
   }
 
   35% {
     transform: scale(1.018);
-    box-shadow: 0 28px 84px color-mix(in srgb, var(--color-secondary) 32%, transparent);
   }
 
   58% {
