@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import { getTenantLogoUrl } from '~/components/templates/chrome'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   tenant?: Record<string, any> | null
   templateId?: string
   sticky?: boolean
   chromeStyle?: string
-}>()
+  ctaLabel?: string
+  ctaHref?: string
+  ctaIcon?: string
+}>(), {
+  ctaLabel: 'Contact',
+  ctaHref: '#contact',
+  ctaIcon: 'i-lucide-mail'
+})
 
 const menuOpen = ref(false)
 
@@ -54,10 +61,10 @@ const logoUrl = computed(() => getTenantLogoUrl(props.tenant))
 
       <div class="hidden @4xl:block">
         <UButton
-          to="#contact"
+          :to="ctaHref"
           color="primary"
-          icon="i-lucide-mail"
-          label="Contact"
+          :icon="ctaIcon"
+          :label="ctaLabel"
           size="sm"
           class="bg-[var(--color-accent)] text-[var(--color-surface)] hover:bg-[color:color-mix(in_srgb,var(--color-accent)_86%,var(--color-text))]"
         />

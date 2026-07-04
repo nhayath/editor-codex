@@ -512,16 +512,21 @@ body {
 }
 
 /* ============================================================
-   Classic — refined traditional layout with Islamic geometric
-   touches and gentle motion. Everything here is scoped to
-   [data-template='classic'] so the other templates (and the
-   shared TenantHeader/Footer fallback) are untouched.
+   Classic - refined light masjid identity for the default
+   template. Cream base, emerald structure, gold ornament, and
+   subtle Islamic geometry. Scoped so other templates are untouched.
    ============================================================ */
 .tenant-site[data-template='classic'] {
   position: relative;
   isolation: isolate;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 88%, #f0e3c8) 0%, var(--color-bg) 34rem, #f7f1e4 100%);
+  --classic-cream: #fbf7ed;
+  --classic-cream-deep: #efe4cc;
+  --classic-green: var(--color-primary);
   --classic-gold: var(--color-secondary);
-  --classic-hairline: color-mix(in srgb, var(--color-text) 10%, transparent);
+  --classic-hairline: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  --classic-shadow: color-mix(in srgb, var(--color-primary) 13%, transparent);
 }
 
 /* Decorative geometric texture behind the whole page. Only shown when the
@@ -530,13 +535,27 @@ body {
   position: absolute;
   z-index: 0;
   inset: 0;
-  background: color-mix(in srgb, var(--color-primary) 64%, var(--color-secondary));
+  background: color-mix(in srgb, var(--classic-green) 72%, var(--classic-gold));
   content: "";
   mask-image: url("/backgrounds/eight-point-star.svg");
   mask-position: top center;
   mask-repeat: repeat;
-  mask-size: 132px;
-  opacity: 0.05;
+  mask-size: 128px;
+  opacity: 0.045;
+  pointer-events: none;
+}
+
+.tenant-site[data-template='classic']:not(.tenant-page-background)::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: color-mix(in srgb, var(--classic-gold) 72%, var(--classic-green));
+  content: "";
+  mask-image: url("/backgrounds/mihrab-arches.svg");
+  mask-position: top 5rem center;
+  mask-repeat: repeat-x;
+  mask-size: 172px;
+  opacity: 0.038;
   pointer-events: none;
 }
 
@@ -546,57 +565,111 @@ body {
 }
 
 /* Section rhythm */
+.tenant-site[data-template='classic'] .tenant-container {
+  width: min(1160px, calc(100% - 2rem));
+}
+
 .tenant-site[data-template='classic'] > .tenant-section {
-  padding-block: clamp(1.75rem, 4vw, 3rem);
+  padding-block: clamp(2rem, 4.5vw, 3.75rem);
 }
 
 .tenant-site[data-template='classic'] > .tenant-section:first-of-type {
-  padding-block: clamp(1rem, 2.5vw, 1.75rem) clamp(1.25rem, 3vw, 2.25rem);
+  padding-block: clamp(0.9rem, 2vw, 1.25rem) clamp(0.6rem, 1.8vw, 1.15rem);
 }
 
 .tenant-site[data-template='classic'] > #next-prayer {
-  padding-block: clamp(0.75rem, 2vw, 1.25rem) clamp(0.5rem, 1.5vw, 1rem);
+  padding-block: clamp(0.85rem, 2vw, 1.25rem) clamp(0.4rem, 1.4vw, 0.8rem);
 }
 
 .tenant-site[data-template='classic'] > #next-prayer + #hero {
-  padding-block-start: clamp(0.5rem, 1.5vw, 1rem);
+  padding-block-start: clamp(0.5rem, 1.4vw, 0.9rem);
 }
 
 .tenant-site[data-template='classic'] > #next-prayer + #hero::before {
   display: none;
 }
 
+.tenant-site[data-template='classic'] > :where(#donation-cta, #donation-campaigns) {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--classic-gold) 9%, transparent), color-mix(in srgb, var(--classic-green) 5%, transparent));
+}
+
 /* Ornamental gold hairline divider between consecutive sections */
 .tenant-site[data-template='classic'] > .tenant-section + .tenant-section::before {
   display: block;
-  width: min(440px, 64%);
-  height: 9px;
-  margin: 0 auto clamp(1rem, 2.5vw, 1.75rem);
+  width: min(480px, 68%);
+  height: 13px;
+  margin: 0 auto clamp(1.15rem, 2.5vw, 2rem);
   background:
-    linear-gradient(90deg, transparent, var(--classic-hairline) 16%, color-mix(in srgb, var(--color-secondary) 55%, transparent) 50%, var(--classic-hairline) 84%, transparent) center / 100% 1px no-repeat,
-    radial-gradient(circle, color-mix(in srgb, var(--color-secondary) 80%, transparent) 0 3px, transparent 3.5px) center / 9px 9px no-repeat;
+    linear-gradient(90deg, transparent, var(--classic-hairline) 14%, color-mix(in srgb, var(--classic-gold) 64%, transparent) 50%, var(--classic-hairline) 86%, transparent) center / 100% 1px no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--classic-gold) 88%, transparent) 0 3px, transparent 3.5px) center / 9px 9px no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--classic-green) 60%, transparent) 0 2px, transparent 2.5px) calc(50% - 24px) center / 7px 7px no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--classic-green) 60%, transparent) 0 2px, transparent 2.5px) calc(50% + 24px) center / 7px 7px no-repeat;
   content: "";
 }
 
-/* Cards: a calmer resting shadow plus a gentle hover lift */
-.tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .rounded-lg) {
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+/* Card and panel finish: warm surfaces, restrained geometry, green/gold states. */
+.tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .rounded-lg, .tenant-section .rounded-xl, .tenant-section .rounded-2xl) {
+  border-radius: 0.5rem;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
 }
 
-.tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1) {
-  box-shadow: 0 12px 30px color-mix(in srgb, var(--color-primary) 9%, transparent);
+.tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .ring-1, .tenant-section .rounded-lg, .tenant-section .rounded-xl, .tenant-section .rounded-2xl) {
+  border-color: color-mix(in srgb, var(--classic-gold) 20%, var(--classic-hairline));
+  box-shadow:
+    0 16px 36px var(--classic-shadow),
+    0 1px 0 color-mix(in srgb, var(--classic-gold) 24%, transparent);
+}
+
+.tenant-site[data-template='classic'] :where(.tenant-section .tenant-surface-pattern)::before {
+  mask-position: center;
+}
+
+.tenant-site[data-template='classic'] > #hero :where(.rounded-lg) {
+  background: color-mix(in srgb, var(--classic-cream) 72%, var(--color-surface));
+  box-shadow:
+    0 22px 55px color-mix(in srgb, var(--classic-green) 16%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--classic-gold) 24%, transparent);
+}
+
+.tenant-site[data-template='classic'] > #hero img {
+  background: color-mix(in srgb, var(--classic-green) 10%, var(--classic-cream));
+}
+
+.tenant-site[data-template='classic'] :where(a, button):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--classic-gold) 76%, var(--classic-green));
+  outline-offset: 3px;
 }
 
 /* Header: gold-tinted base line + soft elevation */
 .tenant-site[data-template='classic'] > header {
-  border-bottom-color: color-mix(in srgb, var(--color-secondary) 32%, var(--classic-hairline));
-  box-shadow: 0 10px 30px color-mix(in srgb, var(--color-primary) 7%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--classic-gold) 42%, var(--classic-hairline));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--classic-cream) 90%, var(--color-surface)), color-mix(in srgb, var(--color-surface) 86%, transparent));
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--classic-green) 10%, transparent);
+}
+
+.tenant-site[data-template='classic'] > header :where(a:first-child > div) {
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--classic-green) 90%, #10251b), var(--classic-green));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--classic-gold) 42%, transparent),
+    0 8px 20px color-mix(in srgb, var(--classic-green) 16%, transparent);
+}
+
+.tenant-site[data-template='classic'] > header :where(nav a, nav button) {
+  letter-spacing: 0;
 }
 
 /* Footer: gold gradient top accent */
 .tenant-site[data-template='classic'] > footer {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 88%, var(--classic-cream)), color-mix(in srgb, var(--classic-cream-deep) 54%, var(--color-surface)));
   border-top: 2px solid transparent;
-  border-image: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-secondary) 70%, transparent) 35%, color-mix(in srgb, var(--color-secondary) 70%, transparent) 65%, transparent) 1;
+  border-image: linear-gradient(90deg, transparent, color-mix(in srgb, var(--classic-gold) 78%, transparent) 35%, color-mix(in srgb, var(--classic-gold) 78%, transparent) 65%, transparent) 1;
 }
 
 /* Motion — opt-in only when the visitor allows it */
@@ -612,8 +685,11 @@ body {
   .tenant-site[data-template='classic'] > .tenant-section:nth-of-type(5) { animation-delay: 0.34s; }
   .tenant-site[data-template='classic'] > .tenant-section:nth-of-type(n+6) { animation-delay: 0.4s; }
 
-  .tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1):hover {
-    box-shadow: 0 20px 44px color-mix(in srgb, var(--color-primary) 16%, transparent);
+  .tenant-site[data-template='classic'] :where(.tenant-section article, .tenant-section .rounded-lg.ring-1, .tenant-section .rounded-xl, .tenant-section .rounded-2xl):hover {
+    border-color: color-mix(in srgb, var(--classic-gold) 36%, var(--classic-hairline));
+    box-shadow:
+      0 24px 52px color-mix(in srgb, var(--classic-green) 18%, transparent),
+      0 1px 0 color-mix(in srgb, var(--classic-gold) 34%, transparent);
     transform: translateY(-4px);
   }
 }

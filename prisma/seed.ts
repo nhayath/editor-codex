@@ -5,6 +5,23 @@ const prisma = new PrismaClient()
 
 const passwordHash = await bcrypt.hash('password123', 10)
 
+const classicNavItems = [
+  { label: 'Home', href: '#top', order: 0 },
+  { label: 'Prayer Times', href: '#prayer-times', order: 1 },
+  { label: "Jumu'ah", href: '#jummah-prayers', order: 2 },
+  { label: 'Events', href: '#events', order: 3 },
+  { label: 'Donate', href: '#donation-cta', order: 4 },
+  { label: 'About', href: '#about-mosque', order: 5 }
+]
+
+const classicFooterLinks = [
+  { label: 'Prayer Times', href: '#prayer-times', order: 0 },
+  { label: "Jumu'ah Prayers", href: '#jummah-prayers', order: 1 },
+  { label: 'Events', href: '#events', order: 2 },
+  { label: 'Donation Campaigns', href: '#donation-campaigns', order: 3 },
+  { label: 'About Us', href: '#about-mosque', order: 4 }
+]
+
 const tenantSeeds = [
   {
     owner: { email: 'owner@alnoor.test', name: 'Al-Noor Owner' },
@@ -13,7 +30,7 @@ const tenantSeeds = [
       slug: 'al-noor',
       domain: 'al-noor.msaas.test',
       templateId: 'classic',
-      paletteId: 'emerald',
+      paletteId: 'sacred-modern',
       fontPairId: 'inter-amiri',
       settings: {
         address: '14 Crescent Road',
@@ -22,14 +39,16 @@ const tenantSeeds = [
         phone: '+44 20 7946 1010',
         email: 'info@alnoor.test',
         logoUrl: '',
-        primaryColor: '#1B6B4A',
-        secondaryColor: '#D4AF37',
+        primaryColor: '#004532',
+        secondaryColor: '#DDBB32',
         aboutText: 'Al-Noor Mosque serves local families through daily prayers, Islamic education, youth work, and community support.',
         facebook: 'https://facebook.com/alnoor',
         instagram: 'https://instagram.com/alnoor',
         youtube: 'https://youtube.com/@alnoor',
         timezone: 'Europe/London'
       },
+      navItems: classicNavItems,
+      footerLinks: classicFooterLinks,
       overrides: {
         hero: {
           props: {
@@ -99,8 +118,8 @@ const tenantSeeds = [
       slug: 'birmingham-central',
       domain: 'bcm.msaas.test',
       templateId: 'classic',
-      paletteId: 'burgundy',
-      fontPairId: 'playfair-lato',
+      paletteId: 'sacred-modern',
+      fontPairId: 'inter-amiri',
       settings: {
         address: '180 Belgrave Middleway',
         city: 'Birmingham',
@@ -108,14 +127,16 @@ const tenantSeeds = [
         phone: '+44 121 555 3030',
         email: 'admin@bcm.test',
         logoUrl: '',
-        primaryColor: '#7B2D3B',
-        secondaryColor: '#D4A574',
+        primaryColor: '#004532',
+        secondaryColor: '#DDBB32',
         aboutText: 'Birmingham Central Mosque welcomes worshippers and visitors with daily prayer, Islamic learning, and community services.',
         facebook: 'https://facebook.com/bcm',
         instagram: 'https://instagram.com/bcm',
         youtube: 'https://youtube.com/@bcm',
         timezone: 'Europe/London'
       },
+      navItems: classicNavItems,
+      footerLinks: classicFooterLinks,
       overrides: {
         hero: {
           props: {

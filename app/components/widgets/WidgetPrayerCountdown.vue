@@ -297,8 +297,8 @@ const upcoming = computed(() => {
 
     <!-- Iqamah panel: Sacred Modern-inspired standalone board -->
     <template v-if="effectiveVariant === 'iqamah-panel'">
-      <div class="grid gap-4 @md:grid-cols-[auto_1fr_auto] @md:items-center">
-        <div class="flex items-center gap-3">
+      <div class="grid gap-4 @3xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.75fr)_auto] @3xl:items-center">
+        <div class="flex min-w-0 items-center gap-3">
           <span
             class="classic-iqamah-live-dot grid size-12 shrink-0 place-items-center rounded-full ring-1"
             :style="{ background: isFilled ? 'color-mix(in srgb, var(--color-secondary) 18%, transparent)' : 'color-mix(in srgb, var(--color-primary) 10%, var(--color-surface))', color: accentTextColor, borderColor: trackColor }"
@@ -326,7 +326,7 @@ const upcoming = computed(() => {
           </div>
         </div>
 
-        <div class="grid gap-2 border-y py-4 @md:grid-cols-2 @md:border-x @md:border-y-0 @md:px-6 @md:py-0" :style="{ borderColor: trackColor }">
+        <div class="grid min-w-0 gap-2 border-y py-4 @3xl:border-x @3xl:border-y-0 @3xl:px-6 @3xl:py-0 @4xl:grid-cols-2" :style="{ borderColor: trackColor }">
           <div>
             <p class="text-xs font-bold uppercase tracking-normal" :style="{ color: mutedColor }">
               Prayer begins
@@ -345,7 +345,7 @@ const upcoming = computed(() => {
           </div>
         </div>
 
-        <div class="rounded-md px-4 py-3 ring-1 @md:min-w-44 @md:text-right" :style="{ background: isFilled ? 'color-mix(in srgb, var(--color-secondary) 14%, transparent)' : 'color-mix(in srgb, var(--color-primary) 7%, var(--color-surface))', borderColor: trackColor }">
+        <div class="rounded-md px-4 py-3 ring-1 @3xl:min-w-44 @3xl:text-right" :style="{ background: isFilled ? 'color-mix(in srgb, var(--color-secondary) 14%, transparent)' : 'color-mix(in srgb, var(--color-primary) 7%, var(--color-surface))', borderColor: trackColor }">
           <p class="text-xs font-bold uppercase tracking-normal" :style="{ color: mutedColor }">
             {{ contextLabel }}
           </p>
